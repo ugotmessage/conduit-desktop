@@ -39,7 +39,7 @@ import { TBL } from './types.js';
 import { loadLaunchIdentity, type LaunchIdentity } from './app-sync-identity.js';
 import { openInPlace } from './app-sync-open.js';
 import { devDeviceLimitOverride, devLimitCollaborators } from './app-sync-dev.js';
-import { UNLIMITED } from '../vault-session/effective-limit.js';
+import { localFileSyncCollaborators } from './app-sync-local.js';
 import { devIgnoreOwnerTag } from './app-sync-dev-owner.js';
 import { exportClosedLineage, lineageForPath, pendingVaults, type LineageLookupDeps } from './app-sync-lineage.js';
 import { exportUnsynced as exportOpen, sideFileTuples } from './app-sync-actions.js';
@@ -119,6 +119,7 @@ export class AppSyncManager {
   private started: Started | null = null;
   private readonly slot: VaultSlot<OpenedPersonalVault>;
   private openedPath: string | null = null;
+  private localFileSyncSession = false;
   private continueWaiters: (() => void)[] = [];
   /** Lineages whose unsynced changes were exported this launch (5.11 turn-off rule). */
   private readonly exported = new Set<string>();
@@ -221,10 +222,11 @@ export class AppSyncManager {
       progress: this.progress(),
       incarnations: s.identity.incarnations,
       tickets: this.tickets,
-      collaborators: devLimitCollaborators(localFileSync ? UNLIMITED : s.devLimit),
+      collaborators: localFileSync ? localFileSyncCollaborators() : devLimitCollaborators(s.devLimit),
       ignoreOwnerTag: localFileSync || s.ignoreOwnerTag,
       localFileSync,
     };
+    this.localFileSyncSession = localFileSync;
     try {
       const opened = await this.slot.open(() => (this.isEnabled() ? openPersonalVault(input, openDeps) : openInPlace(input, openDeps)));
       this.openedPath = path.resolve(input.path);
@@ -267,6 +269,11 @@ export class AppSyncManager {
   /** Opening, closing, open or soft-locked: a lock must run and before-quit must flush. */
   hasSession(): boolean {
     return this.slot.isBusy();
+  }
+
+  /** Includes an unlock in progress, so signing in cannot retain a local-only runtime. */
+  hasLocalFileSyncSession(): boolean {
+    return this.localFileSyncSession && this.hasSession();
   }
 
   isOpening(): boolean {

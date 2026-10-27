@@ -57,7 +57,7 @@ export function useRemoteClipboard({
 
   // Sync local clipboard to remote — debounced to avoid spamming
   const syncToRemote = (trigger: string) => {
-    if (!enabled || !isConnected) return;
+    if (!enabled || !isConnected || !isActive) return;
     const now = Date.now();
     if (now - lastSyncRef.current < 500) return; // 500ms debounce
     lastSyncRef.current = now;
@@ -68,18 +68,18 @@ export function useRemoteClipboard({
 
   // On focus of container: sync local clipboard to remote
   useEffect(() => {
-    if (!enabled || !isConnected) return;
+    if (!enabled || !isConnected || !isActive) return;
     const el = containerRef.current;
     if (!el) return;
 
     const handleFocus = () => syncToRemote("focus");
-    el.addEventListener("focus", handleFocus);
-    return () => el.removeEventListener("focus", handleFocus);
-  }, [sessionId, protocol, isConnected, enabled, containerRef]);
+    el.addEventListener("focusin", handleFocus);
+    return () => el.removeEventListener("focusin", handleFocus);
+  }, [sessionId, protocol, isConnected, isActive, enabled, containerRef]);
 
   // On paste event: send clipboard text directly as safety net
   useEffect(() => {
-    if (!enabled || !isConnected) return;
+    if (!enabled || !isConnected || !isActive) return;
     const el = containerRef.current;
     if (!el) return;
 
@@ -93,14 +93,14 @@ export function useRemoteClipboard({
 
     el.addEventListener("paste", handlePaste);
     return () => el.removeEventListener("paste", handlePaste);
-  }, [sessionId, protocol, isConnected, enabled, containerRef]);
+  }, [sessionId, protocol, isConnected, isActive, enabled, containerRef]);
 
   // On isActive change to true: sync clipboard
   useEffect(() => {
     if (isActive && enabled && isConnected) {
       syncToRemote("isActive");
     }
-  }, [isActive, enabled, isConnected]);
+  }, [sessionId, protocol, isActive, enabled, isConnected]);
 
   // Listen for clipboard events from main process (informational)
   useEffect(() => {
