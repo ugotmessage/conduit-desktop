@@ -1,3 +1,4 @@
+import { t as __tr } from "./lib/i18n";
 import { useState, useEffect, useCallback, useRef } from "react";
 import Sidebar from "./components/layout/Sidebar";
 import SplitContainer from "./components/layout/SplitContainer";
@@ -117,10 +118,9 @@ function OfflineBanner() {
       status={false}
       align="center"
       className="shrink-0"
-      actions={[{ label: "Reconnect", onClick: () => void useAuthStore.getState().tryReauthenticate() }]}
+      actions={[{ label: __tr("Reconnect"), onClick: () => void useAuthStore.getState().tryReauthenticate() }]}
     >
-      Working offline — using cached features
-    </Banner>
+      {__tr("Working offline — using cached features")}</Banner>
   );
 }
 
@@ -213,13 +213,13 @@ function App() {
       if (lastShown === today) return;
 
       if (days <= 1 && days > 0) {
-        toast.warning('Your trial ends tomorrow. Subscribe to keep Pro features.');
+        toast.warning(__tr("Your trial ends tomorrow. Subscribe to keep Pro features."));
         localStorage.setItem(lastWarningKey, today);
       } else if (days <= 3) {
-        toast.warning(`Your trial ends in ${days} days. Subscribe to keep access.`);
+        toast.warning(__tr("Your trial ends in {v0} days. Subscribe to keep access.", { v0: (days) }));
         localStorage.setItem(lastWarningKey, today);
       } else if (days <= 7) {
-        toast.info(`Your trial ends in ${days} days.`);
+        toast.info(__tr("Your trial ends in {v0} days.", { v0: (days) }));
         localStorage.setItem(lastWarningKey, today);
       }
     });
@@ -233,14 +233,14 @@ function App() {
         const profile = useAuthStore.getState().profile;
         const status = profile?.subscription_status;
         if (status === 'active') {
-          toast.success('Your trial has ended and your Pro subscription is now active.', {
+          toast.success(__tr("Your trial has ended and your Pro subscription is now active."), {
             persistent: true,
-            actions: [{ label: 'Relaunch', onClick: () => invoke('app_relaunch'), variant: 'primary' }],
+            actions: [{ label: __tr("Relaunch"), onClick: () => invoke('app_relaunch'), variant: 'primary' }],
           });
         } else if (profile?.has_used_trial) {
-          toast.warning('Your trial has ended. Subscribe to keep Pro features.', {
+          toast.warning(__tr("Your trial has ended. Subscribe to keep Pro features."), {
             persistent: true,
-            actions: [{ label: 'Relaunch', onClick: () => invoke('app_relaunch') }],
+            actions: [{ label: __tr("Relaunch"), onClick: () => invoke('app_relaunch') }],
           });
         }
       }
@@ -412,9 +412,9 @@ function App() {
   // Tier change notification
   useEffect(() => {
     const handleTierChanged = () => {
-      toast.info('Your plan has changed. Relaunch to apply all updates.', {
+      toast.info(__tr("Your plan has changed. Relaunch to apply all updates."), {
         persistent: true,
-        actions: [{ label: 'Relaunch', onClick: () => invoke('app_relaunch'), variant: 'primary' }],
+        actions: [{ label: __tr("Relaunch"), onClick: () => invoke('app_relaunch'), variant: 'primary' }],
       });
     };
     document.addEventListener('conduit:tier-changed', handleTierChanged);
@@ -635,7 +635,7 @@ function App() {
       if (vaultType === "team") {
         const { myVaultRole, myRole } = useTeamStore.getState();
         if (myVaultRole !== "admin" && myRole !== "admin") {
-          toast.error("Only vault admins or team admins can rename this vault");
+          toast.error(__tr("Only vault admins or team admins can rename this vault"));
           return;
         }
         if (!teamVaultId) return;
@@ -649,7 +649,7 @@ function App() {
       const { isUnlocked, vaultType } = useVaultStore.getState();
       if (!isUnlocked) return;
       if (vaultType === "team") {
-        toast.error("Password change is not available for team vaults");
+        toast.error(__tr("Password change is not available for team vaults"));
         return;
       }
       setShowChangePasswordDialog(true);
@@ -658,14 +658,14 @@ function App() {
       const { isUnlocked, vaultType, saveVault } = useVaultStore.getState();
       if (!isUnlocked) return;
       if (vaultType === "team") {
-        toast.info("Team vaults are saved to cloud automatically");
+        toast.info(__tr("Team vaults are saved to cloud automatically"));
         return;
       }
       try {
         await saveVault();
-        toast.success("Vault saved", { duration: 2000 });
+        toast.success(__tr("Vault saved"), { duration: 2000 });
       } catch {
-        toast.error("Failed to save vault");
+        toast.error(__tr("Failed to save vault"));
       }
     };
     const handleNewAgentEvent = () => {
@@ -883,9 +883,9 @@ function App() {
       else if (a === "close-all-sessions") {
         useSessionStore.getState().clearAll();
         useLayoutStore.getState().resetLayout();
-        toast.info("All sessions closed");
+        toast.info(__tr("All sessions closed"));
       }
-      else if (a === "dev:test-toast") toast.success("Test toast notification", "Triggered from View menu");
+      else if (a === "dev:test-toast") toast.success(__tr("Test toast notification"), __tr("Triggered from View menu"));
     });
 
     // macOS refused Conduit's local network traffic at startup. Nothing on the
@@ -896,12 +896,12 @@ function App() {
         payload && typeof payload === "object" && "appName" in payload && typeof payload.appName === "string"
           ? payload.appName
           : localNetworkSettingsAppName();
-      toast.error("macOS is blocking local network access", {
+      toast.error(__tr("macOS is blocking local network access"), {
         message: localNetworkPermissionMessage(appName),
         persistent: true,
         actions: [
           {
-            label: "Open Settings",
+            label: __tr("Open Settings"),
             variant: "primary",
             onClick: () => invoke("open_local_network_settings").catch(console.error),
           },
@@ -1083,7 +1083,7 @@ function App() {
                 <IconButton
                   data-cv-ai-toggle=""
                   icon="robot"
-                  label="Toggle AI Panel"
+                  label={__tr("Toggle AI Panel")}
                   pressed={showAiPanel}
                   className="mr-2"
                   onClick={() => setShowAiPanel(!showAiPanel)}

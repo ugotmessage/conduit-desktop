@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 /**
  * useRemoteClipboard — bidirectional clipboard sync for RDP/VNC sessions.
  *
@@ -110,7 +111,7 @@ export function useRemoteClipboard({
       `${protocol}:clipboard`,
       (event) => {
         if (event.payload.sessionId === sessionId) {
-          toast.success("Copied from remote clipboard");
+          toast.success(__tr("Copied from remote clipboard"));
         }
       }
     );

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useCallback, type JSX } from "react";
 import { invoke } from "../../lib/electron";
 import {
@@ -110,10 +111,9 @@ export default function VaultImportDialog({ onClose }: Props) {
   const footer =
     step === "file" ? (
       <>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{__tr("Cancel")}</Button>
         <Button variant="primary" onClick={handleDecrypt} disabled={!filePath || !passphrase} loading={loading} loadingLabel="Decrypting...">
-          Continue
-        </Button>
+          {__tr("Continue")}</Button>
       </>
     ) : step === "preview" ? (
       <>
@@ -124,22 +124,19 @@ export default function VaultImportDialog({ onClose }: Props) {
             setError(null);
           }}
         >
-          Back
-        </Button>
+          {__tr("Back")}</Button>
         <Button variant="primary" onClick={handleImport}>
-          Import {preview ? preview.entry_count : 0} Entries
-        </Button>
+          {__tr("Import")} {preview ? preview.entry_count : 0} {__tr("Entries")}</Button>
       </>
     ) : step === "results" ? (
       <Button variant="primary" onClick={onClose}>
-        Done
-      </Button>
+        {__tr("Done")}</Button>
     ) : null;
 
   return (
     <Dialog
       open
-      title="Import from Export"
+      title={__tr("Import from Export")}
       icon="upload"
       width={512}
       onClose={onClose}
@@ -151,7 +148,7 @@ export default function VaultImportDialog({ onClose }: Props) {
       {step === "file" && (
         <div className="space-y-4">
           <div>
-            <label className="block text-label font-semibold text-ink-secondary mb-1">Export File</label>
+            <label className="block text-label font-semibold text-ink-secondary mb-1">{__tr("Export File")}</label>
             <button
               type="button"
               onClick={handlePickFile}
@@ -159,7 +156,7 @@ export default function VaultImportDialog({ onClose }: Props) {
             >
               <FileImportIcon size={16} className="text-ink-muted flex-shrink-0" />
               <span className={filePath ? "truncate text-ink" : "truncate text-ink-muted"}>
-                {filePath ? filePath.split(/[/\\]/).pop() : "Choose .conduit-export file..."}
+                {filePath ? filePath.split(/[/\\]/).pop() : __tr("Choose .conduit-export file...")}
               </span>
             </button>
           </div>
@@ -168,15 +165,14 @@ export default function VaultImportDialog({ onClose }: Props) {
             label={
               <span className="inline-flex items-center gap-1">
                 <LockIcon size={16} />
-                Export Passphrase
-              </span>
+                {__tr("Export Passphrase")}</span>
             }
           >
             <TextInput
               type={showPassphrase ? "text" : "password"}
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
-              placeholder="Enter the passphrase used during export"
+              placeholder={__tr("Enter the passphrase used during export")}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && filePath && passphrase) handleDecrypt();
               }}
@@ -184,7 +180,7 @@ export default function VaultImportDialog({ onClose }: Props) {
                 <IconButton
                   size="sm"
                   icon={showPassphrase ? "eyeOff" : "eye"}
-                  label={showPassphrase ? "Hide passphrase" : "Show passphrase"}
+                  label={showPassphrase ? __tr("Hide passphrase") : __tr("Show passphrase")}
                   onClick={() => setShowPassphrase(!showPassphrase)}
                   tabIndex={-1}
                 />
@@ -204,24 +200,23 @@ export default function VaultImportDialog({ onClose }: Props) {
         <div className="space-y-4">
           <div className="p-3 rounded-md bg-well space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-ink-muted">Source Vault</span>
+              <span className="text-ink-muted">{__tr("Source Vault")}</span>
               <span className="font-medium text-ink">{preview.source_vault_name}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-ink-muted">Exported</span>
+              <span className="text-ink-muted">{__tr("Exported")}</span>
               <span>{new Date(preview.exported_at).toLocaleDateString()}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-ink-muted">Scope</span>
-              <span>{preview.scope === "full" ? "Full vault" : preview.scope_path ?? "Folder"}</span>
+              <span className="text-ink-muted">{__tr("Scope")}</span>
+              <span>{preview.scope === "full" ? __tr("Full vault") : preview.scope_path ?? __tr("Folder")}</span>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <span className="flex items-center gap-1">
               <FolderIcon size={16} className="text-ink-muted" />
-              {preview.folder_count} folders
-            </span>
+              {preview.folder_count} {__tr("folders")}</span>
             {Object.entries(preview.entry_type_counts).map(([type, count]) => (
               <span key={type} className="flex items-center gap-1">
                 <EntryTypeIcon type={type} />
@@ -232,7 +227,7 @@ export default function VaultImportDialog({ onClose }: Props) {
 
           {preview.folder_tree.length > 0 && (
             <div>
-              <label className="block text-label font-semibold text-ink-secondary mb-1">Folder Structure</label>
+              <label className="block text-label font-semibold text-ink-secondary mb-1">{__tr("Folder Structure")}</label>
               <div className="p-2 rounded-md bg-well text-label space-y-0.5 max-h-32 overflow-y-auto">
                 {renderFolderTree(preview.folder_tree)}
               </div>
@@ -258,20 +253,20 @@ export default function VaultImportDialog({ onClose }: Props) {
       {step === "results" && result && (
         <div className="space-y-4">
           <ResultSummary
-            title="Import Complete"
+            title={__tr("Import Complete")}
             counts={[
-              { value: result.foldersCreated, label: "Folders Created" },
-              { value: result.entriesCreated, label: "Entries Created" },
+              { value: result.foldersCreated, label: __tr("Folders Created") },
+              { value: result.entriesCreated, label: __tr("Entries Created") },
             ]}
           />
 
           {(result.credentialRefsRemapped > 0 || result.credentialRefsCleared > 0) && (
             <div className="text-meta text-ink-muted space-y-0.5">
               {result.credentialRefsRemapped > 0 && (
-                <p>{result.credentialRefsRemapped} credential reference(s) remapped successfully</p>
+                <p>{result.credentialRefsRemapped} {__tr("credential reference(s) remapped successfully")}</p>
               )}
               {result.credentialRefsCleared > 0 && (
-                <p>{result.credentialRefsCleared} credential reference(s) cleared (referenced credentials not in export)</p>
+                <p>{result.credentialRefsCleared} {__tr("credential reference(s) cleared (referenced credentials not in export)")}</p>
               )}
             </div>
           )}

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useRef, useEffect } from "react";
 import {
   CircleFilledIcon,
@@ -41,7 +42,7 @@ const typeIcons: Record<SessionType, React.ReactNode> = {
 };
 
 const IS_MAC = navigator.platform.toUpperCase().includes("MAC");
-const HOME_TAB_TOOLTIP = IS_MAC ? "Home (Cmd+Shift+H)" : "Home (Ctrl+Shift+H)";
+const HOME_TAB_TOOLTIP = IS_MAC ? __tr("Home (Cmd+Shift+H)") : __tr("Home (Ctrl+Shift+H)");
 
 // Chromium reports line-based wheel deltas for some mice; a line is about one row of text.
 const WHEEL_LINE_PX = 16;
@@ -57,50 +58,50 @@ const NO_EDGES: PaneEdges = { top: false, left: false };
 
 function newTabMenuItems(cliAgentsEnabled: boolean): PopupMenuItem[] {
   return [
-    { id: "quick_connect", label: "Quick Connect", icon: "link" },
+    { id: "quick_connect", label: __tr("Quick Connect"), icon: "link" },
     { id: "sep0", label: "", type: "separator" },
-    { id: "shell_header", label: "Local Shell", type: "header" },
-    { id: "home", label: "Home Directory", icon: "home" },
+    { id: "shell_header", label: __tr("Local Shell"), type: "header" },
+    { id: "home", label: __tr("Home Directory"), icon: "home" },
     ...(cliAgentsEnabled
       ? [
           { id: "sep1", label: "", type: "separator" as const },
-          { id: "agent_header", label: "Agent Directory", type: "header" as const },
+          { id: "agent_header", label: __tr("Agent Directory"), type: "header" as const },
           ...AI_HARNESSES.map((h) => ({ id: `agent_${h.id}`, label: h.name, icon: "terminal" as const })),
         ]
       : []),
     { id: "sep2", label: "", type: "separator" },
-    { id: "browse", label: "Browse...", icon: "folder" },
+    { id: "browse", label: __tr("Browse..."), icon: "folder" },
   ];
 }
 
 function tabMenuItems(session: Session | undefined, entry: EntryMeta | undefined): PopupMenuItem[] {
   const entryId = session?.entryId;
-  const items: PopupMenuItem[] = [{ id: "rename", label: "Rename", icon: "textCursor" }];
+  const items: PopupMenuItem[] = [{ id: "rename", label: __tr("Rename"), icon: "textCursor" }];
   if (entryId && session?.type !== "dashboard" && session?.type !== "document") {
     const isReconnecting = session?.metadata?.reconnecting === true;
-    items.push({ id: "reconnect", label: isReconnecting ? "Reconnecting..." : "Reconnect", icon: "refresh" });
+    items.push({ id: "reconnect", label: isReconnecting ? __tr("Reconnecting...") : __tr("Reconnect"), icon: "refresh" });
   }
   if (entryId && session?.type !== "dashboard") {
-    items.push({ id: "view_info", label: "View Info", icon: "infoCircle" });
+    items.push({ id: "view_info", label: __tr("View Info"), icon: "infoCircle" });
   }
   if (session?.type === "rdp" && session?.status === "connected") {
-    items.push({ id: "send_cad", label: "Send Ctrl+Alt+Delete", icon: "keyboard" });
+    items.push({ id: "send_cad", label: __tr("Send Ctrl+Alt+Delete"), icon: "keyboard" });
   }
   if (entry?.username || entry?.credential_id || entryId) {
     items.push({ id: "sep1", label: "", type: "separator" });
   }
   if (entry?.username || entry?.credential_id) {
-    items.push({ id: "copy_username", label: "Copy Username", icon: "user" });
+    items.push({ id: "copy_username", label: __tr("Copy Username"), icon: "user" });
   }
   if (entryId) {
-    items.push({ id: "copy_password", label: "Copy Password", icon: "key" });
+    items.push({ id: "copy_password", label: __tr("Copy Password"), icon: "key" });
   }
   items.push(
     { id: "sep2", label: "", type: "separator" },
-    { id: "split_right", label: "Split Right", icon: "splitHorizontal" },
-    { id: "split_down", label: "Split Down", icon: "splitVertical" },
+    { id: "split_right", label: __tr("Split Right"), icon: "splitHorizontal" },
+    { id: "split_down", label: __tr("Split Down"), icon: "splitVertical" },
     { id: "sep3", label: "", type: "separator" },
-    { id: "close", label: "Close Session", variant: "danger", icon: "close" },
+    { id: "close", label: __tr("Close Session"), variant: "danger", icon: "close" },
   );
   return items;
 }
@@ -109,11 +110,11 @@ async function copyCredentialField(entryId: string, field: "username" | "passwor
   const cred = await useEntryStore.getState().resolveCredential(entryId);
   const value = cred?.[field];
   if (!value) {
-    toast.error(field === "username" ? "No username available" : "No password available");
+    toast.error(field === "username" ? __tr("No username available") : __tr("No password available"));
     return;
   }
   await navigator.clipboard.writeText(value);
-  toast.success(field === "username" ? "Username copied" : "Password copied");
+  toast.success(field === "username" ? __tr("Username copied") : __tr("Password copied"));
 }
 
 async function openLocalShell(choice: string): Promise<void> {
@@ -122,7 +123,7 @@ async function openLocalShell(choice: string): Promise<void> {
     return;
   }
   if (choice === "browse") {
-    const folder = await invoke<string | null>("dialog_select_folder", { title: "Select Working Directory" });
+    const folder = await invoke<string | null>("dialog_select_folder", { title: __tr("Select Working Directory") });
     if (folder) await useSessionStore.getState().createLocalShell(undefined, folder);
     return;
   }
@@ -271,7 +272,7 @@ export default function PaneTabBar({ paneId, isFocused: _isFocused, rightSlot, e
       await runTabMenuAction(selected, session);
     } catch (error) {
       console.error(`[PaneTabBar] Tab menu action "${selected}" failed:`, error);
-      toast.error("That action failed");
+      toast.error(__tr("That action failed"));
     }
   };
 
@@ -422,7 +423,7 @@ export default function PaneTabBar({ paneId, isFocused: _isFocused, rightSlot, e
                   size="sm"
                   tone="inherit"
                   icon="close"
-                  label={`Close ${session.title}`}
+                  label={__tr("Close {v0}", { v0: (session.title) })}
                   className="cv-tab-close"
                   onClick={(e) => handleCloseTab(e, session.id)}
                 />
@@ -435,7 +436,7 @@ export default function PaneTabBar({ paneId, isFocused: _isFocused, rightSlot, e
       <div className="cv-tabstrip-slot">
         <IconButton
           icon="plus"
-          label="New Local Shell"
+          label={__tr("New Local Shell")}
           data-cv-new-tab=""
           className="mx-1"
           onClick={(e) => handleNewShell(e)}
@@ -479,7 +480,7 @@ function SidebarToggle() {
           }
         }}
         className={cx("group flex w-11 self-stretch items-center justify-center", sidebarActive && "cursor-default")}
-        title={sidebarActive ? "Close sidebar (Ctrl+B)" : "Open sidebar (Ctrl+B)"}
+        title={sidebarActive ? __tr("Close sidebar (Ctrl+B)") : __tr("Open sidebar (Ctrl+B)")}
       >
         <span
           className={cx(

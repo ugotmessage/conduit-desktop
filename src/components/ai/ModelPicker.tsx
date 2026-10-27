@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useRef, useEffect } from "react";
 import { useAiStore } from "../../stores/aiStore";
 import { CheckIcon } from "../../lib/icons";
@@ -77,8 +78,8 @@ export default function ModelPicker() {
   return (
     <div ref={containerRef} data-popover className={CARD}>
       <div className="flex items-center justify-between border-b border-divider px-4 py-3">
-        <span className="text-body font-semibold text-ink">Select a model</span>
-        <IconButton size="sm" icon="close" label="Close" onClick={closePicker} />
+        <span className="text-body font-semibold text-ink">{__tr("Select a model")}</span>
+        <IconButton size="sm" icon="close" label={__tr("Close")} onClick={closePicker} />
       </div>
 
       <div className="max-h-64 overflow-y-auto p-1">
@@ -112,18 +113,16 @@ export default function ModelPicker() {
                   setCustomInput("");
                 }
               }}
-              placeholder="Enter model ID..."
+              placeholder={__tr("Enter model ID...")}
               className="flex-1"
             />
             <Button variant="primary" onClick={handleCustomSubmit} disabled={!customInput.trim()}>
-              Apply
-            </Button>
+              {__tr("Apply")}</Button>
           </div>
         ) : (
           <div className="p-1">
             <ListRow onClick={() => setShowCustom(true)}>
-              Use custom model ID...
-            </ListRow>
+              {__tr("Use custom model ID...")}</ListRow>
           </div>
         )}
       </div>

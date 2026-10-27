@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useRef, useState } from "react";
 import { hasUnseenAgentEdit, isStale, type KbKind, type KbMeta } from "../../lib/kb";
 import { useEntryStore } from "../../stores/entryStore";
@@ -31,7 +32,7 @@ export default function ArticleHeader({ entry, kb }: { entry: EntryMeta; kb: KbM
     if ((await kbCall("kb_delete", { id: entry.id }, "Couldn't delete the article")) !== null) {
       useSessionStore.getState().removeSession(entry.id);
       useArticleTabsStore.getState().closeEverywhere(entry.id);
-      toast.success("Article deleted");
+      toast.success(__tr("Article deleted"));
     }
   };
 
@@ -39,10 +40,9 @@ export default function ArticleHeader({ entry, kb }: { entry: EntryMeta; kb: KbM
     <>
       <div className="flex flex-wrap items-center gap-2 border-b border-divider px-4 py-1.5 text-label" data-cv-kb-header={entry.id}>
         <span className="text-ink-faint">
-          {where} › Knowledge ·
-        </span>
+          {where} {__tr("› Knowledge ·")}</span>
         <span className="w-40 shrink-0">
-          <Select value={kb.kind} onChange={(e) => void update({ kind: e.target.value as KbKind }, "Couldn't change the kind")} aria-label="Kind">
+          <Select value={kb.kind} onChange={(e) => void update({ kind: e.target.value as KbKind }, "Couldn't change the kind")} aria-label={__tr("Kind")}>
             {(Object.keys(KIND_META) as KbKind[]).map((k) => (
               <option key={k} value={k}>
                 {KIND_META[k].label}
@@ -55,60 +55,57 @@ export default function ArticleHeader({ entry, kb }: { entry: EntryMeta; kb: KbM
         </span>
         <div className="flex-1" />
         {kb.verified_at && !stale ? (
-          <span className="text-success" title={kb.verify_note ?? undefined}>Verified {formatRelativeTime(kb.verified_at)}</span>
+          <span className="text-success" title={kb.verify_note ?? undefined}>{__tr("Verified")} {formatRelativeTime(kb.verified_at)}</span>
         ) : (
           <Button size="sm" icon="circleCheck" onClick={() => void kbCall("kb_verify", { id: entry.id, still_true: true }, "Couldn't mark it verified")}>
-            Mark verified
-          </Button>
+            {__tr("Mark verified")}</Button>
         )}
         <IconButton
           size="sm"
           icon={kb.pinned ? "pinFilled" : "pin"}
-          label={kb.pinned ? "Unpin" : "Pin to the top"}
+          label={kb.pinned ? __tr("Unpin") : __tr("Pin to the top")}
           onClick={() => void update({ pinned: !kb.pinned }, "Couldn't pin the article")}
         />
-        <IconButton size="sm" icon="history" label="History" onClick={() => setDialog("history")} />
+        <IconButton size="sm" icon="history" label={__tr("History")} onClick={() => setDialog("history")} />
         <span ref={menuRef}>
-          <IconButton size="sm" icon="ellipsis" label="More" onClick={() => setMenuOpen((o) => !o)} />
+          <IconButton size="sm" icon="ellipsis" label={__tr("More")} onClick={() => setMenuOpen((o) => !o)} />
         </span>
         <Popover anchorRef={menuRef} open={menuOpen} onClose={() => setMenuOpen(false)} placement="bottom-end" padding={false}>
           <Menu onClose={() => setMenuOpen(false)}>
             {kb.status === "archived" ? (
-              <MenuItem icon="restore" onSelect={() => void update({ status: "active" }, "Couldn't restore the article")}>Unarchive</MenuItem>
+              <MenuItem icon="restore" onSelect={() => void update({ status: "active" }, "Couldn't restore the article")}>{__tr("Unarchive")}</MenuItem>
             ) : (
-              <MenuItem icon="folder" onSelect={() => void update({ status: "archived" }, "Couldn't archive the article")}>Archive</MenuItem>
+              <MenuItem icon="folder" onSelect={() => void update({ status: "archived" }, "Couldn't archive the article")}>{__tr("Archive")}</MenuItem>
             )}
             {kb.status !== "needs_review" && (
-              <MenuItem icon="alertTriangle" onSelect={() => void kbCall("kb_verify", { id: entry.id, still_true: false }, "Couldn't flag the article")}>Flag as needs review</MenuItem>
+              <MenuItem icon="alertTriangle" onSelect={() => void kbCall("kb_verify", { id: entry.id, still_true: false }, "Couldn't flag the article")}>{__tr("Flag as needs review")}</MenuItem>
             )}
-            <MenuItem icon="trash" danger onSelect={() => setDialog("delete")}>Delete</MenuItem>
+            <MenuItem icon="trash" danger onSelect={() => setDialog("delete")}>{__tr("Delete")}</MenuItem>
           </Menu>
         </Popover>
       </div>
 
       {unseen && (
-        <Banner tone="info" icon="robot" actions={[{ label: "Review", onClick: () => setDialog("review"), primary: true }]}>
-          {editorLabel(kb)} edited this {formatRelativeTime(kb.last_editor!.at)}. Review what changed?
-        </Banner>
+        <Banner tone="info" icon="robot" actions={[{ label: __tr("Review"), onClick: () => setDialog("review"), primary: true }]}>
+          {editorLabel(kb)} {__tr("edited this")} {formatRelativeTime(kb.last_editor!.at)}{__tr(". Review what changed?")}</Banner>
       )}
       {kb.status === "needs_review" && !unseen && (
-        <Banner tone="warn" actions={[{ label: "It's correct", onClick: () => void kbCall("kb_verify", { id: entry.id, still_true: true }, "Couldn't mark it verified") }]}>
-          Someone flagged this article as possibly out of date{kb.verify_note ? `: ${kb.verify_note}` : "."}
+        <Banner tone="warn" actions={[{ label: __tr("It's correct"), onClick: () => void kbCall("kb_verify", { id: entry.id, still_true: true }, "Couldn't mark it verified") }]}>
+          {__tr("Someone flagged this article as possibly out of date")}{kb.verify_note ? `: ${kb.verify_note}` : "."}
         </Banner>
       )}
       {kb.status === "archived" && (
-        <Banner tone="lock" icon="folder" actions={[{ label: "Unarchive", onClick: () => void update({ status: "active" }, "Couldn't restore the article") }]}>
-          This article is archived. Agents and lists leave it out.
-        </Banner>
+        <Banner tone="lock" icon="folder" actions={[{ label: __tr("Unarchive"), onClick: () => void update({ status: "active" }, "Couldn't restore the article") }]}>
+          {__tr("This article is archived. Agents and lists leave it out.")}</Banner>
       )}
 
       {dialog === "history" && <ArticleHistoryDialog entry={entry} onClose={() => setDialog(null)} />}
       {dialog === "review" && <ReviewChangesDialog entry={entry} kb={kb} onClose={() => setDialog(null)} />}
       {dialog === "delete" && (
         <ConfirmDialog
-          title="Delete this article?"
-          message="The article, its history and the secrets it holds are deleted. This cannot be undone. Archive it instead to keep it out of the way."
-          confirmLabel="Delete"
+          title={__tr("Delete this article?")}
+          message={__tr("The article, its history and the secrets it holds are deleted. This cannot be undone. Archive it instead to keep it out of the way.")}
+          confirmLabel={__tr("Delete")}
           variant="danger"
           onCancel={() => setDialog(null)}
           onConfirm={() => void remove()}

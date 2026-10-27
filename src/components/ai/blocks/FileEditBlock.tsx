@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState } from "react";
 import { FileCodeIcon } from "../../../lib/icons";
 import { BlockBody, BlockChevron, BlockFrame, BlockHeader, BlockLabel } from "./BlockParts";
@@ -18,7 +19,7 @@ export default function FileEditBlock({ path, diff }: FileEditBlockProps) {
         <span className="truncate font-mono text-ink-muted" title={path}>
           {filename}
         </span>
-        <BlockLabel className="ml-auto mr-1 text-ink-faint">Edited</BlockLabel>
+        <BlockLabel className="ml-auto mr-1 text-ink-faint">{__tr("Edited")}</BlockLabel>
         <BlockChevron expanded={expanded} />
       </BlockHeader>
 
@@ -26,7 +27,7 @@ export default function FileEditBlock({ path, diff }: FileEditBlockProps) {
         <BlockBody className="overflow-x-auto">
           <div className="mb-1 font-mono text-badge text-ink-faint">{path}</div>
           <pre className="max-h-60 overflow-y-auto whitespace-pre-wrap break-all text-meta text-ink">
-            {diff.after || diff.before || "(no content)"}
+            {diff.after || diff.before || __tr("(no content)")}
           </pre>
         </BlockBody>
       )}

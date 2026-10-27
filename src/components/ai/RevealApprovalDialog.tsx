@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import { invoke, listenSync } from "../../lib/electron";
 import { errorText } from "../../lib/errorText";
@@ -50,7 +51,7 @@ export default function RevealApprovalDialog() {
     try {
       await invoke("approval_respond", { request_id: current.request_id, approved });
     } catch (err) {
-      setError(errorText(err, "Could not send your answer"));
+      setError(errorText(err, __tr("Could not send your answer")));
     } finally {
       setQueue((q) => q.filter((r) => r.request_id !== current.request_id));
       setBusy(false);
@@ -63,7 +64,7 @@ export default function RevealApprovalDialog() {
   return (
     <Dialog
       open
-      title="Show a secret to an agent?"
+      title={__tr("Show a secret to an agent?")}
       icon="lock"
       tone="warn"
       width={448}
@@ -75,28 +76,24 @@ export default function RevealApprovalDialog() {
       footer={
         <>
           <Button onClick={() => void respond(false)} disabled={busy}>
-            Deny
-          </Button>
+            {__tr("Deny")}</Button>
           <Button variant="primary" onClick={() => void respond(true)} loading={busy}>
-            Allow once
-          </Button>
+            {__tr("Allow once")}</Button>
         </>
       }
     >
       <div className="space-y-3">
         <p className="text-ink">
-          <span className="font-semibold">{agent}</span> wants to see the plain value of{" "}
+          <span className="font-semibold">{agent}</span> {__tr("wants to see the plain value of")}{" "}
           <span className="font-semibold">{what}</span>.
         </p>
         <div className="rounded-md border border-card-border bg-well px-3 py-2">
-          <p className="text-label text-ink-faint">Reason it gave</p>
+          <p className="text-label text-ink-faint">{__tr("Reason it gave")}</p>
           <p className="text-body text-ink allow-select">{current.purpose}</p>
         </div>
         <p className="text-body text-ink-muted">
-          Agents can type this secret without seeing it. Allow only if the value itself must be shown. No answer in a
-          minute counts as Deny.
-        </p>
-        {queue.length > 1 && <p className="text-label text-ink-faint">{queue.length - 1} more waiting</p>}
+          {__tr("Agents can type this secret without seeing it. Allow only if the value itself must be shown. No answer in a minute counts as Deny.")}</p>
+        {queue.length > 1 && <p className="text-label text-ink-faint">{queue.length - 1} {__tr("more waiting")}</p>}
         {error && <Callout tone="danger">{error}</Callout>}
       </div>
     </Dialog>

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
 import { useSyncStore } from "../../stores/syncStore";
@@ -11,7 +12,7 @@ async function guarded(failTitle: string, action: () => Promise<void>): Promise<
     await action();
   } catch (err) {
     console.error(`[sync] ${failTitle}:`, err);
-    toast.error(failTitle, errorText(err, "Try again."));
+    toast.error(failTitle, errorText(err, __tr("Try again.")));
   }
 }
 
@@ -29,8 +30,8 @@ export async function openOtherVault(path: string): Promise<void> {
 /** Offers to open a vault written by "separate vault" or "restore as new vault". */
 export function offerOpenNewVault(path: string, title: string): void {
   toast.success(title, {
-    message: "It opens with the same master password.",
-    actions: [{ label: "Open it", variant: "primary", onClick: () => void openOtherVault(path) }],
+    message: __tr("It opens with the same master password."),
+    actions: [{ label: __tr("Open it"), variant: "primary", onClick: () => void openOtherVault(path) }],
   });
 }
 
@@ -39,8 +40,8 @@ export function locateVaultFile(): Promise<void> {
     const path = await syncApi.pickVaultFile("open");
     if (!path) return;
     const ok = await syncApi.locateFile(path);
-    if (ok) toast.success("Found the vault file. Syncing again.");
-    else toast.warning("That file is not this vault.", "Pick the file that holds this vault.");
+    if (ok) toast.success(__tr("Found the vault file. Syncing again."));
+    else toast.warning(__tr("That file is not this vault."), __tr("Pick the file that holds this vault."));
     await useSyncStore.getState().refresh();
   });
 }
@@ -50,7 +51,7 @@ export function saveNewCopyHere(): Promise<void> {
     const path = await syncApi.pickVaultFile("save");
     if (!path) return;
     const ok = await syncApi.saveNewCopy(path);
-    if (ok) toast.success("Saved a new copy. Syncing to it now.");
+    if (ok) toast.success(__tr("Saved a new copy. Syncing to it now."));
     await useSyncStore.getState().refresh();
   });
 }
@@ -62,7 +63,7 @@ export function dismissPrompt(promptId: string): Promise<void> {
 export function applyHeld(choice: "apply" | "keep-mine"): Promise<void> {
   return guarded("Could not apply the choice", async () => {
     await syncApi.heldApply(choice);
-    toast.success(choice === "apply" ? "Applied the older app's changes." : "Kept your versions.");
+    toast.success(choice === "apply" ? __tr("Applied the older app's changes.") : __tr("Kept your versions."));
     await useSyncStore.getState().refresh();
   });
 }
@@ -79,7 +80,7 @@ export function copyAction(copy: CopyInfo, action: CopyAction): Promise<void> {
     if (res.candidateId) {
       useSyncStore.getState().openView({ kind: "candidate", candidateId: res.candidateId, confirmSideFilesAfter: false });
     } else if (action === "trash") {
-      toast.success(`Moved '${copy.name}' to the Trash.`);
+      toast.success(__tr("Moved '{v0}' to the Trash.", { v0: (copy.name) }));
     } else if (action === "separate" && target) {
       offerOpenNewVault(target, "Saved as a separate vault.");
     }

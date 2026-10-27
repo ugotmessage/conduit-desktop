@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import type { SemanticIconName } from "../../lib/icons/types";
 import { readKb, type KbKind, type KbMeta } from "../../lib/kb";
 import type { EntryMeta } from "../../types/entry";
@@ -8,13 +9,13 @@ import { openDashboardForEntry, openFolderView, openKnowledgeView } from "../../
 import { KNOWLEDGE_SESSION_ID, entryInfoSessionId, folderViewSessionId } from "../../lib/dashboardSessions";
 
 export const KIND_META: Readonly<Record<KbKind, { label: string; plural: string; icon: SemanticIconName }>> = {
-  overview: { label: "Overview", plural: "Overview", icon: "infoCircle" },
-  facts: { label: "Facts", plural: "Facts", icon: "database" },
-  procedure: { label: "Procedure", plural: "Procedures", icon: "listNumbers" },
-  troubleshooting: { label: "Troubleshooting", plural: "Troubleshooting", icon: "alertTriangle" },
-  contact: { label: "Contact", plural: "Contacts", icon: "users" },
-  playbook: { label: "Playbook", plural: "Playbooks", icon: "stack" },
-  changelog: { label: "Change log", plural: "Change log", icon: "history" },
+  overview: { label: __tr("Overview"), plural: "Overview", icon: "infoCircle" },
+  facts: { label: __tr("Facts"), plural: "Facts", icon: "database" },
+  procedure: { label: __tr("Procedure"), plural: "Procedures", icon: "listNumbers" },
+  troubleshooting: { label: __tr("Troubleshooting"), plural: "Troubleshooting", icon: "alertTriangle" },
+  contact: { label: __tr("Contact"), plural: "Contacts", icon: "users" },
+  playbook: { label: __tr("Playbook"), plural: "Playbooks", icon: "stack" },
+  changelog: { label: __tr("Change log"), plural: "Change log", icon: "history" },
 };
 
 export const NEW_ARTICLE_KINDS: readonly KbKind[] = ["overview", "procedure", "troubleshooting", "facts", "contact", "playbook"];

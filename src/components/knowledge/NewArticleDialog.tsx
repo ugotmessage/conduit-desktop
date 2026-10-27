@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { invoke } from "../../lib/electron";
 import { errorText } from "../../lib/errorText";
@@ -39,7 +40,7 @@ export default function NewArticleDialog({ scope, entryId, folderId, initialKind
       openArticle(created.id, host);
       onClose();
     } catch (err) {
-      toast.error(errorText(err, "Couldn't create the article"));
+      toast.error(errorText(err, __tr("Couldn't create the article")));
     } finally {
       setBusy(false);
     }
@@ -48,7 +49,7 @@ export default function NewArticleDialog({ scope, entryId, folderId, initialKind
   return (
     <Dialog
       open
-      title="New knowledge article"
+      title={__tr("New knowledge article")}
       icon="notes"
       width={440}
       onClose={onClose}
@@ -59,16 +60,14 @@ export default function NewArticleDialog({ scope, entryId, folderId, initialKind
       footer={
         <>
           <Button type="button" onClick={onClose}>
-            Cancel
-          </Button>
+            {__tr("Cancel")}</Button>
           <Button type="submit" variant="primary" disabled={!title.trim()} loading={busy}>
-            Create
-          </Button>
+            {__tr("Create")}</Button>
         </>
       }
     >
       <div className="space-y-3">
-        <FormField label="Kind">
+        <FormField label={__tr("Kind")}>
           <Select value={kind} onChange={(e) => setKind(e.target.value as KbKind)}>
             {NEW_ARTICLE_KINDS.map((k) => (
               <option key={k} value={k}>
@@ -77,15 +76,15 @@ export default function NewArticleDialog({ scope, entryId, folderId, initialKind
             ))}
           </Select>
         </FormField>
-        <FormField label="Title">
-          <TextInput value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Restart the web stack" autoFocus maxLength={200} />
+        <FormField label={__tr("Title")}>
+          <TextInput value={title} onChange={(e) => setTitle(e.target.value)} placeholder={__tr("Restart the web stack")} autoFocus maxLength={200} />
         </FormField>
         <p className="text-label text-ink-faint">
           {scope === "folder"
-            ? "Every asset in this folder and its sub-folders will see this article."
+            ? __tr("Every asset in this folder and its sub-folders will see this article.")
             : scope === "vault"
-              ? "A vault playbook reaches assets that share one of its tags, or every asset when pinned."
-              : "This article belongs to this asset."}
+              ? __tr("A vault playbook reaches assets that share one of its tags, or every asset when pinned.")
+              : __tr("This article belongs to this asset.")}
         </p>
       </div>
     </Dialog>

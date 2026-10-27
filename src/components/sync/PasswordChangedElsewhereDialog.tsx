@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import type { OpenErrorPayload } from "../../types/sync";
 import SyncDialogFrame, { DialogButton } from "./SyncDialogFrame";
@@ -49,33 +50,32 @@ export default function PasswordChangedElsewhereDialog({
     <SyncDialogFrame
       icon="key"
       tone="warn"
-      title="Master password changed"
+      title={__tr("Master password changed")}
       onEscape={onCancel}
       onSubmit={submit}
       footer={
         <>
-          <DialogButton onClick={onCancel} disabled={busy}>Cancel</DialogButton>
+          <DialogButton onClick={onCancel} disabled={busy}>{__tr("Cancel")}</DialogButton>
           <DialogButton type="submit" variant="primary" disabled={!canSubmit} loading={busy} loadingLabel="Unlocking...">
-            Unlock
-          </DialogButton>
+            {__tr("Unlock")}</DialogButton>
         </>
       }
     >
-      {fromSavedUnlock && <p className="text-ink">Conduit couldn't open {savedUnlockName} automatically.</p>}
+      {fromSavedUnlock && <p className="text-ink">{__tr("Conduit couldn't open")} {savedUnlockName} {__tr("automatically.")}</p>}
       <p className="text-ink">{passwordChangedText(payload.changedByDeviceName, payload.changedMs)}</p>
       <p>
         {needsPrevious
-          ? "Enter the new password and your previous one, so changes made on this device are kept."
-          : "Enter the new password to unlock."}
+          ? __tr("Enter the new password and your previous one, so changes made on this device are kept.")
+          : __tr("Enter the new password to unlock.")}
       </p>
-      <PasswordField label="New master password" value={password} onChange={setPassword} autoFocus />
-      {needsPrevious && <PasswordField label="Previous master password" value={previous} onChange={setPrevious} />}
+      <PasswordField label={__tr("New master password")} value={password} onChange={setPassword} autoFocus />
+      {needsPrevious && <PasswordField label={__tr("Previous master password")} value={previous} onChange={setPrevious} />}
       {payload.deleteBiometric && (
-        <p className="text-label text-ink-muted">Quick Unlock was turned off for this vault. Turn it on again in Settings.</p>
+        <p className="text-label text-ink-muted">{__tr("Quick Unlock was turned off for this vault. Turn it on again in Settings.")}</p>
       )}
       {fromSavedUnlock && (
-        <Checkbox checked={keep} onChange={setKeep} description="Saves the password you enter now.">
-          <span className="font-medium text-ink">Keep unlocking automatically at startup</span>
+        <Checkbox checked={keep} onChange={setKeep} description={__tr("Saves the password you enter now.")}>
+          <span className="font-medium text-ink">{__tr("Keep unlocking automatically at startup")}</span>
         </Checkbox>
       )}
       <InlineError message={error} />

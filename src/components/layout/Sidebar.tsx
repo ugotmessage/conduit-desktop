@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronDownIcon, ClockIcon, LockOpenIcon } from "../../lib/icons";
 import { useStartupVaultStore } from "../../stores/startupVaultStore";
@@ -26,7 +27,7 @@ import { hasInsetTitleBar } from "../../lib/titleBar";
 import { showContextMenu } from "../../utils/contextMenu";
 import { blankAreaMenu, headerCreateMenu, parseCreateAction, runCreateAction } from "../entries/createMenu";
 
-const CREATE_DISABLED_REASON = "View-only access";
+const CREATE_DISABLED_REASON = __tr("View-only access");
 const INSET_TITLE_BAR = hasInsetTitleBar();
 
 const TRIAL_TONES = {
@@ -323,15 +324,15 @@ export default function Sidebar() {
         <div className="flex shrink-0 items-center gap-1">
           <IconButton
             icon={showFavoritesOnly ? "starFilled" : "star"}
-            label={showFavoritesOnly ? "Show all entries" : "Show favorites only"}
+            label={showFavoritesOnly ? __tr("Show all entries") : __tr("Show favorites only")}
             onClick={handleToggleFavorites}
             tone={showFavoritesOnly ? "inherit" : "default"}
             className={showFavoritesOnly ? "text-favorite" : undefined}
           />
           <IconButton
             icon="plus"
-            label="New Entry"
-            title={isCreateDisabled ? CREATE_DISABLED_REASON : "New Entry (Ctrl+E)"}
+            label={__tr("New Entry")}
+            title={isCreateDisabled ? CREATE_DISABLED_REASON : __tr("New Entry (Ctrl+E)")}
             disabled={isCreateDisabled}
             disabledReason={CREATE_DISABLED_REASON}
             aria-haspopup="menu"
@@ -339,8 +340,8 @@ export default function Sidebar() {
           />
           <IconButton
             icon="folderPlus"
-            label="New Folder"
-            title={isCreateDisabled ? CREATE_DISABLED_REASON : "New Folder (Ctrl+Shift+N)"}
+            label={__tr("New Folder")}
+            title={isCreateDisabled ? CREATE_DISABLED_REASON : __tr("New Folder (Ctrl+Shift+N)")}
             disabled={isCreateDisabled}
             disabledReason={CREATE_DISABLED_REASON}
             onClick={handleNewFolder}
@@ -364,7 +365,7 @@ export default function Sidebar() {
           tone="info"
           size="sm"
           icon="users"
-          title="Create your first team vault"
+          title={__tr("Create your first team vault")}
           className="mx-2 mt-2"
           onDismiss={dismissOnboarding}
           actions={
@@ -376,12 +377,10 @@ export default function Sidebar() {
                 dismissOnboarding();
               }}
             >
-              Create Team Vault
-            </Button>
+              {__tr("Create Team Vault")}</Button>
           }
         >
-          Share credentials securely with your team.
-        </Callout>
+          {__tr("Share credentials securely with your team.")}</Callout>
       )}
 
       {/* Team invitation banner */}
@@ -391,7 +390,7 @@ export default function Sidebar() {
       <div data-cv-sidebar-search className="px-2 pb-2">
         <SearchInput
           ref={searchInputRef}
-          placeholder="Search entries..."
+          placeholder={__tr("Search entries...")}
           value={searchQuery}
           onChange={setSearchQuery}
           onKeyDown={(e) => {
@@ -443,13 +442,12 @@ export default function Sidebar() {
           tone="info"
           size="sm"
           icon="sparkles"
-          title="Try Pro free for 30 days"
+          title={__tr("Try Pro free for 30 days")}
           className="mx-2 mb-2"
           onDismiss={dismissTrialPromo}
           actions={
             <Button size="sm" variant="primary" onClick={() => invoke("auth_open_pricing")}>
-              Start Free Trial →
-            </Button>
+              {__tr("Start Free Trial →")}</Button>
           }
         />
       )}
@@ -457,8 +455,7 @@ export default function Sidebar() {
         <div className={cx("mx-2 mb-2 flex h-7 items-center gap-2 rounded-md border px-2 text-label font-semibold", trialTone.box)}>
           <ClockIcon size={16} className={cx("shrink-0", trialTone.icon)} />
           <span className="truncate">
-            Pro Trial — {trialDaysRemaining} {trialDaysRemaining === 1 ? 'day' : 'days'} left
-          </span>
+            {__tr("Pro Trial —")} {trialDaysRemaining} {trialDaysRemaining === 1 ? __tr("day") : __tr("days")} {__tr("left")}</span>
         </div>
       )}
       {/* Footer — home + settings + account */}
@@ -475,9 +472,9 @@ export default function Sidebar() {
             <TeamSyncIndicator />
           </div>
           <div className="flex shrink-0 items-center gap-1">
-            <IconButton icon="home" label="Home" onClick={openHome} />
-            <IconButton icon="notes" label="Knowledge" onClick={openKnowledgeView} />
-            <IconButton icon="settings" label="Settings" title="Settings (Ctrl+,)" onClick={handleSettings} />
+            <IconButton icon="home" label={__tr("Home")} onClick={openHome} />
+            <IconButton icon="notes" label={__tr("Knowledge")} onClick={openKnowledgeView} />
+            <IconButton icon="settings" label={__tr("Settings")} title={__tr("Settings (Ctrl+,)")} onClick={handleSettings} />
           </div>
         </div>
         {user ? (
@@ -487,14 +484,13 @@ export default function Sidebar() {
                 type="button"
                 onClick={() => document.dispatchEvent(new CustomEvent("conduit:settings", { detail: { tab: "account" } }))}
                 className="min-w-0 truncate text-left text-label text-ink-muted hover:text-ink hover:underline"
-                title="Account Settings"
+                title={__tr("Account Settings")}
               >
                 {user.email}
               </button>
               {authMode === 'cached' && (
                 <Badge tone="warning" className="shrink-0">
-                  offline
-                </Badge>
+                  {__tr("offline")}</Badge>
               )}
             </div>
             {showSignOutConfirm ? (
@@ -504,21 +500,18 @@ export default function Sidebar() {
                   variant="danger"
                   onClick={async () => { setShowSignOutConfirm(false); await signOut(); }}
                 >
-                  Confirm
-                </Button>
+                  {__tr("Confirm")}</Button>
                 <Button size="sm" variant="ghost" onClick={() => setShowSignOutConfirm(false)}>
-                  Cancel
-                </Button>
+                  {__tr("Cancel")}</Button>
               </div>
             ) : (
-              <IconButton icon="logout" tone="danger" label="Sign Out" onClick={() => setShowSignOutConfirm(true)} />
+              <IconButton icon="logout" tone="danger" label={__tr("Sign Out")} onClick={() => setShowSignOutConfirm(true)} />
             )}
           </div>
         ) : authMode === 'local' ? (
           <div className="px-2 py-1.5 border-t border-divider">
             <Button variant="link" size="sm" icon="login" onClick={() => useAuthStore.getState().exitToSignIn()}>
-              Sign in to start a free Pro trial
-            </Button>
+              {__tr("Sign in to start a free Pro trial")}</Button>
           </div>
         ) : null}
       </div>

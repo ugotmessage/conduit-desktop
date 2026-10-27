@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect, useState } from "react";
 import { PlugIcon } from "../../../lib/icons";
 import type { EntryMeta } from "../../../types/entry";
@@ -26,7 +27,7 @@ function ResultLine({ result }: { result: ReachabilityResult }) {
         {text.badge}
       </Badge>
       <span className="min-w-0">
-        {text.detail} {"·"} checked {lowerFirst(formatRelativeTime(result.checkedAt))}
+        {text.detail} {"·"} {__tr("checked")} {lowerFirst(formatRelativeTime(result.checkedAt))}
       </span>
     </span>
   );
@@ -47,7 +48,7 @@ export default function ReachabilityRow({ entry }: { entry: EntryMeta }) {
         ) : result ? (
           <ResultLine result={result} />
         ) : (
-          <span className="text-ink-muted">Not checked yet</span>
+          <span className="text-ink-muted">{__tr("Not checked yet")}</span>
         )}
       </div>
       {port !== null && <p className="mt-0.5 text-meta text-ink-muted">{reachabilityHint(port)}</p>}
@@ -56,12 +57,12 @@ export default function ReachabilityRow({ entry }: { entry: EntryMeta }) {
 
   return (
     <DetailRow
-      label="Is it up?"
+      label={__tr("Is it up?")}
       icon={<PlugIcon size={16} />}
       value={value}
       actions={
         <Button size="sm" disabled={busy} onClick={() => void check(entry.id)}>
-          {result ? "Check again" : "Check"}
+          {result ? __tr("Check again") : __tr("Check")}
         </Button>
       }
     />

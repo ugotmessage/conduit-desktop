@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { invoke, listen } from "../../lib/electron";
 import { toast } from "./Toast";
@@ -121,10 +122,10 @@ export default function UpdateNotificationBridge() {
           setState("downloaded");
         } else if (result) {
           // update:available event will handle the UI
-          toast.info(`Checking for update v${result.version}...`);
+          toast.info(__tr("Checking for update v{v0}...", { v0: (result.version) }));
         } else {
           setUpdate(null);
-          toast.info("Conduit is up to date.");
+          toast.info(__tr("Conduit is up to date."));
         }
       } catch {
         // Check failed — silently ignore

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { Card, IconSlot, Select, cx } from "../ui";
 import { HINT } from "../settings/settings-styles";
 
@@ -7,11 +8,11 @@ interface IdleLockOption {
 }
 
 export const IDLE_LOCK_OPTIONS: readonly IdleLockOption[] = [
-  { minutes: 0, label: "Off" },
-  { minutes: 5, label: "After 5 minutes" },
-  { minutes: 15, label: "After 15 minutes" },
-  { minutes: 30, label: "After 30 minutes" },
-  { minutes: 60, label: "After 1 hour" },
+  { minutes: 0, label: __tr("Off") },
+  { minutes: 5, label: __tr("After 5 minutes") },
+  { minutes: 15, label: __tr("After 15 minutes") },
+  { minutes: 30, label: __tr("After 30 minutes") },
+  { minutes: 60, label: __tr("After 1 hour") },
 ];
 
 /** What the main process honors: any positive whole number of minutes; anything else is Off. */
@@ -22,7 +23,7 @@ export function normalizeIdleMinutes(value: unknown): number {
 /** The menu, plus "Custom (N min)" in order for a stored value it does not list, so it shows and saves as is. */
 export function idleLockOptions(minutes: number): readonly IdleLockOption[] {
   if (IDLE_LOCK_OPTIONS.some((o) => o.minutes === minutes)) return IDLE_LOCK_OPTIONS;
-  return [...IDLE_LOCK_OPTIONS, { minutes, label: `Custom (${minutes} min)` }].sort((a, b) => a.minutes - b.minutes);
+  return [...IDLE_LOCK_OPTIONS, { minutes, label: __tr("Custom ({v0} min)", { v0: (minutes) }) }].sort((a, b) => a.minutes - b.minutes);
 }
 
 interface IdleLockSettingProps {
@@ -38,12 +39,12 @@ export default function IdleLockSetting({ minutes, onChange }: IdleLockSettingPr
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <IconSlot icon="clock" size={20} className={cx("shrink-0", value > 0 ? "text-link" : "text-ink-faint")} />
         <div className="min-w-0">
-          <p className="text-body font-semibold text-ink">Lock the vault when idle</p>
-          <p className={`mt-0.5 ${HINT}`}>Locks when this computer is idle or its screen locks. Open connections close.</p>
+          <p className="text-body font-semibold text-ink">{__tr("Lock the vault when idle")}</p>
+          <p className={`mt-0.5 ${HINT}`}>{__tr("Locks when this computer is idle or its screen locks. Open connections close.")}</p>
         </div>
       </div>
       <div className="w-40 shrink-0">
-        <Select value={value} onChange={(e) => onChange(Number(e.target.value))} aria-label="Lock the vault when idle">
+        <Select value={value} onChange={(e) => onChange(Number(e.target.value))} aria-label={__tr("Lock the vault when idle")}>
           {idleLockOptions(value).map((o) => (
             <option key={o.minutes} value={o.minutes}>{o.label}</option>
           ))}

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { invoke } from "../../lib/electron";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -9,12 +10,12 @@ import { releaseAfterText } from "./sync-copy";
 
 /** Actions of the plan enforcement dialogs and banners (docs/PLAN_ENFORCEMENT.md 4.6-4.8). */
 
-export const COPY_READY_TITLE = "Your copy is ready.";
+export const COPY_READY_TITLE = __tr("Your copy is ready.");
 
 export function openTeamTrial(): void {
   syncApi.openTeamTrial().catch((err) => {
     console.error("[sync] Failed to open the Team trial page:", err);
-    toast.error("Could not open the Team page");
+    toast.error(__tr("Could not open the Team page"));
   });
 }
 
@@ -29,7 +30,7 @@ export async function updateConduit(): Promise<void> {
     if (found.downloaded) document.dispatchEvent(new CustomEvent("conduit:check-for-updates"));
   } catch (err) {
     console.error("[sync] Update check failed:", err);
-    await invoke("auth_open_download").catch(() => toast.error("Could not open the download page"));
+    await invoke("auth_open_download").catch(() => toast.error(__tr("Could not open the download page")));
   }
 }
 
@@ -48,12 +49,12 @@ export async function switchAccount(): Promise<void> {
 export async function releaseVault(): Promise<void> {
   try {
     const res = await syncApi.releaseOwnership();
-    if (res.released) toast.success("Vault released. The next account that opens it becomes its owner.");
+    if (res.released) toast.success(__tr("Vault released. The next account that opens it becomes its owner."));
     else if (res.reason === "too_soon") toast.warning(releaseAfterText(res.retryAfterMs));
-    else if (res.reason === "unconfirmed") toast.error("Could not release this vault. Check your connection and try again.");
+    else if (res.reason === "unconfirmed") toast.error(__tr("Could not release this vault. Check your connection and try again."));
   } catch (err) {
     console.error("[sync] Release failed:", err);
-    toast.error("Could not release this vault. Check your connection and try again.");
+    toast.error(__tr("Could not release this vault. Check your connection and try again."));
   }
   await useSyncStore.getState().refresh();
 }
@@ -68,7 +69,7 @@ export async function makeOwnCopy(ticket: string, copyDir: string | null): Promi
     return true;
   } catch (err) {
     console.error("[sync] Make my own copy failed:", err);
-    toast.error("Could not make your copy", errorText(err, "Try again."));
+    toast.error(__tr("Could not make your copy"), errorText(err, __tr("Try again.")));
     return false;
   }
 }
@@ -83,6 +84,6 @@ export async function makeOwnCopyWhileOpen(vaultPath: string | null): Promise<vo
     offerOpenNewVault(made.path, COPY_READY_TITLE);
   } catch (err) {
     console.error("[sync] Make my own copy failed:", err);
-    toast.error("Could not make your copy", errorText(err, "Try again."));
+    toast.error(__tr("Could not make your copy"), errorText(err, __tr("Try again.")));
   }
 }

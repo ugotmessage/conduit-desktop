@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../../lib/i18n";
 import { useEffect, useState } from "react";
 import { listen } from "../../../../lib/electron";
 import { useVaultStore } from "../../../../stores/vaultStore";
@@ -11,10 +12,10 @@ import { BackupToggleRow } from "./BackupToggleRow";
 import { errorText } from "../../../../lib/errorText";
 
 function statusText(state: LocalBackupState): string {
-  if (state.status === "backed-up" && state.lastBackedUpAt) return `Last backup: ${new Date(state.lastBackedUpAt).toLocaleString()}`;
-  if (state.status === "backing-up") return "Backing up...";
-  if (state.status === "error") return `Error: ${state.error}`;
-  return "No backups yet";
+  if (state.status === "backed-up" && state.lastBackedUpAt) return __tr("Last backup: {v0}", { v0: (new Date(state.lastBackedUpAt).toLocaleString()) });
+  if (state.status === "backing-up") return __tr("Backing up...");
+  if (state.status === "error") return __tr("Error: {v0}", { v0: (state.error ?? "") });
+  return __tr("No backups yet");
 }
 
 /** Settings > Backup > Local Backup: the toggle, folder, retention, Backup Now and the file list. */
@@ -57,7 +58,7 @@ export function LocalBackupSection() {
         await enableLocalBackup(chosen);
       }
     } catch (err) {
-      toast.error("Could not change local backup", errorText(err, "Try again."));
+      toast.error(__tr("Could not change local backup"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -72,7 +73,7 @@ export function LocalBackupSection() {
       setFolder(chosen);
       await enableLocalBackup(chosen);
     } catch (err) {
-      toast.error("Could not change the backup folder", errorText(err, "Try again."));
+      toast.error(__tr("Could not change the backup folder"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -83,7 +84,7 @@ export function LocalBackupSection() {
     try {
       await localBackupNow();
     } catch (err) {
-      toast.error("Backup failed", errorText(err, "Try again."));
+      toast.error(__tr("Backup failed"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -93,7 +94,7 @@ export function LocalBackupSection() {
     try {
       await deleteLocalBackup(fullPath);
     } catch (err) {
-      toast.error("Could not delete the backup", errorText(err, "Try again."));
+      toast.error(__tr("Could not delete the backup"), errorText(err, __tr("Try again.")));
     }
     setConfirmDelete(null);
   };
@@ -104,7 +105,7 @@ export function LocalBackupSection() {
     <div className="space-y-3">
       <BackupToggleRow
         icon={<FloppyIcon size={16} className={enabled ? "text-(--c-accent)" : "text-ink-muted"} />}
-        title="Local Backup"
+        title={__tr("Local Backup")}
         checked={enabled}
         disabled={busy}
         onChange={() => void toggle()}
@@ -113,17 +114,17 @@ export function LocalBackupSection() {
       {localBackupState?.enabled && (
         <>
           <div>
-            <label className={`${SECTION_LABEL} mb-1`}>Backup Folder</label>
+            <label className={`${SECTION_LABEL} mb-1`}>{__tr("Backup Folder")}</label>
             <div className="flex items-center gap-2">
               <div className="flex h-control min-w-0 flex-1 items-center truncate rounded border border-input-border bg-input px-1.5 text-label text-ink-muted">
-                {localBackupState.backupPath ?? "Not set"}
+                {localBackupState.backupPath ?? __tr("Not set")}
               </div>
-              <IconButton icon={FolderIcon} label="Change backup folder" onClick={() => void changeFolder()} />
+              <IconButton icon={FolderIcon} label={__tr("Change backup folder")} onClick={() => void changeFolder()} />
             </div>
           </div>
 
           <div>
-            <label className={`${SECTION_LABEL} mb-1`}>Retention Period</label>
+            <label className={`${SECTION_LABEL} mb-1`}>{__tr("Retention Period")}</label>
             <div className="flex items-center gap-2">
               <span className="block w-20">
                 <TextInput
@@ -134,22 +135,21 @@ export function LocalBackupSection() {
                   min={1}
                 />
               </span>
-              <span className="text-label text-ink-muted">days</span>
+              <span className="text-label text-ink-muted">{__tr("days")}</span>
             </div>
-            <p className={`mt-0.5 ${HINT}`}>Backups older than this are automatically deleted</p>
+            <p className={`mt-0.5 ${HINT}`}>{__tr("Backups older than this are automatically deleted")}</p>
           </div>
 
           <p className="text-label text-ink-muted">{statusText(localBackupState)}</p>
 
           <div className="flex items-center gap-2">
             <Button size="sm" loading={busy} loadingLabel="Working..." onClick={() => void backupNow()}>
-              Backup Now
-            </Button>
+              {__tr("Backup Now")}</Button>
           </div>
 
           {localBackups.length > 0 && (
             <div>
-              <label className={`${SECTION_LABEL} mb-1`}>Backup Files ({localBackups.length})</label>
+              <label className={`${SECTION_LABEL} mb-1`}>{__tr("Backup Files (")}{localBackups.length})</label>
               <div data-cv-backup-files="" className="max-h-32 overflow-y-auto rounded border border-card-border">
                 {localBackups.map((backup) => (
                   <div
@@ -166,18 +166,16 @@ export function LocalBackupSection() {
                     {confirmDelete === backup.fullPath ? (
                       <div className="ml-2 flex items-center gap-1">
                         <Button variant="danger" size="sm" onClick={() => void deleteBackup(backup.fullPath)}>
-                          Delete
-                        </Button>
+                          {__tr("Delete")}</Button>
                         <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(null)}>
-                          No
-                        </Button>
+                          {__tr("No")}</Button>
                       </div>
                     ) : (
                       <IconButton
                         size="sm"
                         icon={TrashIcon}
                         tone="danger"
-                        label="Delete backup"
+                        label={__tr("Delete backup")}
                         className="ml-2"
                         onClick={() => setConfirmDelete(backup.fullPath)}
                       />
@@ -191,8 +189,7 @@ export function LocalBackupSection() {
       )}
 
       <p className={HINT}>
-        Backups are encrypted with your master password using AES-256-GCM before writing to disk. No account required.
-      </p>
+        {__tr("Backups are encrypted with your master password using AES-256-GCM before writing to disk. No account required.")}</p>
     </div>
   );
 }

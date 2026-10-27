@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect } from "react";
 import { useVaultStore, type TeamSyncState } from "../../stores/vaultStore";
 import { AlertTriangleIcon, UsersIcon, WifiOffIcon } from "../../lib/icons";
@@ -53,14 +54,14 @@ export default function TeamSyncIndicator() {
       <div className="flex items-center">
         <div
           className="flex size-toolbar shrink-0 items-center justify-center text-info"
-          title={`Team vault synced${lastSyncedAt ? `: ${formatTime(lastSyncedAt)}` : ""}`}
+          title={__tr("Team vault synced{v0}", { v0: (lastSyncedAt ? `: ${formatTime(lastSyncedAt)}` : "") })}
         >
           <UsersIcon size={16} />
         </div>
         {syncFailures > 0 && (
           <div
             className="flex size-toolbar shrink-0 items-center justify-center text-warning"
-            title={`${syncFailures} item${syncFailures === 1 ? "" : "s"} failed to sync — will retry automatically`}
+            title={__tr("{v0} item{v1} failed to sync — will retry automatically", { v0: (syncFailures), v1: (syncFailures === 1 ? "" : "s") })}
           >
             <AlertTriangleIcon size={12} />
           </div>
@@ -71,7 +72,7 @@ export default function TeamSyncIndicator() {
 
   if (status === "syncing") {
     return (
-      <div className="flex size-toolbar shrink-0 items-center justify-center text-info animate-pulse" title="Syncing team vault...">
+      <div className="flex size-toolbar shrink-0 items-center justify-center text-info animate-pulse" title={__tr("Syncing team vault...")}>
         <UsersIcon size={16} />
       </div>
     );
@@ -81,7 +82,7 @@ export default function TeamSyncIndicator() {
     return (
       <div
         className="flex size-toolbar shrink-0 items-center justify-center text-warning"
-        title={`Team vault offline${pendingChanges > 0 ? ` (${pendingChanges} pending changes)` : ""}`}
+        title={__tr("Team vault offline{v0}", { v0: (pendingChanges > 0 ? ` (${pendingChanges} pending changes)` : "") })}
       >
         <WifiOffIcon size={16} />
       </div>
@@ -93,14 +94,14 @@ export default function TeamSyncIndicator() {
       <div className="flex items-center">
         <div
           className="flex size-toolbar shrink-0 items-center justify-center text-danger"
-          title={`Team sync error: ${error ?? "Unknown error"}`}
+          title={__tr("Team sync error: {v0}", { v0: (error ?? "Unknown error") })}
         >
           <AlertTriangleIcon size={16} />
         </div>
         {syncFailures > 0 && (
           <span
             className="text-badge text-warning"
-            title={`${syncFailures} item${syncFailures === 1 ? "" : "s"} failed to sync — will retry automatically`}
+            title={__tr("{v0} item{v1} failed to sync — will retry automatically", { v0: (syncFailures), v1: (syncFailures === 1 ? "" : "s") })}
           >
             {syncFailures}
           </span>

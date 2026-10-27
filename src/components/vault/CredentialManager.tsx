@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { useVaultStore } from "../../stores/vaultStore";
 import { useTeamStore } from "../../stores/teamStore";
@@ -104,7 +105,7 @@ export default function CredentialManager({ onClose }: CredentialManagerProps) {
     <>
       <Dialog
         open
-        title="Credentials"
+        title={__tr("Credentials")}
         icon="key"
         width={672}
         style={{ maxHeight: "80vh" }}
@@ -116,17 +117,17 @@ export default function CredentialManager({ onClose }: CredentialManagerProps) {
           subtitle={
             <>
               {vaultType === "team" && activeTeamVault && <Badge tone="accent">{activeTeamVault.name}</Badge>}
-              <span>{credentials.length} stored</span>
+              <span>{credentials.length} {__tr("stored")}</span>
             </>
           }
         >
-          {isUnlocked && <IconButton icon="lockOpen" label="Lock vault" onClick={() => lockVault()} />}
+          {isUnlocked && <IconButton icon="lockOpen" label={__tr("Lock vault")} onClick={() => lockVault()} />}
         </DialogHeader>
 
         <div className="flex items-center gap-2 border-b border-divider px-4 pb-2">
           <TextInput
             leading={<SearchIcon size={16} />}
-            placeholder="Search credentials..."
+            placeholder={__tr("Search credentials...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -138,19 +139,18 @@ export default function CredentialManager({ onClose }: CredentialManagerProps) {
               setShowForm(true);
             }}
           >
-            Add
-          </Button>
+            {__tr("Add")}</Button>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
           {filteredCredentials.length === 0 ? (
             credentials.length === 0 ? (
               <div className="py-4">
-                <EmptyState icon="key" title="No credentials stored" description='Click "Add" to create your first credential' />
+                <EmptyState icon="key" title={__tr("No credentials stored")} description={__tr("Click \"Add\" to create your first credential")} />
               </div>
             ) : (
               <div className="py-4">
-                <EmptyState icon="search" title="No matching credentials" />
+                <EmptyState icon="search" title={__tr("No matching credentials")} />
               </div>
             )
           ) : (
@@ -174,8 +174,8 @@ export default function CredentialManager({ onClose }: CredentialManagerProps) {
           <LockIcon size={12} compact />
           <span>
             {vaultType === "team"
-              ? "End-to-end encrypted with zero-knowledge team key"
-              : "Credentials are encrypted with AES-256-GCM"}
+              ? __tr("End-to-end encrypted with zero-knowledge team key")
+              : __tr("Credentials are encrypted with AES-256-GCM")}
           </span>
         </div>
       </Dialog>
@@ -211,14 +211,12 @@ function CredentialRow({
     <div className="group px-4 py-3 hover:bg-hover">
       {isDeleting ? (
         <div className="flex items-center justify-between">
-          <p className="text-body text-danger">Delete "{credential.name}"?</p>
+          <p className="text-body text-danger">{__tr("Delete \"")}{credential.name}"?</p>
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={onDeleteCancel}>
-              Cancel
-            </Button>
+              {__tr("Cancel")}</Button>
             <Button size="sm" variant="danger" onClick={onDeleteConfirm}>
-              Delete
-            </Button>
+              {__tr("Delete")}</Button>
           </div>
         </div>
       ) : (
@@ -252,8 +250,8 @@ function CredentialRow({
             )}
           </div>
           <div className="ml-2 flex items-center gap-1 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
-            <IconButton icon="pencil" label="Edit credential" onClick={onEdit} />
-            <IconButton icon="trash" tone="danger" label="Delete credential" onClick={onDeleteStart} />
+            <IconButton icon="pencil" label={__tr("Edit credential")} onClick={onEdit} />
+            <IconButton icon="trash" tone="danger" label={__tr("Delete credential")} onClick={onDeleteStart} />
           </div>
         </div>
       )}

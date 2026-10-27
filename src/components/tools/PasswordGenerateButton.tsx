@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import PasswordGeneratorDialog from "./PasswordGeneratorDialog";
 import { IconButton } from "../ui";
@@ -13,7 +14,7 @@ export default function PasswordGenerateButton({
 
   return (
     <>
-      <IconButton size="sm" icon="key" label="Password Generator" onClick={() => setShowDialog(true)} />
+      <IconButton size="sm" icon="key" label={__tr("Password Generator")} onClick={() => setShowDialog(true)} />
       {showDialog && (
         <PasswordGeneratorDialog
           onClose={() => setShowDialog(false)}

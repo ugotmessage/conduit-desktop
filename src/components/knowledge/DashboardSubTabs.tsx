@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useCallback, useState, type ReactNode } from "react";
 import { readKb } from "../../lib/kb";
 import { selectArticleTabs, useArticleTabsStore } from "../../stores/articleTabsStore";
@@ -47,7 +48,7 @@ export default function DashboardSubTabs({ host, homeLabel, visible, children }:
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col bg-editor">
-      <div role="tablist" aria-label="Open articles" className="flex shrink-0 items-end gap-0.5 overflow-x-auto border-b border-divider px-2 pt-1.5" data-cv-article-tabs={host}>
+      <div role="tablist" aria-label={__tr("Open articles")} className="flex shrink-0 items-end gap-0.5 overflow-x-auto border-b border-divider px-2 pt-1.5" data-cv-article-tabs={host}>
         <button
           type="button"
           role="tab"
@@ -72,11 +73,11 @@ export default function DashboardSubTabs({ host, homeLabel, visible, children }:
               <button type="button" className="flex min-w-0 items-center gap-1.5" onClick={() => activate(host, a.id)}>
                 <IconSlot icon={kind.icon} size={12} className="shrink-0" />
                 <span className="truncate">{a.name}</span>
-                {dirty.has(a.id) && <span className="size-1.5 shrink-0 rounded-full bg-warning" aria-label="Unsaved changes" />}
+                {dirty.has(a.id) && <span className="size-1.5 shrink-0 rounded-full bg-warning" aria-label={__tr("Unsaved changes")} />}
               </button>
               <button
                 type="button"
-                aria-label={`Close ${a.name}`}
+                aria-label={__tr("Close {v0}", { v0: (a.name) })}
                 onClick={() => requestClose(a.id)}
                 className="ml-0.5 flex size-4 shrink-0 items-center justify-center rounded text-ink-faint opacity-60 hover:bg-hover hover:text-ink hover:opacity-100"
               >
@@ -95,9 +96,9 @@ export default function DashboardSubTabs({ host, homeLabel, visible, children }:
       ))}
       {confirmClose && (
         <ConfirmDialog
-          title="Unsaved Changes"
-          message="This article has unsaved changes. Close it and discard them?"
-          confirmLabel="Discard"
+          title={__tr("Unsaved Changes")}
+          message={__tr("This article has unsaved changes. Close it and discard them?")}
+          confirmLabel={__tr("Discard")}
           variant="danger"
           onConfirm={() => {
             closeTab(host, confirmClose);

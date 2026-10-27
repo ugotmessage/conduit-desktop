@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useCallback, type ReactNode } from "react";
 import { toast } from "../common/Toast";
 import { invoke } from "../../lib/electron";
@@ -25,7 +26,7 @@ const keyTypes: { value: SshKeyType; label: ReactNode }[] = [
     value: "ed25519",
     label: (
       <>
-        Ed25519<span className="ml-1 text-badge opacity-60">recommended</span>
+        Ed25519<span className="ml-1 text-badge opacity-60">{__tr("recommended")}</span>
       </>
     ),
   },
@@ -34,8 +35,8 @@ const keyTypes: { value: SshKeyType; label: ReactNode }[] = [
 ];
 
 const rsaBitsOptions: { value: `${RsaBits}`; label: string }[] = [
-  { value: "2048", label: "2048 bits" },
-  { value: "4096", label: "4096 bits" },
+  { value: "2048", label: __tr("2048 bits") },
+  { value: "4096", label: __tr("4096 bits") },
 ];
 
 const ecdsaCurveOptions: { value: EcdsaCurve; label: string }[] = [
@@ -44,7 +45,7 @@ const ecdsaCurveOptions: { value: EcdsaCurve; label: string }[] = [
   { value: "P-521", label: "P-521" },
 ];
 
-const OPTIONAL = <span className="font-normal text-ink-faint">(optional)</span>;
+const OPTIONAL = <span className="font-normal text-ink-faint">{__tr("(optional)")}</span>;
 
 export default function SshKeyGeneratorDialog({
   onClose,
@@ -67,7 +68,7 @@ export default function SshKeyGeneratorDialog({
 
   const generate = useCallback(async () => {
     if (settings.passphrase && settings.passphrase !== passConfirm) {
-      setError("Passphrases do not match");
+      setError(__tr("Passphrases do not match"));
       return;
     }
     setError(null);
@@ -89,7 +90,7 @@ export default function SshKeyGeneratorDialog({
           : `SSH Key (${settings.type.toUpperCase()})`
       );
     } catch (err) {
-      setError(errorText(err, "Failed to generate key pair"));
+      setError(errorText(err, __tr("Failed to generate key pair")));
     } finally {
       setGenerating(false);
     }
@@ -98,13 +99,13 @@ export default function SshKeyGeneratorDialog({
   const handleCopyPublic = async () => {
     if (!result) return;
     await navigator.clipboard.writeText(result.publicKey);
-    toast.success("Public key copied to clipboard");
+    toast.success(__tr("Public key copied to clipboard"));
   };
 
   const handleCopyPrivate = async () => {
     if (!result) return;
     await navigator.clipboard.writeText(result.privateKey);
-    toast.success("Private key copied to clipboard");
+    toast.success(__tr("Private key copied to clipboard"));
   };
 
   const handleCopyInstallCommand = async () => {
@@ -113,7 +114,7 @@ export default function SshKeyGeneratorDialog({
     const escapedKey = result.publicKey.replace(/'/g, "'\\''");
     const cmd = `mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '${escapedKey}' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys`;
     await navigator.clipboard.writeText(cmd);
-    toast.success("Install command copied to clipboard");
+    toast.success(__tr("Install command copied to clipboard"));
   };
 
   const handleSaveToVault = async () => {
@@ -128,10 +129,10 @@ export default function SshKeyGeneratorDialog({
         publicKey: result.publicKey,
         fingerprint: result.fingerprint,
       });
-      toast.success("SSH key saved to vault");
+      toast.success(__tr("SSH key saved to vault"));
       setShowSaveForm(false);
     } catch (err) {
-      toast.error(errorText(err, "Failed to save credential"));
+      toast.error(errorText(err, __tr("Failed to save credential")));
     } finally {
       setSaving(false);
     }
@@ -161,7 +162,7 @@ export default function SshKeyGeneratorDialog({
             <TextInput
               value={credentialName}
               onChange={(e) => setCredentialName(e.target.value)}
-              placeholder="Credential name..."
+              placeholder={__tr("Credential name...")}
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSaveToVault();
@@ -169,11 +170,9 @@ export default function SshKeyGeneratorDialog({
             />
           </div>
           <Button variant="primary" icon="floppy" loading={saving} onClick={handleSaveToVault} disabled={!credentialName.trim()}>
-            Save
-          </Button>
+            {__tr("Save")}</Button>
           <Button variant="ghost" onClick={() => setShowSaveForm(false)}>
-            Cancel
-          </Button>
+            {__tr("Cancel")}</Button>
         </div>
       )}
 
@@ -182,21 +181,18 @@ export default function SshKeyGeneratorDialog({
           <Button
             icon="terminalAlt"
             onClick={handleCopyInstallCommand}
-            title="Copy a shell command that adds this public key to a server's authorized_keys"
+            title={__tr("Copy a shell command that adds this public key to a server's authorized_keys")}
           >
-            Copy Install Command
-          </Button>
+            {__tr("Copy Install Command")}</Button>
           {isUnlocked && !showSaveForm && (
             <Button icon="floppy" onClick={() => setShowSaveForm(true)}>
-              Save to Vault
-            </Button>
+              {__tr("Save to Vault")}</Button>
           )}
         </div>
         <div className="flex items-center gap-2">
           {onUseKey && (
             <Button variant="primary" onClick={handleUseKey}>
-              Use Private Key
-            </Button>
+              {__tr("Use Private Key")}</Button>
           )}
           <Button
             onClick={async () => {
@@ -204,8 +200,7 @@ export default function SshKeyGeneratorDialog({
               onClose();
             }}
           >
-            Copy Public Key & Close
-          </Button>
+            {__tr("Copy Public Key & Close")}</Button>
         </div>
       </div>
     </div>
@@ -214,16 +209,16 @@ export default function SshKeyGeneratorDialog({
   return (
     <Dialog
       open
-      title="SSH Key Generator"
+      title={__tr("SSH Key Generator")}
       onClose={onClose}
       width={result ? 768 : 512}
-      footer={result ? resultFooter : <Button onClick={onClose}>Close</Button>}
+      footer={result ? resultFooter : <Button onClick={onClose}>{__tr("Close")}</Button>}
     >
       {/* Side by side once a key exists */}
       <div className={cx(result && "flex gap-4")}>
         <div className={cx("space-y-4", result && "w-1/2 shrink-0")}>
           <div>
-            <label className="mb-1 block text-label font-semibold text-ink-secondary">Key Type</label>
+            <label className="mb-1 block text-label font-semibold text-ink-secondary">{__tr("Key Type")}</label>
             <SegmentedControl
               options={keyTypes}
               value={settings.type}
@@ -234,7 +229,7 @@ export default function SshKeyGeneratorDialog({
 
           {settings.type === "rsa" && (
             <div>
-              <label className="mb-1 block text-label font-semibold text-ink-secondary">Key Size</label>
+              <label className="mb-1 block text-label font-semibold text-ink-secondary">{__tr("Key Size")}</label>
               <SegmentedControl
                 options={rsaBitsOptions}
                 value={`${settings.rsaBits}`}
@@ -246,7 +241,7 @@ export default function SshKeyGeneratorDialog({
 
           {settings.type === "ecdsa" && (
             <div>
-              <label className="mb-1 block text-label font-semibold text-ink-secondary">Curve</label>
+              <label className="mb-1 block text-label font-semibold text-ink-secondary">{__tr("Curve")}</label>
               <SegmentedControl
                 options={ecdsaCurveOptions}
                 value={settings.ecdsaCurve}
@@ -257,12 +252,12 @@ export default function SshKeyGeneratorDialog({
           )}
 
           <div>
-            <FormField label={<>Passphrase {OPTIONAL}</>}>
+            <FormField label={<>{__tr("Passphrase")} {OPTIONAL}</>}>
               <TextInput
                 type="password"
                 value={settings.passphrase}
                 onChange={(e) => setSettings((s) => ({ ...s, passphrase: e.target.value }))}
-                placeholder="Leave empty for no passphrase"
+                placeholder={__tr("Leave empty for no passphrase")}
               />
             </FormField>
             {settings.passphrase && (
@@ -271,19 +266,18 @@ export default function SshKeyGeneratorDialog({
                   type="password"
                   value={passConfirm}
                   onChange={(e) => setPassConfirm(e.target.value)}
-                  placeholder="Confirm passphrase"
+                  placeholder={__tr("Confirm passphrase")}
                   invalid={passphraseMismatch}
                 />
               </div>
             )}
             {passphraseMismatch && (
               <p data-cv-error="" className="mt-1 text-meta text-danger">
-                Passphrases do not match
-              </p>
+                {__tr("Passphrases do not match")}</p>
             )}
           </div>
 
-          <FormField label={<>Comment {OPTIONAL}</>}>
+          <FormField label={<>{__tr("Comment")} {OPTIONAL}</>}>
             <TextInput
               value={settings.comment}
               onChange={(e) => setSettings((s) => ({ ...s, comment: e.target.value }))}
@@ -299,7 +293,7 @@ export default function SshKeyGeneratorDialog({
             loading={generating}
             loadingLabel="Generating..."
           >
-            {result ? "Regenerate Key Pair" : "Generate Key Pair"}
+            {result ? __tr("Regenerate Key Pair") : __tr("Generate Key Pair")}
           </Button>
 
           {error && <Callout tone="danger">{error}</Callout>}

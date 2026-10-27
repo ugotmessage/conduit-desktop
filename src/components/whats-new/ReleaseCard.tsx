@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { useAppIcon } from '../../hooks/useAppIcon';
 import { getMediaUrl } from './useReleaseNotes';
@@ -175,8 +176,7 @@ export default function ReleaseCard({ release, step, count, direction, isAnimati
 
           <div className="flex justify-end">
             <Button variant="primary" onClick={onClose}>
-              Close
-            </Button>
+              {__tr("Close")}</Button>
           </div>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, type CSSProperties } from "react";
 import { AlertTriangleIcon } from "../../lib/icons";
 import { getHarness } from "../../lib/ai-harnesses";
@@ -57,14 +58,14 @@ export default function AgentPane({ pane, epoch, focused, showHeader, style }: P
       {showHeader && (
         <div className="flex h-6 shrink-0 items-center justify-between gap-1 pl-2 pr-2.5">
           <PaneEngineSwitcher engineType={pane.engineType} focused={focused} onSelect={(type) => setPaneEngine(pane.id, type)} />
-          <IconButton size="sm" icon="close" label={`Close ${name} agent`} onClick={close} />
+          <IconButton size="sm" icon="close" label={__tr("Close {v0} agent", { v0: (name) })} onClick={close} />
         </div>
       )}
       {loading && (
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <Spinner size={24} className="text-ink-muted" />
-            <span className="text-label text-ink-muted">Starting {name}...</span>
+            <span className="text-label text-ink-muted">{__tr("Starting")} {name}...</span>
           </div>
         </div>
       )}
@@ -72,11 +73,10 @@ export default function AgentPane({ pane, epoch, focused, showHeader, style }: P
         <div className="flex flex-1 items-center justify-center overflow-y-auto px-4">
           <div className="max-w-sm text-center">
             <AlertTriangleIcon size={48} className="mx-auto mb-3 text-danger" />
-            <p className="mb-2 text-body font-semibold text-ink-secondary">Failed to start terminal</p>
+            <p className="mb-2 text-body font-semibold text-ink-secondary">{__tr("Failed to start terminal")}</p>
             <p className="mb-4 text-label text-ink-muted">{error}</p>
             <Button variant="primary" onClick={retry}>
-              Retry
-            </Button>
+              {__tr("Retry")}</Button>
           </div>
         </div>
       )}

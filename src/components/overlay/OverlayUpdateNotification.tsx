@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { ToastCard, type ToastCardAction, type ToastCardType } from "../ui";
 import type { UpdateState } from "../../types/toast";
 
@@ -29,15 +30,15 @@ function messageFor({ state, version }: UpdateState): string {
 function actionsFor(state: UpdateState["state"], onAction: (action: UpdateAction) => void): ReadonlyArray<ToastCardAction> | undefined {
   if (state === "downloaded") {
     return [
-      { id: "install", label: "Restart Now", variant: "primary", icon: "refresh", onClick: () => onAction("install") },
-      { id: "dismiss", label: "Later", onClick: () => onAction("dismiss") },
-      { id: "website", label: "Download manually from website", icon: "externalLink", onClick: () => onAction("website") },
+      { id: "install", label: __tr("Restart Now"), variant: "primary", icon: "refresh", onClick: () => onAction("install") },
+      { id: "dismiss", label: __tr("Later"), onClick: () => onAction("dismiss") },
+      { id: "website", label: __tr("Download manually from website"), icon: "externalLink", onClick: () => onAction("website") },
     ];
   }
   if (state === "error") {
     return [
-      { id: "website", label: "Download from Website", variant: "primary", icon: "externalLink", onClick: () => onAction("website") },
-      { id: "dismiss", label: "Later", onClick: () => onAction("dismiss") },
+      { id: "website", label: __tr("Download from Website"), variant: "primary", icon: "externalLink", onClick: () => onAction("website") },
+      { id: "dismiss", label: __tr("Later"), onClick: () => onAction("dismiss") },
     ];
   }
   return undefined;

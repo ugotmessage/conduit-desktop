@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback } from "react";
 import { useTeamStore, type AuditLogEntry } from "../../stores/teamStore";
 import { CheckIcon, FileIcon, FolderIcon, LockIcon, MailIcon, ShieldLockIcon, UsersIcon } from "../../lib/icons";
@@ -11,26 +12,26 @@ interface AuditLogViewerProps {
 }
 
 const ACTION_LABELS: Record<string, { label: string; color: string }> = {
-  entry_create: { label: "Created entry", color: "text-success" },
-  entry_update: { label: "Updated entry", color: "text-warning" },
-  entry_delete: { label: "Deleted entry", color: "text-danger" },
-  entry_view: { label: "Viewed entry", color: "text-link" },
-  password_changed: { label: "Password changed", color: "text-warning" },
-  password_history_delete: { label: "Deleted password history", color: "text-danger" },
-  folder_create: { label: "Created folder", color: "text-success" },
-  folder_update: { label: "Updated folder", color: "text-warning" },
-  folder_delete: { label: "Deleted folder", color: "text-danger" },
-  member_add: { label: "Added member", color: "text-success" },
-  member_remove: { label: "Removed member", color: "text-danger" },
-  member_role_change: { label: "Changed role", color: "text-warning" },
-  vault_create: { label: "Created vault", color: "text-success" },
-  vault_delete: { label: "Deleted vault", color: "text-danger" },
-  vault_access: { label: "Accessed vault", color: "text-link" },
-  permission_grant: { label: "Granted permission", color: "text-success" },
-  permission_revoke: { label: "Revoked permission", color: "text-danger" },
-  invitation_sent: { label: "Sent invitation", color: "text-link" },
-  invitation_accepted: { label: "Accepted invitation", color: "text-success" },
-  invitation_declined: { label: "Declined invitation", color: "text-warning" },
+  entry_create: { label: __tr("Created entry"), color: "text-success" },
+  entry_update: { label: __tr("Updated entry"), color: "text-warning" },
+  entry_delete: { label: __tr("Deleted entry"), color: "text-danger" },
+  entry_view: { label: __tr("Viewed entry"), color: "text-link" },
+  password_changed: { label: __tr("Password changed"), color: "text-warning" },
+  password_history_delete: { label: __tr("Deleted password history"), color: "text-danger" },
+  folder_create: { label: __tr("Created folder"), color: "text-success" },
+  folder_update: { label: __tr("Updated folder"), color: "text-warning" },
+  folder_delete: { label: __tr("Deleted folder"), color: "text-danger" },
+  member_add: { label: __tr("Added member"), color: "text-success" },
+  member_remove: { label: __tr("Removed member"), color: "text-danger" },
+  member_role_change: { label: __tr("Changed role"), color: "text-warning" },
+  vault_create: { label: __tr("Created vault"), color: "text-success" },
+  vault_delete: { label: __tr("Deleted vault"), color: "text-danger" },
+  vault_access: { label: __tr("Accessed vault"), color: "text-link" },
+  permission_grant: { label: __tr("Granted permission"), color: "text-success" },
+  permission_revoke: { label: __tr("Revoked permission"), color: "text-danger" },
+  invitation_sent: { label: __tr("Sent invitation"), color: "text-link" },
+  invitation_accepted: { label: __tr("Accepted invitation"), color: "text-success" },
+  invitation_declined: { label: __tr("Declined invitation"), color: "text-warning" },
 };
 
 const ACTION_CATEGORIES = [
@@ -59,8 +60,8 @@ function formatDate(iso: string): string {
   yesterday.setDate(yesterday.getDate() - 1);
   const isYesterday = d.toDateString() === yesterday.toDateString();
 
-  if (isToday) return "Today";
-  if (isYesterday) return "Yesterday";
+  if (isToday) return __tr("Today");
+  if (isYesterday) return __tr("Yesterday");
   return d.toLocaleDateString(undefined, {
     weekday: "short",
     month: "short",
@@ -208,12 +209,10 @@ export default function AuditLogViewer({ teamVaultId, embedded, onClose }: Audit
           )}
         >
           <FilterBox checked={allSelected} />
-          All Events
-        </button>
+          {__tr("All Events")}</button>
         {filterActions.length > 0 && (
           <button type="button" onClick={selectAll} className="text-badge text-ink-faint transition-colors hover:text-ink-secondary">
-            Clear
-          </button>
+            {__tr("Clear")}</button>
         )}
       </div>
 
@@ -272,7 +271,7 @@ export default function AuditLogViewer({ teamVaultId, embedded, onClose }: Audit
     <div className="flex min-w-0 flex-1 flex-col">
       <div className="flex items-center justify-between border-b border-divider px-4 py-2">
         <span className="text-label text-ink-muted">
-          Showing {allEntries.length} event{allEntries.length !== 1 ? "s" : ""}
+          {__tr("Showing")} {allEntries.length} {__tr("event")}{allEntries.length !== 1 ? "s" : ""}
         </span>
         {loading && <Spinner size={12} className="text-ink-muted" />}
       </div>
@@ -287,13 +286,12 @@ export default function AuditLogViewer({ teamVaultId, embedded, onClose }: Audit
         {!loading && allEntries.length === 0 && (
           <EmptyState
             icon="history"
-            title="No activity found."
+            title={__tr("No activity found.")}
             className="my-4"
             action={
               filterActions.length > 0 ? (
                 <Button variant="link" size="sm" onClick={selectAll}>
-                  Clear filters
-                </Button>
+                  {__tr("Clear filters")}</Button>
               ) : undefined
             }
           />
@@ -342,12 +340,12 @@ export default function AuditLogViewer({ teamVaultId, embedded, onClose }: Audit
         {hasMore && allEntries.length > 0 && (
           <div className="flex justify-center pb-4 pt-2">
             <Button onClick={handleLoadMore} disabled={loading}>
-              {loading ? "Loading..." : "Load More"}
+              {loading ? __tr("Loading...") : __tr("Load More")}
             </Button>
           </div>
         )}
 
-        <p className="py-2 text-center text-meta text-ink-faint">Audit logs are retained for 2 years.</p>
+        <p className="py-2 text-center text-meta text-ink-faint">{__tr("Audit logs are retained for 2 years.")}</p>
       </div>
     </div>
   );
@@ -363,7 +361,7 @@ export default function AuditLogViewer({ teamVaultId, embedded, onClose }: Audit
 
   const close = onClose ?? (() => {});
   return (
-    <Dialog open title="Audit Log" icon="history" width={900} closeOnEscape={false} onClose={close} layout="custom">
+    <Dialog open title={__tr("Audit Log")} icon="history" width={900} closeOnEscape={false} onClose={close} layout="custom">
       <DialogHeader />
       {team?.name && <p className="-mt-2 pb-3 pl-13 pr-4 text-label text-ink-muted">{team.name}</p>}
 
@@ -373,7 +371,7 @@ export default function AuditLogViewer({ teamVaultId, embedded, onClose }: Audit
       </div>
 
       <DialogFooter divided>
-        <Button onClick={close}>Close</Button>
+        <Button onClick={close}>{__tr("Close")}</Button>
       </DialogFooter>
     </Dialog>
   );

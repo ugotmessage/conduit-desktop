@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useMemo } from "react";
 import { effectiveFolderId, folderChain, readKb } from "../../lib/kb";
 import { useEntryStore } from "../../stores/entryStore";
@@ -30,15 +31,14 @@ export default function FolderKnowledgeSection({ folderId, assetCount, className
   return (
     <section className={cx("rounded border border-card-border bg-card p-4", className)} data-cv-folder-knowledge={folderId}>
       <div className="mb-2 flex items-baseline gap-2">
-        <h3 className="text-body font-semibold text-ink">Knowledge</h3>
+        <h3 className="text-body font-semibold text-ink">{__tr("Knowledge")}</h3>
         <span className="text-label text-ink-faint">
-          Shared with {assetCount} {assetCount === 1 ? "asset" : "assets"} in this folder
-        </span>
+          {__tr("Shared with")} {assetCount} {assetCount === 1 ? __tr("asset") : __tr("assets")} {__tr("in this folder")}</span>
       </div>
       <KnowledgePanel target={{ folderId }} />
       {recent.length > 0 && (
         <div className="mt-3 border-t border-divider pt-2">
-          <h4 className="px-2 text-meta font-semibold uppercase tracking-wide text-ink-faint">Recent agent learnings here</h4>
+          <h4 className="px-2 text-meta font-semibold uppercase tracking-wide text-ink-faint">{__tr("Recent agent learnings here")}</h4>
           {recent.map((a) => (
             <ArticleRow key={a.entry.id} entry={a.entry} kb={a.kb} context={assetName(a.entry.parent_entry_id)} host={folderViewSessionId(folderId)} />
           ))}

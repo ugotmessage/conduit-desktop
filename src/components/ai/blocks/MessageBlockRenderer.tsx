@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { MessageBlock } from "../../../stores/aiStore";
 import TextBlock from "./TextBlock";
 import ToolCallBlock from "./ToolCallBlock";
@@ -43,7 +44,7 @@ export default function MessageBlockRenderer({ blocks, onApprovalRespond }: Mess
               <div key={i} className="my-1.5 flex items-center gap-2 rounded-md border border-danger-border bg-well px-3 py-1.5 text-label">
                 <FileXIcon size={16} className="shrink-0 text-danger" />
                 <span className="truncate font-mono text-ink-muted">{block.path}</span>
-                <BlockLabel className="ml-auto text-danger">Deleted</BlockLabel>
+                <BlockLabel className="ml-auto text-danger">{__tr("Deleted")}</BlockLabel>
               </div>
             );
 

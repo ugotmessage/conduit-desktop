@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useId, useState } from "react";
 import type { EntryMeta } from "../../types/entry";
 import MarkdownRenderer from "../markdown/MarkdownRenderer";
@@ -16,8 +17,8 @@ export default function EntrySidePanel({ entry }: { entry: EntryMeta }) {
   const [tab, setTab] = useState<SideTab>(own > 0 || !hasNotes ? "knowledge" : "notes");
 
   const items: ReadonlyArray<TabItem<SideTab>> = [
-    { value: "knowledge", label: knowledge.length ? `Knowledge (${knowledge.length})` : "Knowledge", icon: "notes" },
-    { value: "notes", label: "Notes", icon: "fileText" },
+    { value: "knowledge", label: knowledge.length ? __tr("Knowledge ({v0})", { v0: (knowledge.length) }) : __tr("Knowledge"), icon: "notes" },
+    { value: "notes", label: __tr("Notes"), icon: "fileText" },
   ];
 
   return (
@@ -29,7 +30,7 @@ export default function EntrySidePanel({ entry }: { entry: EntryMeta }) {
         ) : hasNotes ? (
           <MarkdownRenderer content={entry.notes!} />
         ) : (
-          <p className="text-body text-ink-muted">No notes. Edit the entry to add some, or keep what you know as knowledge articles.</p>
+          <p className="text-body text-ink-muted">{__tr("No notes. Edit the entry to add some, or keep what you know as knowledge articles.")}</p>
         )}
       </TabPanel>
     </div>

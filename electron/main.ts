@@ -1,4 +1,5 @@
 import './app-identity.js';
+import zhTW from "./locales/zh-TW.js";
 import { app, BaseWindow, BrowserWindow, globalShortcut, KeyboardEvent as ElectronKeyboardEvent, Menu, MenuItem, Tray, nativeImage, nativeTheme, ipcMain, shell, screen } from 'electron';
 import path from 'node:path';
 import os from 'node:os';
@@ -354,7 +355,7 @@ function createTray(mainWindow: BrowserWindow) {
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show Conduit',
+      label: __tr('Show Conduit'),
       click: () => {
         if (mainWindow.isDestroyed()) return;
         if (isMac) app.dock?.show().catch(() => {});
@@ -366,13 +367,13 @@ function createTray(mainWindow: BrowserWindow) {
       },
     },
     {
-      label: 'Credential Picker',
+      label: __tr('Credential Picker'),
       accelerator: 'CmdOrCtrl+Shift+Space',
       click: () => createPickerWindow(),
     },
     { type: 'separator' },
     {
-      label: 'Quit',
+      label: __tr('Quit'),
       click: () => app.quit(),
     },
   ]);
@@ -423,7 +424,7 @@ function devViewMenuItems(): Electron.MenuItemConstructorOptions[] {
     { role: 'toggleDevTools' },
     { type: 'separator' },
     {
-      label: 'Actual Size',
+      label: __tr('Actual Size'),
       accelerator: 'CmdOrCtrl+0',
       click: (_mi: MenuItem, win: BaseWindow | undefined, _ev: ElectronKeyboardEvent) => {
         const bw = win as BrowserWindow | undefined;
@@ -431,7 +432,7 @@ function devViewMenuItems(): Electron.MenuItemConstructorOptions[] {
       },
     },
     {
-      label: 'Zoom In',
+      label: __tr('Zoom In'),
       accelerator: 'CmdOrCtrl+Plus',
       click: (_mi: MenuItem, win: BaseWindow | undefined, _ev: ElectronKeyboardEvent) => {
         const bw = win as BrowserWindow | undefined;
@@ -439,7 +440,7 @@ function devViewMenuItems(): Electron.MenuItemConstructorOptions[] {
       },
     },
     {
-      label: 'Zoom Out',
+      label: __tr('Zoom Out'),
       accelerator: 'CmdOrCtrl+-',
       click: (_mi: MenuItem, win: BaseWindow | undefined, _ev: ElectronKeyboardEvent) => {
         const bw = win as BrowserWindow | undefined;
@@ -447,10 +448,10 @@ function devViewMenuItems(): Electron.MenuItemConstructorOptions[] {
       },
     },
     { type: 'separator' },
-    { role: 'togglefullscreen' },
+    { role: 'togglefullscreen', label: __tr("Toggle Full Screen") },
     { type: 'separator' },
     {
-      label: 'Trigger Test Toast',
+      label: __tr('Trigger Test Toast'),
       click: () => sendMenuAction('dev:test-toast'),
     },
   ];
@@ -465,127 +466,127 @@ function buildAppMenu() {
             label: app.name,
             submenu: [
               {
-                label: 'Settings',
+                label: __tr('Settings'),
                 accelerator: 'CmdOrCtrl+,',
                 click: () => sendMenuAction('settings'),
               },
               { type: 'separator' as const },
-              { role: 'hide' as const },
-              { role: 'hideOthers' as const },
-              { role: 'unhide' as const },
+              { role: 'hide' as const, label: __tr("Hide Conduit") },
+              { role: 'hideOthers' as const, label: __tr("Hide Others") },
+              { role: 'unhide' as const, label: __tr("Show All") },
               { type: 'separator' as const },
-              { role: 'quit' as const },
+              { role: 'quit' as const, label: __tr("Quit Conduit") },
             ],
           } as Electron.MenuItemConstructorOptions,
         ]
       : []),
     // File menu
     {
-      label: 'File',
+      label: __tr('File'),
       submenu: [
         {
-          label: 'New Vault',
+          label: __tr('New Vault'),
           click: () => sendMenuAction('new-vault'),
         },
         {
-          label: 'Open Vault...',
+          label: __tr('Open Vault...'),
           accelerator: 'CmdOrCtrl+O',
           click: () => sendMenuAction('open-vault'),
         },
         { type: 'separator' },
         {
-          label: 'New Entry',
+          label: __tr('New Entry'),
           accelerator: 'CmdOrCtrl+E',
           click: () => sendMenuAction('new-entry'),
         },
         {
-          label: 'New Folder',
+          label: __tr('New Folder'),
           accelerator: 'CmdOrCtrl+Shift+N',
           click: () => sendMenuAction('new-folder'),
         },
         { type: 'separator' },
         {
-          label: 'Export',
+          label: __tr('Export'),
           click: () => sendMenuAction('export-vault'),
         },
         {
-          label: 'Import',
+          label: __tr('Import'),
           submenu: [
             {
-              label: 'From Conduit Export...',
+              label: __tr('From Conduit Export...'),
               click: () => sendMenuAction('import-export'),
             },
             { type: 'separator' },
             {
-              label: 'From Remote Desktop Manager...',
+              label: __tr('From Remote Desktop Manager...'),
               click: () => sendMenuAction('import-rdm'),
             },
           ],
         },
         { type: 'separator' },
         {
-          label: 'Vault Management',
+          label: __tr('Vault Management'),
           submenu: [
             {
-              label: 'Save Vault',
+              label: __tr('Save Vault'),
               accelerator: 'CmdOrCtrl+S',
               click: () => sendMenuAction('save-vault'),
             },
             { type: 'separator' },
             {
-              label: 'Switch Vault...',
+              label: __tr('Switch Vault...'),
               click: () => sendMenuAction('switch-vault'),
             },
             {
-              label: 'Lock Vault',
+              label: __tr('Lock Vault'),
               accelerator: 'CmdOrCtrl+Shift+L',
               click: () => sendMenuAction('lock-vault'),
             },
             {
-              label: 'Rename Vault...',
+              label: __tr('Rename Vault...'),
               click: () => sendMenuAction('rename-vault'),
             },
             { type: 'separator' },
             {
-              label: 'Change Password...',
+              label: __tr('Change Password...'),
               click: () => sendMenuAction('change-vault-password'),
             },
           ],
         },
         { type: 'separator' },
         {
-          label: 'Sign Out',
+          label: __tr('Sign Out'),
           click: () => sendMenuAction('sign-out'),
         },
         { type: 'separator' },
         {
-          label: 'Settings',
+          label: __tr('Settings'),
           accelerator: 'CmdOrCtrl+,',
           click: () => sendMenuAction('settings'),
         },
         { type: 'separator' },
-        isMac ? { role: 'close' } : { role: 'quit' },
+        isMac ? { role: 'close', label: __tr("Close Window") } : { role: 'quit', label: __tr("Quit Conduit") },
       ],
     },
     // Edit menu — required on macOS for Cmd+C/V/X/A to reach the renderer
     {
-      label: 'Edit',
+      label: __tr('Edit'),
       submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
+        { role: 'undo', label: __tr("Undo") },
+        { role: 'redo', label: __tr("Redo") },
         { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'selectAll' },
+        { role: 'cut', label: __tr("Cut") },
+        { role: 'copy', label: __tr("Copy") },
+        { role: 'paste', label: __tr("Paste") },
+        { role: 'selectAll', label: __tr("Select All") },
       ],
     },
     // View menu: Home in every build, the dev tools only in dev builds
     {
-      label: 'View',
+      label: __tr('View'),
       submenu: [
         {
-          label: 'Home',
+          label: __tr('Home'),
           accelerator: 'CmdOrCtrl+Shift+H',
           click: () => sendMenuAction('home'),
         },
@@ -594,20 +595,20 @@ function buildAppMenu() {
     },
     // Tools menu
     {
-      label: 'Tools',
+      label: __tr('Tools'),
       submenu: [
         {
-          label: 'Password Generator',
+          label: __tr('Password Generator'),
           accelerator: 'CmdOrCtrl+G',
           click: () => sendMenuAction('password-generator'),
         },
         {
-          label: 'SSH Key Generator',
+          label: __tr('SSH Key Generator'),
           click: () => sendMenuAction('ssh-key-generator'),
         },
         { type: 'separator' },
         {
-          label: 'Close All Sessions',
+          label: __tr('Close All Sessions'),
           click: async () => {
             // Force-close all sessions on the main process (terminals, web, RDP, VNC)
             await AppState.getInstance().closeAllSessions();
@@ -621,22 +622,22 @@ function buildAppMenu() {
     ...(isMac
       ? [
           {
-            label: 'Window',
+            label: __tr('Window'),
             submenu: [
-              { role: 'minimize' as const },
-              { role: 'zoom' as const },
+              { role: 'minimize' as const, label: __tr("Minimize") },
+              { role: 'zoom' as const, label: __tr("Zoom") },
               { type: 'separator' as const },
-              { role: 'front' as const },
+              { role: 'front' as const, label: __tr("Bring All to Front") },
             ],
           },
         ]
       : []),
     // Help menu
     {
-      label: 'Help',
+      label: __tr('Help'),
       submenu: [
         {
-          label: 'Conduit Help',
+          label: __tr('Conduit Help'),
           accelerator: 'F1',
           click: () => {
             const docsUrl = isDev
@@ -646,20 +647,20 @@ function buildAppMenu() {
           },
         },
         {
-          label: 'Getting Started',
+          label: __tr('Getting Started'),
           click: () => sendMenuAction('replay-onboarding'),
         },
         {
-          label: "What's New",
+          label: __tr("What's New"),
           click: () => sendMenuAction('whats-new'),
         },
         { type: 'separator' },
         {
-          label: 'Submit a Bug...',
+          label: __tr('Submit a Bug...'),
           click: () => sendMenuAction('submit-bug'),
         },
         {
-          label: 'Submit Feedback...',
+          label: __tr('Submit Feedback...'),
           click: () => sendMenuAction('submit-feedback'),
         },
         { type: 'separator' },
@@ -681,7 +682,7 @@ function buildAppMenu() {
         },
         { type: 'separator' },
         {
-          label: 'About Conduit',
+          label: __tr('About Conduit'),
           click: () => sendMenuAction('about'),
         },
       ],
@@ -1012,7 +1013,7 @@ app.whenReady().then(async () => {
       console.error('[updater] setupAutoUpdater failed:', err);
     });
 
-    // Rebuild menu when update is downloaded (dynamic label: "Restart to Update to vX.Y.Z")
+    // Rebuild menu when update is downloaded (dynamic label: __tr("Restart to Update to vX.Y.Z"))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     app.on('conduit:update-downloaded' as any, () => {
       buildAppMenu();
@@ -1075,3 +1076,9 @@ app.on('before-quit', (event) => {
 
   logger.close();
 });
+
+function __tr(english: string): string {
+  const value = readSettings().ui_language ?? 'system';
+  const chinese = value === 'zh-TW' || (value === 'system' && /^zh(?:-|$)/i.test(app.getLocale()));
+  return chinese ? zhTW[english] ?? english : english;
+}

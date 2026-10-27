@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import { useSessionStore, type SessionType } from "../../stores/sessionStore";
 import { useEntryStore } from "../../stores/entryStore";
@@ -44,31 +45,28 @@ export default function ConnectionError({ sessionId, entryId, error, sessionType
   return (
     <SessionStatePanel className="flex-1">
       <PlugDisconnectedIcon size={48} stroke={1.2} className="mb-4 text-danger" />
-      <div className="mb-2 text-title font-medium text-danger">Connection Error</div>
+      <div className="mb-2 text-title font-medium text-danger">{__tr("Connection Error")}</div>
       <div className="mb-1 max-w-md text-center text-body text-ink-muted">{friendly}</div>
       {showRaw && <div className="mt-1 max-w-md break-all text-center font-mono text-label text-ink-faint">{error}</div>}
       {mayBeBlocked && localNetworkBlocked && (
         <Callout
           tone="warning"
           className="mt-4 max-w-md"
-          title="macOS is blocking local network access"
+          title={__tr("macOS is blocking local network access")}
           actions={
             <Button size="sm" onClick={() => invoke("open_local_network_settings").catch(console.error)}>
-              Open Settings
-            </Button>
+              {__tr("Open Settings")}</Button>
           }
         >
-          {settingsAppName} cannot reach devices on your network until you allow it.
-          Open Privacy &amp; Security, choose Local Network, and turn on {settingsAppName}.
+          {settingsAppName} {__tr("cannot reach devices on your network until you allow it. Open Privacy & Security, choose Local Network, and turn on")} {settingsAppName}.
         </Callout>
       )}
       <div className="mt-6 flex gap-3">
         {entryId && (
           <Button variant="primary" onClick={() => useEntryStore.getState().reconnectSession(sessionId)}>
-            Reconnect
-          </Button>
+            {__tr("Reconnect")}</Button>
         )}
-        <Button onClick={() => useSessionStore.getState().closeSession(sessionId)}>Close</Button>
+        <Button onClick={() => useSessionStore.getState().closeSession(sessionId)}>{__tr("Close")}</Button>
       </div>
     </SessionStatePanel>
   );

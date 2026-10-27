@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { EntryMeta, EntryType, FolderData } from "../../../types/entry";
 import type { ReachabilityResult } from "../../../types/dashboard";
 import { STATUS_RANK, UNCHECKED_RANK } from "../reachability/reachabilityCopy";
@@ -6,10 +7,10 @@ import { isCheckable } from "../reachability/reachabilityTarget";
 export type FolderSort = "name" | "type" | "last-connected" | "status";
 
 export const FOLDER_SORT_OPTIONS: readonly { readonly value: FolderSort; readonly label: string }[] = [
-  { value: "name", label: "Name" },
-  { value: "type", label: "Type" },
-  { value: "last-connected", label: "Last connected" },
-  { value: "status", label: "Status" },
+  { value: "name", label: __tr("Name") },
+  { value: "type", label: __tr("Type") },
+  { value: "last-connected", label: __tr("Last connected") },
+  { value: "status", label: __tr("Status") },
 ];
 
 export const ENTRY_TYPE_LABELS: Readonly<Record<EntryType, string>> = {

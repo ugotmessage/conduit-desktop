@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useMemo, useState } from "react";
 import { useEntryStore } from "../../stores/entryStore";
 import { useTierStore } from "../../stores/tierStore";
@@ -57,7 +58,7 @@ export default function FolderDashboard({ folderId }: FolderDashboardProps) {
   if (!folder) {
     return (
       <div className="flex-1 flex items-center justify-center bg-editor">
-        <p className="text-body text-ink-faint">Folder not found</p>
+        <p className="text-body text-ink-faint">{__tr("Folder not found")}</p>
       </div>
     );
   }
@@ -75,14 +76,14 @@ export default function FolderDashboard({ folderId }: FolderDashboardProps) {
           <div className="flex-1 min-w-0">
             <h2 className="text-title font-semibold text-ink truncate">{folder.name}</h2>
             <p className="text-body text-ink-muted">
-              {total} {total === 1 ? "entry" : "entries"}
+              {total} {total === 1 ? __tr("entry") : __tr("entries")}
               {subFolderCount > 0 && ` · ${subFolderCount} sub-folder${subFolderCount === 1 ? "" : "s"}`}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <CheckAllButton items={listed} checkMany={reachability.checkMany} />
             <OpenAllButton entryIds={openAllIds(listed, (id) => lockedEntryIds.has(id))} />
-            <IconButton icon="plus" label="New Entry" onClick={() => newEntryIn(folderId)} />
+            <IconButton icon="plus" label={__tr("New Entry")} onClick={() => newEntryIn(folderId)} />
           </div>
         </div>
       </div>
@@ -97,14 +98,13 @@ export default function FolderDashboard({ folderId }: FolderDashboardProps) {
                 <SearchInput
                   value={query}
                   onChange={setQuery}
-                  placeholder="Search this folder..."
-                  aria-label="Search this folder"
+                  placeholder={__tr("Search this folder...")}
+                  aria-label={__tr("Search this folder")}
                   wrapperClassName="max-w-sm"
                 />
                 <div className="ml-auto flex shrink-0 items-center gap-2">
                   <label htmlFor={SORT_SELECT_ID} className="whitespace-nowrap text-label text-ink-muted">
-                    Sort by
-                  </label>
+                    {__tr("Sort by")}</label>
                   <Select
                     id={SORT_SELECT_ID}
                     value={sort}
@@ -130,10 +130,9 @@ export default function FolderDashboard({ folderId }: FolderDashboardProps) {
       {total === 0 && (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-body text-ink-faint mb-2">This folder is empty</p>
+            <p className="text-body text-ink-faint mb-2">{__tr("This folder is empty")}</p>
             <Button variant="primary" onClick={() => newEntryIn(folderId)}>
-              New Entry
-            </Button>
+              {__tr("New Entry")}</Button>
           </div>
         </div>
       )}

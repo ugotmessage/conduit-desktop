@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useRef, useEffect, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { usePopoverPosition } from "../../hooks/usePopoverPosition";
@@ -46,8 +47,8 @@ export default function ColorPicker({ value, onSelect, onClose, anchorRef }: Col
   return createPortal(
     <div ref={ref} data-popover className={cx(PICKER_PANEL, "w-[220px] p-3")} style={{ top: pos.top, left: pos.left }}>
       <div className="mb-2 flex items-center justify-between">
-        <span className={PICKER_TITLE}>Color</span>
-        <IconButton size="sm" icon="close" label="Close" onClick={onClose} />
+        <span className={PICKER_TITLE}>{__tr("Color")}</span>
+        <IconButton size="sm" icon="close" label={__tr("Close")} onClick={onClose} />
       </div>
 
       <button
@@ -56,8 +57,7 @@ export default function ColorPicker({ value, onSelect, onClose, anchorRef }: Col
         {...(value === null ? { "data-selected": "" } : {})}
         className={cx(defaultRowClass(value === null), "mb-2")}
       >
-        Use Default
-      </button>
+        {__tr("Use Default")}</button>
 
       <div className="grid grid-cols-8 gap-1.5">
         {PRESET_COLORS.map((color) => (

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import KnowledgeBadge, { useKnowledgeCounts } from "../knowledge/KnowledgeBadge";
 import NewArticleDialog from "../knowledge/NewArticleDialog";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
@@ -340,7 +341,7 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
   const handleDoubleClick = useCallback((node: TreeNode) => {
     if (node.kind === "entry" && node.entryType !== "credential") {
       if (isEntryLocked(node.id)) {
-        toast.error("This entry is locked — upgrade your plan to access it");
+        toast.error(__tr("This entry is locked — upgrade your plan to access it"));
         return;
       }
       // Double-click opens just this entry; clear multi-selection
@@ -357,7 +358,7 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
     const entry = entries.find((e) => e.id === nodeId);
     if (entry?.host) {
       await navigator.clipboard.writeText(entry.host);
-      toast.success("Host copied");
+      toast.success(__tr("Host copied"));
     }
   }, [entries]);
 
@@ -365,9 +366,9 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
     const cred = await resolveCredential(nodeId);
     if (cred?.username) {
       await navigator.clipboard.writeText(cred.username);
-      toast.success("Username copied");
+      toast.success(__tr("Username copied"));
     } else {
-      toast.error("No username available");
+      toast.error(__tr("No username available"));
     }
   }, [resolveCredential]);
 
@@ -375,9 +376,9 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
     const cred = await resolveCredential(nodeId);
     if (cred?.password) {
       await navigator.clipboard.writeText(cred.password);
-      toast.success("Password copied");
+      toast.success(__tr("Password copied"));
     } else {
-      toast.error("No password available");
+      toast.error(__tr("No password available"));
     }
   }, [resolveCredential]);
 
@@ -465,10 +466,10 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
     }
 
     if (skipped > 0) {
-      toast.info(`${skipped} item${skipped > 1 ? "s" : ""} skipped (circular reference or insufficient permissions)`);
+      toast.info(__tr("{v0} item{v1} skipped (circular reference or insufficient permissions)", { v0: (skipped), v1: (skipped > 1 ? "s" : "") }));
     }
     if (folderOnEntryRejected > 0) {
-      toast.info(`${folderOnEntryRejected} folder${folderOnEntryRejected > 1 ? "s" : ""} skipped — folders cannot be nested under entries`);
+      toast.info(__tr("{v0} folder{v1} skipped — folders cannot be nested under entries", { v0: (folderOnEntryRejected), v1: (folderOnEntryRejected > 1 ? "s" : "") }));
     }
 
     // Resolve the target for entries and folders separately.
@@ -488,7 +489,7 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
 
     const totalFailed = results[0].failed + results[1].failed;
     if (totalFailed > 0) {
-      toast.error(`Failed to move ${totalFailed} item${totalFailed > 1 ? "s" : ""}`);
+      toast.error(__tr("Failed to move {v0} item{v1}", { v0: (totalFailed), v1: (totalFailed > 1 ? "s" : "") }));
     }
 
     // Auto-expand the target after a successful move so the user sees the
@@ -512,8 +513,8 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
     if (selectedEntryIds.has(node.id) && selectedEntryIds.size > 1) {
       const count = selectedEntryIds.size;
       const items: PopupMenuItem[] = [
-        { id: "header", label: `${count} items selected`, type: "separator" },
-        { id: "delete_multi", label: `Delete ${count} Items`, variant: "danger", icon: "trash" },
+        { id: "header", label: __tr("{v0} items selected", { v0: (count) }), type: "separator" },
+        { id: "delete_multi", label: __tr("Delete {v0} Items", { v0: (count) }), variant: "danger", icon: "trash" },
       ];
       const selected = await showContextMenu(e.clientX, e.clientY, items);
       if (selected === "delete_multi") {
@@ -543,23 +544,23 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
       const role = vaultType === "team" ? (getEffectiveRole(node.id) ?? "viewer") : "admin";
       const canEdit = role === "admin" || role === "editor";
 
-      items.push({ id: "view_info", label: "View Info", icon: "infoCircle" });
+      items.push({ id: "view_info", label: __tr("View Info"), icon: "infoCircle" });
       if (canEdit) {
         items.push({ id: "sep_info", label: "", type: "separator" });
         items.push(newEntrySubmenu());
         items.push(newFolderItem());
-        items.push({ id: "new_article", label: "Add Knowledge Article", icon: "notes" });
+        items.push({ id: "new_article", label: __tr("Add Knowledge Article"), icon: "notes" });
         items.push({ id: "sep1", label: "", type: "separator" });
-        items.push({ id: "edit_folder", label: "Edit Folder", icon: "pencil" });
-        items.push({ id: "rename", label: "Rename", icon: "textCursor" });
+        items.push({ id: "edit_folder", label: __tr("Edit Folder"), icon: "pencil" });
+        items.push({ id: "rename", label: __tr("Rename"), icon: "textCursor" });
       }
       if (vaultType === "team" && canManagePerms()) {
         items.push({ id: "sep_perms", label: "", type: "separator" });
-        items.push({ id: "manage_permissions", label: "Manage Permissions", icon: "shield" });
+        items.push({ id: "manage_permissions", label: __tr("Manage Permissions"), icon: "shield" });
       }
       if (role === "admin") {
         items.push({ id: "sep2", label: "", type: "separator" });
-        items.push({ id: "delete", label: "Delete", variant: "danger", icon: "trash" });
+        items.push({ id: "delete", label: __tr("Delete"), variant: "danger", icon: "trash" });
       }
     } else {
       const entry = entries.find((en) => en.id === node.id);
@@ -582,57 +583,57 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
 
       if (locked) {
         // Locked entries: only upgrade prompt + delete (to free up slots)
-        items.push({ id: "upgrade", label: "Upgrade to Access", icon: "lock" });
+        items.push({ id: "upgrade", label: __tr("Upgrade to Access"), icon: "lock" });
         items.push({ id: "sep1", label: "", type: "separator" });
         if (role === "admin") {
-          items.push({ id: "delete", label: "Delete", variant: "danger", icon: "trash" });
+          items.push({ id: "delete", label: __tr("Delete"), variant: "danger", icon: "trash" });
         }
       } else {
         if (isConnection) {
-          items.push({ id: "open", label: "Open Session", icon: "playerPlay" });
+          items.push({ id: "open", label: __tr("Open Session"), icon: "playerPlay" });
           const openWithChildren: PopupMenuItem[] = [
-            { id: "open_external", label: "Open External", icon: "externalLink" },
+            { id: "open_external", label: __tr("Open External"), icon: "externalLink" },
           ];
           if (node.entryType !== "web") {
             openWithChildren.push({
-              id: "open_with_credential", label: "Open with Credential\u2026", icon: "key",
+              id: "open_with_credential", label: __tr("Open with Credential…"), icon: "key",
             });
           }
-          items.push({ id: "open_with", label: "Open With", icon: "ellipsis", children: openWithChildren });
+          items.push({ id: "open_with", label: __tr("Open With"), icon: "ellipsis", children: openWithChildren });
         }
-        items.push({ id: "view_info", label: "View Info", icon: "infoCircle" });
+        items.push({ id: "view_info", label: __tr("View Info"), icon: "infoCircle" });
         items.push({ id: "sep0", label: "", type: "separator" });
         if (canEdit) {
-          items.push({ id: "edit", label: "Edit", icon: "pencil" });
+          items.push({ id: "edit", label: __tr("Edit"), icon: "pencil" });
         }
         if (isConnection && entry?.host) {
-          items.push({ id: "copy_host", label: "Copy Host", icon: "server" });
+          items.push({ id: "copy_host", label: __tr("Copy Host"), icon: "server" });
         }
         if (entry?.username || entry?.credential_id) {
-          items.push({ id: "copy_username", label: "Copy Username", icon: "user" });
+          items.push({ id: "copy_username", label: __tr("Copy Username"), icon: "user" });
         }
-        items.push({ id: "copy_password", label: "Copy Password", icon: "key" });
+        items.push({ id: "copy_password", label: __tr("Copy Password"), icon: "key" });
         if (hasTotp) {
-          items.push({ id: "copy_otp", label: "Copy OTP", icon: "clock" });
+          items.push({ id: "copy_otp", label: __tr("Copy OTP"), icon: "clock" });
         }
         const autoTypeChildren: PopupMenuItem[] = [
-          { id: "autotype_username", label: "Type Username", icon: "user" },
-          { id: "autotype_password", label: "Type Password", icon: "key" },
-          { id: "autotype_username_tab_password", label: "Type Both (Tab Between)", icon: "keyboard" },
+          { id: "autotype_username", label: __tr("Type Username"), icon: "user" },
+          { id: "autotype_password", label: __tr("Type Password"), icon: "key" },
+          { id: "autotype_username_tab_password", label: __tr("Type Both (Tab Between)"), icon: "keyboard" },
         ];
-        items.push({ id: "autotype", label: "Auto-type", icon: "keyboard", children: autoTypeChildren });
+        items.push({ id: "autotype", label: __tr("Auto-type"), icon: "keyboard", children: autoTypeChildren });
         items.push({ id: "sep1", label: "", type: "separator" });
-        items.push({ id: "favorite", label: entry?.is_favorite ? "Unfavorite" : "Favorite", icon: entry?.is_favorite ? "starFilled" : "star" });
+        items.push({ id: "favorite", label: entry?.is_favorite ? __tr("Unfavorite") : __tr("Favorite"), icon: entry?.is_favorite ? "starFilled" : "star" });
         if (canEdit) {
-          items.push({ id: "rename", label: "Rename", icon: "textCursor" });
-          items.push({ id: "duplicate", label: "Duplicate", icon: "copy" });
-          items.push({ id: "new_article", label: "Add Knowledge Article", icon: "notes" });
+          items.push({ id: "rename", label: __tr("Rename"), icon: "textCursor" });
+          items.push({ id: "duplicate", label: __tr("Duplicate"), icon: "copy" });
+          items.push({ id: "new_article", label: __tr("Add Knowledge Article"), icon: "notes" });
           items.push({ id: "sep_new", label: "", type: "separator" });
           items.push(newHereSubmenu(parentFolderId ? "New in This Folder" : "New at Top Level"));
         }
         if (role === "admin") {
           items.push({ id: "sep2", label: "", type: "separator" });
-          items.push({ id: "delete", label: "Delete", variant: "danger", icon: "trash" });
+          items.push({ id: "delete", label: __tr("Delete"), variant: "danger", icon: "trash" });
         }
       }
     }
@@ -667,7 +668,7 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
       case "open_external":
         invoke("entry_open_external", { id: node.id }).catch((err: unknown) => {
           const msg = err instanceof Error ? err.message : String(err);
-          toast.error(`Failed to open external: ${msg}`);
+          toast.error(__tr("Failed to open external: {v0}", { v0: (msg) }));
         });
         break;
       case "open_with_credential":
@@ -688,59 +689,59 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
       case "copy_otp": {
         try {
           const full = await getEntry(node.id);
-          if (!full?.totp_secret) { toast.error("No OTP configured"); break; }
+          if (!full?.totp_secret) { toast.error(__tr("No OTP configured")); break; }
           const { code } = generateTotpCode({ secret: full.totp_secret });
           await navigator.clipboard.writeText(code);
-          toast.success("OTP copied");
+          toast.success(__tr("OTP copied"));
         } catch (err) {
-          toast.error(errorText(err, "Failed to copy OTP"));
+          toast.error(errorText(err, __tr("Failed to copy OTP")));
         }
         break;
       }
       case "autotype_username": {
         const cred = await resolveCredential(node.id);
-        if (!cred?.username) { toast.error("No username available"); break; }
+        if (!cred?.username) { toast.error(__tr("No username available")); break; }
         const hasSessionU = !!getTypeableActiveSession();
-        toast.info(hasSessionU ? "Typing in 2s — click the target field now" : "Typing in 3s — switch to the target app now");
+        toast.info(hasSessionU ? __tr("Typing in 2s — click the target field now") : __tr("Typing in 3s — switch to the target app now"));
         try {
           if (hasSessionU) {
             await typeIntoActiveSession(cred.username);
           } else {
             await globalTypeText(cred.username);
           }
-          toast.success("Username typed");
-        } catch (err) { toast.error(errorText(err, "Failed to type username")); }
+          toast.success(__tr("Username typed"));
+        } catch (err) { toast.error(errorText(err, __tr("Failed to type username"))); }
         break;
       }
       case "autotype_password": {
         const cred = await resolveCredential(node.id);
-        if (!cred?.password) { toast.error("No password available"); break; }
+        if (!cred?.password) { toast.error(__tr("No password available")); break; }
         const hasSessionP = !!getTypeableActiveSession();
-        toast.info(hasSessionP ? "Typing in 2s — click the target field now" : "Typing in 3s — switch to the target app now");
+        toast.info(hasSessionP ? __tr("Typing in 2s — click the target field now") : __tr("Typing in 3s — switch to the target app now"));
         try {
           if (hasSessionP) {
             await typeIntoActiveSession(cred.password);
           } else {
             await globalTypeText(cred.password);
           }
-          toast.success("Password typed");
-        } catch (err) { toast.error(errorText(err, "Failed to type password")); }
+          toast.success(__tr("Password typed"));
+        } catch (err) { toast.error(errorText(err, __tr("Failed to type password"))); }
         break;
       }
       case "autotype_username_tab_password": {
         const cred = await resolveCredential(node.id);
-        if (!cred?.username) { toast.error("No username available"); break; }
-        if (!cred?.password) { toast.error("No password available"); break; }
+        if (!cred?.username) { toast.error(__tr("No username available")); break; }
+        if (!cred?.password) { toast.error(__tr("No password available")); break; }
         const hasSessionB = !!getTypeableActiveSession();
-        toast.info(hasSessionB ? "Typing in 2s — click the target field now" : "Typing in 3s — switch to the target app now");
+        toast.info(hasSessionB ? __tr("Typing in 2s — click the target field now") : __tr("Typing in 3s — switch to the target app now"));
         try {
           if (hasSessionB) {
             await typeUsernameTabPassword(cred.username, cred.password);
           } else {
             await globalTypeUsernameTabPassword(cred.username, cred.password);
           }
-          toast.success("Credentials typed");
-        } catch (err) { toast.error(errorText(err, "Failed to type credentials")); }
+          toast.success(__tr("Credentials typed"));
+        } catch (err) { toast.error(errorText(err, __tr("Failed to type credentials"))); }
         break;
       }
       case "favorite":
@@ -914,9 +915,9 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
       <div key={group.path} className="mt-2 first:mt-0">
         <div
           className="flex h-row items-center px-2 text-meta font-semibold text-ink-muted"
-          title={group.path === "/" ? "Root" : group.path}
+          title={group.path === "/" ? __tr("Root") : group.path}
         >
-          <span className="truncate">{group.path === "/" ? "Root" : group.path}</span>
+          <span className="truncate">{group.path === "/" ? __tr("Root") : group.path}</span>
         </div>
         {group.entries.map((node) => renderNode(node, 0))}
       </div>
@@ -1011,8 +1012,8 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
             <button
               type="button"
               data-cv-tree-twistie=""
-              aria-label={isExpanded ? "Collapse" : "Expand"}
-              title={isExpanded ? "Collapse" : "Expand"}
+              aria-label={isExpanded ? __tr("Collapse") : __tr("Expand")}
+              title={isExpanded ? __tr("Collapse") : __tr("Expand")}
               className="flex size-4 shrink-0 items-center justify-center text-ink-muted"
             >
               {isExpanded ? (
@@ -1048,7 +1049,7 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
               {isFolder && vaultType === "team" && (() => {
                 const effectiveRole = getEffectiveRole(node.id);
                 if (effectiveRole === "viewer") {
-                  return <span title="View-only" className="flex shrink-0"><LockIcon size={12} className="text-warning" /></span>;
+                  return <span title={__tr("View-only")} className="flex shrink-0"><LockIcon size={12} className="text-warning" /></span>;
                 }
                 return null;
               })()}
@@ -1074,20 +1075,19 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
       return (
         <div className="mt-8 text-center px-4">
           <UsersIcon size={32} className="text-ink-faint mx-auto mb-2" />
-          <p className="text-body text-ink-muted">No entries in this vault yet</p>
+          <p className="text-body text-ink-muted">{__tr("No entries in this vault yet")}</p>
           <p className="text-label text-ink-faint mt-1">
-            Right-click here or use + above to add your first connection or credential.
-          </p>
+            {__tr("Right-click here or use + above to add your first connection or credential.")}</p>
         </div>
       );
     }
     return (
       <div className="mt-4 text-center text-body text-ink-faint">
         {searchQuery
-          ? "No matching entries"
+          ? __tr("No matching entries")
           : showFavoritesOnly
-            ? "No favorites yet — right-click an entry to add one"
-            : "No entries yet. Right-click here or use + above to add one."}
+            ? __tr("No favorites yet — right-click an entry to add one")
+            : __tr("No entries yet. Right-click here or use + above to add one.")}
       </div>
     );
   }
@@ -1110,7 +1110,7 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
       {maxConnections !== -1 && connectionCount >= maxConnections && authMode !== 'local' && (
         <div className="mx-2 mt-2">
           <UpgradeBanner
-            message={`Connection limit reached (${connectionCount}/${maxConnections})`}
+            message={__tr("Connection limit reached ({v0}/{v1})", { v0: (connectionCount), v1: (maxConnections) })}
             ctaLabel="Upgrade to Pro"
             onCta={() => invoke('auth_open_pricing')}
           />
@@ -1160,9 +1160,9 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
         }
         return (
           <ConfirmDialog
-            title={`Delete ${deleteConfirm.node.kind === "folder" ? "Folder" : "Entry"}`}
+            title={__tr("Delete {v0}", { v0: (deleteConfirm.node.kind === "folder" ? "Folder" : "Entry") })}
             message={message}
-            confirmLabel="Delete"
+            confirmLabel={__tr("Delete")}
             variant="danger"
             onConfirm={confirmDelete}
             onCancel={() => setDeleteConfirm(null)}
@@ -1172,8 +1172,8 @@ export default function EntryTree({ searchQuery, showFavoritesOnly }: EntryTreeP
 
       {multiDeleteConfirm && (
         <ConfirmDialog
-          title="Delete Selected Items"
-          message={`Are you sure you want to delete ${multiDeleteConfirm.count} selected items? This cannot be undone.`}
+          title={__tr("Delete Selected Items")}
+          message={__tr("Are you sure you want to delete {v0} selected items? This cannot be undone.", { v0: (multiDeleteConfirm.count) })}
           confirmLabel={`Delete ${multiDeleteConfirm.count} Items`}
           variant="danger"
           onConfirm={confirmMultiDelete}

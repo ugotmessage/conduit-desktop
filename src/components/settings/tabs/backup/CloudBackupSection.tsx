@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../../lib/i18n";
 import { useState } from "react";
 import { useVaultStore } from "../../../../stores/vaultStore";
 import type { CloudBackupNotice, CloudSyncState } from "../../../../stores/vaultStore";
@@ -12,16 +13,16 @@ import { BackupToggleRow } from "./BackupToggleRow";
 import { errorText } from "../../../../lib/errorText";
 
 function statusText(state: CloudSyncState): string {
-  if (state.status === "synced" && state.lastSyncedAt) return `Last backup: ${new Date(state.lastSyncedAt).toLocaleString()}`;
-  if (state.status === "syncing") return "Backing up...";
-  if (state.status === "error") return `Error: ${state.error}`;
-  return "No cloud backup yet";
+  if (state.status === "synced" && state.lastSyncedAt) return __tr("Last backup: {v0}", { v0: (new Date(state.lastSyncedAt).toLocaleString()) });
+  if (state.status === "syncing") return __tr("Backing up...");
+  if (state.status === "error") return __tr("Error: {v0}", { v0: (state.error ?? "") });
+  return __tr("No cloud backup yet");
 }
 
 function openPricing(): void {
   invoke("auth_open_pricing").catch((err) => {
     console.error("[backup] Failed to open pricing:", err);
-    toast.error("Could not open the pricing page");
+    toast.error(__tr("Could not open the pricing page"));
   });
 }
 
@@ -32,8 +33,7 @@ function NoticeLine({ notice }: { notice: CloudBackupNotice }) {
       <p className="text-label text-warning">{cloudBackupNoticeText(notice)}</p>
       {notice.kind === "plan" && (
         <Button size="sm" onClick={openPricing}>
-          Upgrade
-        </Button>
+          {__tr("Upgrade")}</Button>
       )}
     </div>
   );
@@ -58,7 +58,7 @@ export function CloudBackupSection({ allowed, onOpenManager }: CloudBackupSectio
       else await enableCloudSync();
     } catch (err) {
       console.error("[backup] Failed to toggle cloud backup:", err);
-      toast.error("Could not change cloud backup", errorText(err, "Try again."));
+      toast.error(__tr("Could not change cloud backup"), errorText(err, __tr("Try again.")));
     } finally {
       setSyncing(false);
     }
@@ -69,7 +69,7 @@ export function CloudBackupSection({ allowed, onOpenManager }: CloudBackupSectio
     try {
       await syncNow();
     } catch (err) {
-      toast.error("Cloud backup failed", errorText(err, "Try again."));
+      toast.error(__tr("Cloud backup failed"), errorText(err, __tr("Try again.")));
     } finally {
       setSyncing(false);
     }
@@ -81,7 +81,7 @@ export function CloudBackupSection({ allowed, onOpenManager }: CloudBackupSectio
       await disableCloudSync();
     } catch (err) {
       console.error("[backup] Failed to delete cloud backup:", err);
-      toast.error("Could not delete the cloud backup", errorText(err, "Try again."));
+      toast.error(__tr("Could not delete the cloud backup"), errorText(err, __tr("Try again.")));
     }
     setConfirmDelete(false);
   };
@@ -95,8 +95,8 @@ export function CloudBackupSection({ allowed, onOpenManager }: CloudBackupSectio
     <div data-cv-cloud-backup-section="" className="space-y-3 border-t border-divider pt-4">
       <BackupToggleRow
         icon={enabled ? <CloudIcon size={16} className="text-(--c-accent)" /> : <CloudOffIcon size={16} className="text-ink-muted" />}
-        title="Cloud Backup"
-        aside={!allowed && <Badge data-cv-cloud-backup-badge="" tone="accent">Pro and Team</Badge>}
+        title={__tr("Cloud Backup")}
+        aside={!allowed && <Badge data-cv-cloud-backup-badge="" tone="accent">{__tr("Pro and Team")}</Badge>}
         checked={enabled}
         disabled={syncing || !allowed}
         onChange={() => void toggle()}
@@ -108,21 +108,17 @@ export function CloudBackupSection({ allowed, onOpenManager }: CloudBackupSectio
           {showStatus && <p className="text-label text-ink-muted">{statusText(cloudSyncState)}</p>}
           <div className="flex items-center gap-2">
             <Button size="sm" loading={syncing} loadingLabel="Backing up..." onClick={() => void backUpNow()}>
-              Back Up Now
-            </Button>
+              {__tr("Back Up Now")}</Button>
             {confirmDelete ? (
               <div className="flex items-center gap-1">
                 <Button variant="danger" size="sm" onClick={() => void deleteBackup()}>
-                  Confirm Delete
-                </Button>
+                  {__tr("Confirm Delete")}</Button>
                 <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(false)}>
-                  Cancel
-                </Button>
+                  {__tr("Cancel")}</Button>
               </div>
             ) : (
               <Button variant="ghost-danger" size="sm" onClick={() => setConfirmDelete(true)}>
-                Delete Cloud Backup
-              </Button>
+                {__tr("Delete Cloud Backup")}</Button>
             )}
           </div>
 
@@ -132,8 +128,8 @@ export function CloudBackupSection({ allowed, onOpenManager }: CloudBackupSectio
 
       <p className={HINT}>
         {allowed
-          ? "Your vault is encrypted before upload. Only you can read it. To use a vault on several devices, keep it in a synced folder."
-          : "Upgrade to Pro or Team to back up your vault to the cloud. It is encrypted before upload."}
+          ? __tr("Your vault is encrypted before upload. Only you can read it. To use a vault on several devices, keep it in a synced folder.")
+          : __tr("Upgrade to Pro or Team to back up your vault to the cloud. It is encrypted before upload.")}
       </p>
     </div>
   );

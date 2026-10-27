@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 import { create } from "zustand";
 import { invoke } from "../lib/electron";
 import { disposeTerminalEntry } from "../components/sessions/TerminalView";
@@ -147,7 +148,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       });
 
       // Derive tab title from last path segment when cwd is provided
-      let title = shellType ? `${shellType}` : "Terminal";
+      let title = shellType ? `${shellType}` : __tr("Terminal");
       if (cwd) {
         const segment = cwd.replace(/\\/g, "/").split("/").filter(Boolean).pop();
         if (segment) title = `Terminal (${segment})`;

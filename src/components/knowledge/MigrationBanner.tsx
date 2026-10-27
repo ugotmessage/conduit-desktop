@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { invoke } from "../../lib/electron";
 import { errorText } from "../../lib/errorText";
@@ -24,7 +25,7 @@ export default function MigrationBanner({ entry, ownArticles }: { entry: EntryMe
       await loadAll();
       if (done) toast.success(done(n));
     } catch (err) {
-      toast.error(errorText(err, "Couldn't update the notes"));
+      toast.error(errorText(err, __tr("Couldn't update the notes")));
     } finally {
       setBusy(false);
     }
@@ -33,7 +34,7 @@ export default function MigrationBanner({ entry, ownArticles }: { entry: EntryMe
   const askAgent = () => {
     void navigator.clipboard.writeText(ASK_AGENT_PROMPT(entry.name)).catch(() => undefined);
     document.dispatchEvent(new CustomEvent("conduit:ai-prompt", { detail: { prompt: ASK_AGENT_PROMPT(entry.name), entryId: entry.id } }));
-    toast.info("Prompt copied. Paste it into the agent chat.");
+    toast.info(__tr("Prompt copied. Paste it into the agent chat."));
   };
 
   return (
@@ -41,17 +42,16 @@ export default function MigrationBanner({ entry, ownArticles }: { entry: EntryMe
       tone="info"
       icon="notes"
       actions={[
-        { label: "Ask the agent", onClick: askAgent, disabled: busy },
+        { label: __tr("Ask the agent"), onClick: askAgent, disabled: busy },
         {
-          label: "Split by headings",
+          label: __tr("Split by headings"),
           onClick: () => void run("kb_split_notes", { entry_id: entry.id, notes_after: "keep" }, (n) => `${n} ${n === 1 ? "article" : "articles"} created; the notes are unchanged`),
           disabled: busy,
           primary: true,
         },
-        { label: "Dismiss", onClick: () => void run("kb_dismiss_migration", { entry_id: entry.id }), disabled: busy },
+        { label: __tr("Dismiss"), onClick: () => void run("kb_dismiss_migration", { entry_id: entry.id }), disabled: busy },
       ]}
     >
-      These notes look like a knowledge base. Move them into articles?
-    </Banner>
+      {__tr("These notes look like a knowledge base. Move them into articles?")}</Banner>
   );
 }

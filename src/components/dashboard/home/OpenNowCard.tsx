@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useMemo } from "react";
 import { CircleFilledIcon } from "../../../lib/icons";
 import { isHomeSession } from "../../../lib/dashboardSessions";
@@ -27,9 +28,9 @@ const DOT_TONE: Readonly<Record<Session["status"], string>> = {
 };
 
 export function sessionStatusText(session: Session): string {
-  if (session.status === "connected") return "Connected";
-  if (session.status === "disconnected") return "Disconnected";
-  return session.metadata?.reconnecting ? "Reconnecting..." : "Connecting...";
+  if (session.status === "connected") return __tr("Connected");
+  if (session.status === "disconnected") return __tr("Disconnected");
+  return session.metadata?.reconnecting ? __tr("Reconnecting...") : __tr("Connecting...");
 }
 
 export function isOpenNowSession(session: Session): boolean {
@@ -58,7 +59,7 @@ export default function OpenNowCard() {
   const more = open.length - OPEN_NOW_LIMIT;
   return (
     <Card>
-      <SectionHeader title="Open now" />
+      <SectionHeader title={__tr("Open now")} />
       <div className="space-y-px">
         {open.slice(0, OPEN_NOW_LIMIT).map((session) => {
           const entry = session.entryId ? byId.get(session.entryId) : undefined;
@@ -74,7 +75,7 @@ export default function OpenNowCard() {
           );
         })}
       </div>
-      {more > 0 && <p className="mt-1 px-2 text-meta text-ink-faint">+{more} more</p>}
+      {more > 0 && <p className="mt-1 px-2 text-meta text-ink-faint">+{more} {__tr("more")}</p>}
     </Card>
   );
 }

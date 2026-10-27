@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback } from "react";
 import type { CredentialDto } from "../../types/credential";
 import { generateTotpCode, type TotpResult } from "../../lib/totp";
@@ -41,9 +42,9 @@ export default function PickerCredentialDetail({ credential, onBack }: PickerCre
       await navigator.clipboard.writeText(text);
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 1500);
-      toast.success(`${field.charAt(0).toUpperCase() + field.slice(1).replace("_", " ")} copied`);
+      toast.success(__tr("{v0} copied", { v0: (field.charAt(0).toUpperCase() + field.slice(1).replace("_", " ")) }));
     } catch {
-      toast.error("Failed to copy to clipboard");
+      toast.error(__tr("Failed to copy to clipboard"));
     }
   }, []);
 
@@ -55,26 +56,26 @@ export default function PickerCredentialDetail({ credential, onBack }: PickerCre
   const fields: Array<{ label: string; value: string; field: string; secret?: boolean; totp?: boolean }> = [];
 
   if (credential.username) {
-    fields.push({ label: "Username", value: credential.username, field: "username" });
+    fields.push({ label: __tr("Username"), value: credential.username, field: "username" });
   }
   if (credential.password) {
-    fields.push({ label: "Password", value: credential.password, field: "password", secret: true });
+    fields.push({ label: __tr("Password"), value: credential.password, field: "password", secret: true });
   }
   if (credential.totp_secret && totp) {
-    fields.push({ label: "TOTP Code", value: totp.code, field: "totp", totp: true });
+    fields.push({ label: __tr("TOTP Code"), value: totp.code, field: "totp", totp: true });
   }
   if (credential.domain) {
-    fields.push({ label: "Domain", value: credential.domain, field: "domain" });
+    fields.push({ label: __tr("Domain"), value: credential.domain, field: "domain" });
   }
   if (credential.private_key) {
-    fields.push({ label: "Private Key", value: credential.private_key, field: "private_key", secret: true });
+    fields.push({ label: __tr("Private Key"), value: credential.private_key, field: "private_key", secret: true });
   }
 
   return (
     <div className="flex h-full flex-col">
       {/* Back header */}
       <div className="flex shrink-0 items-center gap-2 border-b border-divider px-3 py-2">
-        <IconButton icon="chevronLeft" label="Back" onClick={onBack} />
+        <IconButton icon="chevronLeft" label={__tr("Back")} onClick={onBack} />
         <span className="truncate text-body font-semibold text-ink">{credential.name}</span>
       </div>
 
@@ -100,13 +101,13 @@ export default function PickerCredentialDetail({ credential, onBack }: PickerCre
                 {f.secret && (
                   <IconButton
                     icon={showPassword ? "eyeOff" : "eye"}
-                    label={showPassword ? "Hide" : "Show"}
+                    label={showPassword ? __tr("Hide") : __tr("Show")}
                     onClick={() => setShowPassword(!showPassword)}
                   />
                 )}
                 <IconButton
                   icon={copiedField === f.field ? "check" : "copy"}
-                  label="Copy"
+                  label={__tr("Copy")}
                   tone={copiedField === f.field ? "inherit" : "default"}
                   className={copiedField === f.field ? "text-success" : undefined}
                   onClick={() => copyToClipboard(f.value, f.field)}
@@ -118,8 +119,7 @@ export default function PickerCredentialDetail({ credential, onBack }: PickerCre
 
         {fields.length === 0 && (
           <div className="flex h-32 items-center justify-center text-body text-ink-muted">
-            No fields to display
-          </div>
+            {__tr("No fields to display")}</div>
         )}
       </div>
     </div>

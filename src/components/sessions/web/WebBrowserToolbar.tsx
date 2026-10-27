@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState, useRef, useCallback } from "react";
 import { invoke } from "../../../lib/electron";
 import {
@@ -103,14 +104,14 @@ export default function WebBrowserToolbar({
 
   return (
     <div className="flex-none h-9 bg-editor border-b border-divider flex items-center gap-1 px-2">
-      <IconButton icon={ArrowLeftIcon} label="Back" onClick={handleGoBack} disabled={!canGoBack} />
-      <IconButton icon={ArrowRightIcon} label="Forward" onClick={handleGoForward} disabled={!canGoForward} />
+      <IconButton icon={ArrowLeftIcon} label={__tr("Back")} onClick={handleGoBack} disabled={!canGoBack} />
+      <IconButton icon={ArrowRightIcon} label={__tr("Forward")} onClick={handleGoForward} disabled={!canGoForward} />
       <IconButton
         icon={isLoading ? CloseIcon : RefreshIcon}
-        label={isLoading ? "Stop" : "Refresh"}
+        label={isLoading ? __tr("Stop") : __tr("Refresh")}
         onClick={handleRefreshOrStop}
       />
-      <IconButton icon={HomeIcon} label="Home" onClick={handleHome} />
+      <IconButton icon={HomeIcon} label={__tr("Home")} onClick={handleHome} />
 
       {/* Address bar */}
       <div className="flex-1 min-w-0 flex items-center gap-1.5 h-control rounded border border-input-border bg-input px-2 focus-within:outline focus-within:outline-1 focus-within:outline-(--c-focus) focus-within:-outline-offset-1">
@@ -146,7 +147,7 @@ export default function WebBrowserToolbar({
       </div>
 
       {/* New tab — opens session's home URL */}
-      <IconButton icon={PlusIcon} label="New Tab" onClick={handleNewTab} />
+      <IconButton icon={PlusIcon} label={__tr("New Tab")} onClick={handleNewTab} />
 
       {/* Autofill button (only if entry) */}
       {entryId && (
@@ -166,10 +167,9 @@ export default function WebBrowserToolbar({
                   setActionsExpanded(false);
                   onStartPicker();
                 }}
-                title="Pick CSS selectors"
+                title={__tr("Pick CSS selectors")}
               >
-                Pick
-              </Button>
+                {__tr("Pick")}</Button>
               {autofillEnabled && (
                 <Button
                   size="sm"
@@ -179,10 +179,9 @@ export default function WebBrowserToolbar({
                     onAutofill();
                   }}
                   disabled={autofillStatus === "filling"}
-                  title="Populate login fields"
+                  title={__tr("Populate login fields")}
                 >
-                  Fill
-                </Button>
+                  {__tr("Fill")}</Button>
               )}
             </div>
           </div>
@@ -198,7 +197,7 @@ function AutofillToggle({ status, onClick }: { status: AutofillStatus; onClick: 
     return (
       <IconButton
         icon={LoaderIcon}
-        label="Autofill"
+        label={__tr("Autofill")}
         tone="inherit"
         disabled
         className="text-link cursor-wait [&_svg]:animate-spin motion-reduce:[&_svg]:animate-none"
@@ -207,7 +206,7 @@ function AutofillToggle({ status, onClick }: { status: AutofillStatus; onClick: 
     );
   }
   if (status === "success") {
-    return <IconButton icon={CheckIcon} label="Autofill" tone="inherit" className="text-success" onClick={onClick} />;
+    return <IconButton icon={CheckIcon} label={__tr("Autofill")} tone="inherit" className="text-success" onClick={onClick} />;
   }
-  return <IconButton icon={KeyIcon} label="Autofill" onClick={onClick} />;
+  return <IconButton icon={KeyIcon} label={__tr("Autofill")} onClick={onClick} />;
 }

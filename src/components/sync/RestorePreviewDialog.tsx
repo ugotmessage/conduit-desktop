@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -18,7 +19,7 @@ function Rows({ title, rows }: { title: string; rows: readonly CandidatePreviewR
       <p className="mb-1 text-label font-semibold text-ink">{title} ({rows.length})</p>
       <ul className="text-label text-ink-muted list-disc pl-5 space-y-0.5">
         {rows.slice(0, MAX_LISTED).map((r) => <li key={rowKeyString(r.row)}>{r.title}</li>)}
-        {rows.length > MAX_LISTED && <li>and {rows.length - MAX_LISTED} more</li>}
+        {rows.length > MAX_LISTED && <li>{__tr("and")} {rows.length - MAX_LISTED} {__tr("more")}</li>}
       </ul>
     </div>
   );
@@ -40,7 +41,7 @@ export default function RestorePreviewDialog({ preview, apply }: RestorePreviewD
     try {
       await action();
     } catch (err) {
-      toast.error(failTitle, errorText(err, "Try again."));
+      toast.error(failTitle, errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -48,7 +49,7 @@ export default function RestorePreviewDialog({ preview, apply }: RestorePreviewD
   const rollBack = () => run(async () => {
     const res = await apply("rollback", null);
     close();
-    toast.success(res.mode === "rollback" ? `Rolled back ${plural(res.applied, "change")}.` : "Vault restored.");
+    toast.success(res.mode === "rollback" ? __tr("Rolled back {v0}.", { v0: (plural(res.applied, "change")) }) : __tr("Vault restored."));
   }, "Could not roll back");
   const asNewVault = () => run(async () => {
     const target = await syncApi.pickVaultFile("save");
@@ -61,29 +62,29 @@ export default function RestorePreviewDialog({ preview, apply }: RestorePreviewD
   return (
     <SyncDialogFrame
       icon="restore"
-      title="Restore from backup"
+      title={__tr("Restore from backup")}
       width={540}
       onEscape={close}
       footer={
         <>
-          <DialogButton onClick={close} disabled={busy}>Cancel</DialogButton>
-          <DialogButton onClick={() => void asNewVault()} disabled={busy}>Restore as a new vault...</DialogButton>
-          <DialogButton variant="primary" onClick={() => void rollBack()} disabled={busy || nothing}>Roll this vault back</DialogButton>
+          <DialogButton onClick={close} disabled={busy}>{__tr("Cancel")}</DialogButton>
+          <DialogButton onClick={() => void asNewVault()} disabled={busy}>{__tr("Restore as a new vault...")}</DialogButton>
+          <DialogButton variant="primary" onClick={() => void rollBack()} disabled={busy || nothing}>{__tr("Roll this vault back")}</DialogButton>
         </>
       }
     >
       <p>
         {nothing
-          ? "This vault already matches the backup."
-          : "Rolling back changes this vault on every device that syncs it. Replaced passwords stay in password history."}
+          ? __tr("This vault already matches the backup.")
+          : __tr("Rolling back changes this vault on every device that syncs it. Replaced passwords stay in password history.")}
       </p>
-      <Rows title="Created since the backup (will be deleted)" rows={preview.deletions} />
-      <Rows title="Deleted since the backup (will come back)" rows={preview.restorations} />
+      <Rows title={__tr("Created since the backup (will be deleted)")} rows={preview.deletions} />
+      <Rows title={__tr("Deleted since the backup (will come back)")} rows={preview.restorations} />
       {preview.replacements.length > 0 && (
-        <p className="text-label text-ink">{plural(preview.replacements.length, "newer value")} will be replaced with the backup's.</p>
+        <p className="text-label text-ink">{plural(preview.replacements.length, "newer value")} {__tr("will be replaced with the backup's.")}</p>
       )}
       {preview.unreadableSecrets > 0 && (
-        <p className="text-label text-warning">{plural(preview.unreadableSecrets, "secret")} in the backup can't be read and stay as they are.</p>
+        <p className="text-label text-warning">{plural(preview.unreadableSecrets, "secret")} {__tr("in the backup can't be read and stay as they are.")}</p>
       )}
     </SyncDialogFrame>
   );

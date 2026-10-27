@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import welcomeVideo from "../../assets/onboarding/welcome.webm";
 import vaultVideo from "../../assets/onboarding/vault.webm";
 import connectionsVideo from "../../assets/onboarding/connections.webm";
@@ -31,9 +32,9 @@ const allSteps: OnboardingStep[] = [
   // Free tier (5 steps)
   {
     id: "welcome",
-    title: "Welcome to Conduit",
+    title: __tr("Welcome to Conduit"),
     description:
-      "Your all-in-one remote connection manager. Securely store credentials, connect to servers, and manage your infrastructure from a single interface.",
+      __tr("Your all-in-one remote connection manager. Securely store credentials, connect to servers, and manage your infrastructure from a single interface."),
     details: [
       "Manage SSH, RDP, VNC, and web sessions in one place",
       "Zero-knowledge encryption keeps your data safe",
@@ -46,9 +47,9 @@ const allSteps: OnboardingStep[] = [
   },
   {
     id: "vault",
-    title: "Your Vault",
+    title: __tr("Your Vault"),
     description:
-      "Everything is stored in an encrypted vault secured by your master password. Your credentials never leave your device unencrypted.",
+      __tr("Everything is stored in an encrypted vault secured by your master password. Your credentials never leave your device unencrypted."),
     details: [
       "AES-256-GCM encryption derived from your master password",
       "Vault files are portable — move or back them up freely",
@@ -61,9 +62,9 @@ const allSteps: OnboardingStep[] = [
   },
   {
     id: "connections",
-    title: "Connections & Credentials",
+    title: __tr("Connections & Credentials"),
     description:
-      "Connect via SSH, RDP, VNC, or web sessions. Store passwords, SSH keys, and domain credentials that auto-fill when you connect.",
+      __tr("Connect via SSH, RDP, VNC, or web sessions. Store passwords, SSH keys, and domain credentials that auto-fill when you connect."),
     details: [
       "SSH terminals with full color, resize, and key forwarding",
       "RDP with clipboard sync, drive redirection, and dynamic resize",
@@ -77,9 +78,9 @@ const allSteps: OnboardingStep[] = [
   },
   {
     id: "organize",
-    title: "Organize Your Workspace",
+    title: __tr("Organize Your Workspace"),
     description:
-      "Use folders to group connections, star your favorites for quick access, and add tags to find anything instantly.",
+      __tr("Use folders to group connections, star your favorites for quick access, and add tags to find anything instantly."),
     details: [
       "Nested folders for organizing by environment, team, or project",
       "Star frequently-used connections for one-click access",
@@ -93,9 +94,9 @@ const allSteps: OnboardingStep[] = [
   },
   {
     id: "mcp-tools",
-    title: "MCP Tools & CLI Agents",
+    title: __tr("MCP Tools & CLI Agents"),
     description:
-      "AI agents like Claude Code can interact with your connections in real-time through MCP tools.",
+      __tr("AI agents like Claude Code can interact with your connections in real-time through MCP tools."),
     details: [
       "External AI agents execute commands on your connections",
       "Read screens, navigate RDP sessions, and transfer files",
@@ -110,9 +111,9 @@ const allSteps: OnboardingStep[] = [
   // Pro tier (2 additional)
   {
     id: "ai-assistant",
-    title: "AI Assistant",
+    title: __tr("AI Assistant"),
     description:
-      "Chat with an AI that understands your connections. Ask questions, run commands, and get context-aware help.",
+      __tr("Chat with an AI that understands your connections. Ask questions, run commands, and get context-aware help."),
     details: [
       "Context-aware — the AI sees your active session and connection details",
       "Ask questions like \"what services are running on this server?\"",
@@ -125,9 +126,9 @@ const allSteps: OnboardingStep[] = [
   },
   {
     id: "multi-device-sync",
-    title: "Multi-Device Sync",
+    title: __tr("Multi-Device Sync"),
     description:
-      "Keep one vault in iCloud Drive, OneDrive, Dropbox or a network share and use it on all your devices at once.",
+      __tr("Keep one vault in iCloud Drive, OneDrive, Dropbox or a network share and use it on all your devices at once."),
     details: [
       "Edits from each device merge field by field, even when made offline",
       "If two devices change the same field, you pick the version to keep",
@@ -142,9 +143,9 @@ const allSteps: OnboardingStep[] = [
   // Teams tier (3 additional)
   {
     id: "team-vaults",
-    title: "Team Vaults",
+    title: __tr("Team Vaults"),
     description:
-      "Share encrypted vaults with your team. Each member gets their own encryption key — no shared passwords needed.",
+      __tr("Share encrypted vaults with your team. Each member gets their own encryption key — no shared passwords needed."),
     details: [
       "Invite team members by email — they join with their own device key",
       "Zero-knowledge key exchange — credentials are never exposed in transit",
@@ -157,9 +158,9 @@ const allSteps: OnboardingStep[] = [
   },
   {
     id: "permissions",
-    title: "Permissions & Roles",
+    title: __tr("Permissions & Roles"),
     description:
-      "Control access at the folder level with admin, editor, and viewer roles.",
+      __tr("Control access at the folder level with admin, editor, and viewer roles."),
     details: [
       "Three roles: Admin (full control), Editor (modify), Viewer (read-only)",
       "Folder-level permissions for granular access control",
@@ -172,9 +173,9 @@ const allSteps: OnboardingStep[] = [
   },
   {
     id: "audit-trail",
-    title: "Audit Trail",
+    title: __tr("Audit Trail"),
     description:
-      "Every action in your team vault is logged. Track who accessed what, when, and maintain compliance.",
+      __tr("Every action in your team vault is logged. Track who accessed what, when, and maintain compliance."),
     details: [
       "Full activity log: credential access, edits, member changes, and more",
       "Filter by action type, member, or date range",

@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 import { create } from 'zustand';
 import { useAuthStore } from './authStore';
 import { useEntryStore } from './entryStore';
@@ -169,8 +170,8 @@ export const useTierStore = create<TierStoreState>((set, get) => ({
           sessionStore.closeSession(session.id).catch((err) => {
             console.error(`[tier] Failed to close session ${session.id}:`, err);
           });
-          toast.warning(`Session "${session.title}" disconnected due to plan change.`, {
-            actions: [{ label: 'Relaunch', onClick: () => window.electron?.invoke('app_relaunch') }],
+          toast.warning(__tr("Session \"{v0}\" disconnected due to plan change.", { v0: (session.title) }), {
+            actions: [{ label: __tr("Relaunch"), onClick: () => window.electron?.invoke('app_relaunch') }],
           });
         }
       }

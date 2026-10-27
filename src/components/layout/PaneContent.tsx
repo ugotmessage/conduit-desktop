@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import type { ReactNode } from "react";
 import VaultKnowledgeView from "../knowledge/VaultKnowledgeView";
 import DashboardSubTabs from "../knowledge/DashboardSubTabs";
@@ -55,8 +56,8 @@ export default function PaneContent({ paneId, isFocused }: PaneContentProps) {
           <Spinner size={24} className="mb-4" />
           <p className="text-body">
             {session.metadata?.reconnecting
-              ? `Reconnecting to ${session.title}...`
-              : `Connecting to ${session.title}...`}
+              ? __tr("Reconnecting to {v0}...", { v0: (session.title) })
+              : __tr("Connecting to {v0}...", { v0: (session.title) })}
           </p>
         </div>
       );
@@ -144,7 +145,7 @@ export default function PaneContent({ paneId, isFocused }: PaneContentProps) {
       }
       default:
         return (
-          <p className="text-ink-faint">Unsupported session type: {session.type}</p>
+          <p className="text-ink-faint">{__tr("Unsupported session type:")} {session.type}</p>
         );
     }
   };

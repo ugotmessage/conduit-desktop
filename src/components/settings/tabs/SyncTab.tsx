@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect, useState, type ReactNode } from "react";
 import { useSyncStore } from "../../../stores/syncStore";
 import { useVaultStore } from "../../../stores/vaultStore";
@@ -29,7 +30,7 @@ function StatusBlock() {
     const shared = state?.vault?.shared === true;
     return (
       <p className="text-body text-ink-muted">
-        {shared ? "Sync is off for this vault until the next unlock." : "Unlock a vault stored in a synced folder to see its sync status."}
+        {shared ? __tr("Sync is off for this vault until the next unlock.") : __tr("Unlock a vault stored in a synced folder to see its sync status.")}
       </p>
     );
   }
@@ -38,7 +39,7 @@ function StatusBlock() {
     try {
       await useSyncStore.getState().syncNow();
     } catch (err) {
-      toast.error("Could not sync", errorText(err, "Try again."));
+      toast.error(__tr("Could not sync"), errorText(err, __tr("Try again.")));
     } finally {
       setSyncing(false);
     }
@@ -53,15 +54,14 @@ function StatusBlock() {
           {detail && <p data-cv-sync-status-detail="" className={`mt-0.5 ${HINT}`}>{detail}</p>}
         </div>
         <Button variant="primary" size="sm" loading={syncing} loadingLabel="Syncing..." onClick={() => void syncNow()}>
-          Sync now
-        </Button>
+          {__tr("Sync now")}</Button>
       </Card>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" onClick={() => open({ kind: "review", row: null })}>
-          Review changes{status.conflictCount > 0 ? ` (${status.conflictCount})` : ""}
+          {__tr("Review changes")}{status.conflictCount > 0 ? ` (${status.conflictCount})` : ""}
         </Button>
-        <Button size="sm" onClick={() => open({ kind: "recently-deleted" })}>Recently deleted</Button>
-        <Button size="sm" onClick={() => open({ kind: "other-copies" })}>Other copies</Button>
+        <Button size="sm" onClick={() => open({ kind: "recently-deleted" })}>{__tr("Recently deleted")}</Button>
+        <Button size="sm" onClick={() => open({ kind: "other-copies" })}>{__tr("Other copies")}</Button>
       </div>
       <SyncNoticeList />
     </div>
@@ -82,8 +82,7 @@ function OwnerBlock() {
       {owner !== null && signedIn && (
         <div className="flex items-center gap-2">
           <Button size="sm" disabled={tooSoon} onClick={() => useSyncStore.getState().setReleaseDialogOpen(true)}>
-            Release this vault...
-          </Button>
+            {__tr("Release this vault...")}</Button>
           {tooSoon && owner.releaseAfterMs !== null && <span className={HINT}>{releaseAfterText(owner.releaseAfterMs)}</span>}
         </div>
       )}
@@ -108,25 +107,23 @@ export default function SyncTab() {
 
   return (
     <div className="space-y-6">
-      <Section title="Multi-device sync">
+      <Section title={__tr("Multi-device sync")}>
         <p className="text-body text-ink-muted">
-          Conduit merges changes from every device that opens a vault file in a synced folder.
-        </p>
+          {__tr("Conduit merges changes from every device that opens a vault file in a synced folder.")}</p>
         <p data-cv-sync-plan="" className={`mt-2 ${HINT}`}>
-          Your plan: a vault can be open {deviceLimitText(stateLimit ?? tierLimit)}
-          {stateLimit?.source === "dev-override" ? " (dev override)" : ""}. Team vaults sync through your team.
-          {capText && ` ${capText}`}
+          {__tr("Your plan: a vault can be open")} {deviceLimitText(stateLimit ?? tierLimit)}
+          {stateLimit?.source === "dev-override" ? __tr(" (dev override)") : ""}{__tr(". Team vaults sync through your team.")}{capText && ` ${capText}`}
         </p>
-        {killSwitch && <p data-cv-sync-paused="" className="mt-2 text-meta text-warning">Conduit paused syncing for now. Your changes are saved on this device.</p>}
+        {killSwitch && <p data-cv-sync-paused="" className="mt-2 text-meta text-warning">{__tr("Conduit paused syncing for now. Your changes are saved on this device.")}</p>}
       </Section>
       {vaultType === "personal" && (
-        <Section title="This vault">
+        <Section title={__tr("This vault")}>
           <OwnerBlock />
           <StatusBlock />
         </Section>
       )}
       {vaultType === "personal" && engineRunning && (
-        <Section title="Devices">
+        <Section title={__tr("Devices")}>
           <SyncDevicesList />
         </Section>
       )}

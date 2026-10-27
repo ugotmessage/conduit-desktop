@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { invoke } from "../../lib/electron";
 import { errorText } from "../../lib/errorText";
@@ -30,7 +31,7 @@ export default function NotesSecurityBanners({ entry }: { entry: EntryMeta }) {
       await loadAll();
       toast.success(done(n));
     } catch (err) {
-      toast.error(errorText(err, "Couldn't update the secrets"));
+      toast.error(errorText(err, __tr("Couldn't update the secrets")));
     } finally {
       setBusy(false);
     }
@@ -42,21 +43,19 @@ export default function NotesSecurityBanners({ entry }: { entry: EntryMeta }) {
         <Banner
           tone="warn"
           icon="lock"
-          actions={[{ label: "Encrypt now", onClick: () => void run("secret_encrypt_entry", (n) => `${n} ${n === 1 ? "secret" : "secrets"} encrypted`), disabled: busy }]}
+          actions={[{ label: __tr("Encrypt now"), onClick: () => void run("secret_encrypt_entry", (n) => `${n} ${n === 1 ? "secret" : "secrets"} encrypted`), disabled: busy }]}
         >
-          {plaintext === 1 ? "1 secret in these notes is" : `${plaintext} secrets in these notes are`} stored unencrypted.
-        </Banner>
+          {plaintext === 1 ? __tr("1 secret in these notes is") : __tr("{v0} secrets in these notes are", { v0: (plaintext) })} {__tr("stored unencrypted.")}</Banner>
       )}
       {orphans > 0 && (
-        <Banner tone="info" icon="key" actions={[{ label: "Clean up", onClick: () => setConfirmCleanup(true), disabled: busy }]}>
-          {orphans === 1 ? "1 encrypted secret is" : `${orphans} encrypted secrets are`} no longer used in any notes.
-        </Banner>
+        <Banner tone="info" icon="key" actions={[{ label: __tr("Clean up"), onClick: () => setConfirmCleanup(true), disabled: busy }]}>
+          {orphans === 1 ? __tr("1 encrypted secret is") : __tr("{v0} encrypted secrets are", { v0: (orphans) })} {__tr("no longer used in any notes.")}</Banner>
       )}
       {confirmCleanup && (
         <ConfirmDialog
-          title="Delete unused secrets?"
-          message={`${orphans === 1 ? "This secret is" : `These ${orphans} secrets are`} not linked from any notes or articles. Deleting cannot be undone.`}
-          confirmLabel="Delete"
+          title={__tr("Delete unused secrets?")}
+          message={__tr("{v0} not linked from any notes or articles. Deleting cannot be undone.", { v0: (orphans === 1 ? "This secret is" : `These ${orphans} secrets are`) })}
+          confirmLabel={__tr("Delete")}
           variant="danger"
           onCancel={() => setConfirmCleanup(false)}
           onConfirm={() => {

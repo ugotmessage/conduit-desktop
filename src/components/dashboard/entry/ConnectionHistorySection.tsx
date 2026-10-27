@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useCallback, useState } from "react";
 import { dashboardApi } from "../../../lib/dashboardApi";
 import { DASHBOARD_CHANNELS, HISTORY_ENTRY_DEFAULT, type ConnectionHistoryEvent } from "../../../types/dashboard";
@@ -23,9 +24,9 @@ export default function ConnectionHistorySection({ entryId }: { entryId: string 
 
   return (
     <section className="mt-6" data-cv-entry-history="">
-      <SectionHeader title="Recent connections" description="Connections from this device only." />
+      <SectionHeader title={__tr("Recent connections")} description={__tr("Connections from this device only.")} />
       {events !== null && events.length === 0 && (
-        <p className="text-label text-ink-faint">No connections from this device yet.</p>
+        <p className="text-label text-ink-faint">{__tr("No connections from this device yet.")}</p>
       )}
       {events !== null && events.length > 0 && (
         // Pulled out by the rows' own padding so their icons line up with the detail rows above.

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useCallback, useMemo } from "react";
 import { invoke } from "../../lib/electron";
 import { useEntryStore } from "../../stores/entryStore";
@@ -82,21 +83,19 @@ export default function ExportDialog({ onClose }: Props) {
   const footer =
     step === "configure" ? (
       <>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{__tr("Cancel")}</Button>
         <Button variant="primary" onClick={handleExport} disabled={!canExport}>
-          Export
-        </Button>
+          {__tr("Export")}</Button>
       </>
     ) : step === "complete" ? (
       <Button variant="primary" onClick={onClose}>
-        Done
-      </Button>
+        {__tr("Done")}</Button>
     ) : null;
 
   return (
     <Dialog
       open
-      title="Export Vault"
+      title={__tr("Export Vault")}
       icon="download"
       width={448}
       onClose={onClose}
@@ -108,7 +107,7 @@ export default function ExportDialog({ onClose }: Props) {
       {step === "configure" && (
         <div className="space-y-4">
           <div>
-            <label className="block text-label font-semibold text-ink-secondary mb-2">What to Export</label>
+            <label className="block text-label font-semibold text-ink-secondary mb-2">{__tr("What to Export")}</label>
             <div className="space-y-2">
               <label className={SCOPE_CARD}>
                 <input
@@ -119,8 +118,8 @@ export default function ExportDialog({ onClose }: Props) {
                   className="accent-(--c-accent)"
                 />
                 <div>
-                  <div className="font-medium text-ink">Entire Vault</div>
-                  <div className="text-meta text-ink-muted">All folders and entries</div>
+                  <div className="font-medium text-ink">{__tr("Entire Vault")}</div>
+                  <div className="text-meta text-ink-muted">{__tr("All folders and entries")}</div>
                 </div>
               </label>
               <label className={SCOPE_CARD}>
@@ -132,8 +131,8 @@ export default function ExportDialog({ onClose }: Props) {
                   className="accent-(--c-accent)"
                 />
                 <div>
-                  <div className="font-medium text-ink">Select Folders</div>
-                  <div className="text-meta text-ink-muted">Choose specific folders to export</div>
+                  <div className="font-medium text-ink">{__tr("Select Folders")}</div>
+                  <div className="text-meta text-ink-muted">{__tr("Choose specific folders to export")}</div>
                 </div>
               </label>
             </div>
@@ -142,8 +141,7 @@ export default function ExportDialog({ onClose }: Props) {
           {scope === "folder" && (
             <div>
               <label className="block text-label font-semibold text-ink-secondary mb-1">
-                Select folders to export ({selectedFolderIds.size} selected)
-              </label>
+                {__tr("Select folders to export (")}{selectedFolderIds.size} {__tr("selected)")}</label>
               <div className="rounded border border-input-border bg-input max-h-48 overflow-y-auto">
                 {folderTree.length > 0 ? (
                   <div className="py-1">
@@ -159,8 +157,7 @@ export default function ExportDialog({ onClose }: Props) {
                   </div>
                 ) : (
                   <div className="py-4 text-center text-ink-faint">
-                    No folders in vault
-                  </div>
+                    {__tr("No folders in vault")}</div>
                 )}
               </div>
             </div>
@@ -170,22 +167,21 @@ export default function ExportDialog({ onClose }: Props) {
             label={
               <span className="inline-flex items-center gap-1">
                 <LockIcon size={16} />
-                Export Passphrase
-              </span>
+                {__tr("Export Passphrase")}</span>
             }
-            description={passphraseWeak ? <span className="text-warning">Passphrase should be at least 8 characters</span> : undefined}
+            description={passphraseWeak ? <span className="text-warning">{__tr("Passphrase should be at least 8 characters")}</span> : undefined}
           >
             <TextInput
               type={showPassphrase ? "text" : "password"}
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
-              placeholder="Enter a passphrase to encrypt the export"
+              placeholder={__tr("Enter a passphrase to encrypt the export")}
               autoFocus={scope === "full"}
               trailing={
                 <IconButton
                   size="sm"
                   icon={showPassphrase ? "eyeOff" : "eye"}
-                  label={showPassphrase ? "Hide passphrase" : "Show passphrase"}
+                  label={showPassphrase ? __tr("Hide passphrase") : __tr("Show passphrase")}
                   onClick={() => setShowPassphrase(!showPassphrase)}
                   tabIndex={-1}
                 />
@@ -193,12 +189,12 @@ export default function ExportDialog({ onClose }: Props) {
             />
           </FormField>
 
-          <FormField label="Confirm Passphrase" error={passphraseMismatch ? "Passphrases do not match" : undefined}>
+          <FormField label={__tr("Confirm Passphrase")} error={passphraseMismatch ? "Passphrases do not match" : undefined}>
             <TextInput
               type={showPassphrase ? "text" : "password"}
               value={confirmPassphrase}
               onChange={(e) => setConfirmPassphrase(e.target.value)}
-              placeholder="Re-enter passphrase"
+              placeholder={__tr("Re-enter passphrase")}
               invalid={passphraseMismatch}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && canExport) handleExport();
@@ -207,8 +203,7 @@ export default function ExportDialog({ onClose }: Props) {
           </FormField>
 
           <p className="text-meta text-ink-faint">
-            Share this passphrase securely with anyone who needs to import this file. It cannot be recovered.
-          </p>
+            {__tr("Share this passphrase securely with anyone who needs to import this file. It cannot be recovered.")}</p>
 
           {error && (
             <Callout tone="danger" icon="alertTriangle">
@@ -223,16 +218,16 @@ export default function ExportDialog({ onClose }: Props) {
       {step === "complete" && resultCounts && (
         <div className="space-y-4">
           <ResultSummary
-            title="Export Complete"
+            title={__tr("Export Complete")}
             counts={[
-              { value: resultCounts.folderCount, label: "Folders" },
-              { value: resultCounts.entryCount, label: "Entries" },
+              { value: resultCounts.folderCount, label: __tr("Folders") },
+              { value: resultCounts.entryCount, label: __tr("Entries") },
             ]}
           />
 
           {outputPath && (
             <p className="text-meta text-ink-faint break-all">
-              Saved to: {outputPath}
+              {__tr("Saved to:")} {outputPath}
             </p>
           )}
         </div>
@@ -300,7 +295,7 @@ function FolderPickerNode({
           <IconButton
             size="sm"
             icon={expanded ? "chevronDown" : "chevronRight"}
-            label={expanded ? "Collapse" : "Expand"}
+            label={expanded ? __tr("Collapse") : __tr("Expand")}
             onClick={(e) => {
               e.stopPropagation();
               setExpanded(!expanded);

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { Button, Spinner } from "../ui";
 
 interface FullScreenSpinnerProps {
@@ -23,8 +24,7 @@ export default function FullScreenSpinner({ text, onGoToHub }: FullScreenSpinner
               if (e.key === "Escape") onGoToHub();
             }}
           >
-            Go to Vault Hub
-          </Button>
+            {__tr("Go to Vault Hub")}</Button>
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { syncApi } from "../../lib/sync-api";
 import { useSyncStore } from "../../stores/syncStore";
 import { toast } from "../common/Toast";
@@ -22,14 +23,14 @@ export function displacedCopy(ev: DisplacedEvent): DisplacedCopy {
   switch (ev.reason) {
     case "device_cap":
       return {
-        title: "Vault locked",
+        title: __tr("Vault locked"),
         body: `You opened Conduit on ${by}. Your plan allows ${ev.deviceCap ?? DEFAULT_DEVICE_CAP} devices at once, so your vaults locked here.`,
         upgrade: false,
         useHere: true,
       };
     case "not_owner":
       return {
-        title: "Vault locked",
+        title: __tr("Vault locked"),
         body: ev.released
           ? "You released this vault and another account now owns it. Unlock it again to make your own copy."
           : "This vault belongs to another Conduit account, and your 14 days of access ended. Unlock it again to make your own copy.",
@@ -37,19 +38,19 @@ export function displacedCopy(ev: DisplacedEvent): DisplacedCopy {
         useHere: false,
       };
     case "update_required":
-      return { title: "Vault locked", body: "Update Conduit to keep using this vault.", upgrade: false, useHere: false, update: true };
+      return { title: __tr("Vault locked"), body: "Update Conduit to keep using this vault.", upgrade: false, useHere: false, update: true };
     case "plan_limit":
-      return { title: "Vault locked", body: `Your plan now allows this vault on one device at a time. It stays open on ${by}.`, upgrade: true, useHere: true };
+      return { title: __tr("Vault locked"), body: `Your plan now allows this vault on one device at a time. It stays open on ${by}.`, upgrade: true, useHere: true };
     case "owner_claim":
-      return { title: "Vault locked", body: `This vault was opened on ${by}. On the Free plan a vault can be open on one device at a time.`, upgrade: false, useHere: true };
+      return { title: __tr("Vault locked"), body: `This vault was opened on ${by}. On the Free plan a vault can be open on one device at a time.`, upgrade: false, useHere: true };
     case "superseded":
-      return { title: "Vault locked", body: "Conduit was opened with this computer's identity somewhere else.", upgrade: false, useHere: true };
+      return { title: __tr("Vault locked"), body: "Conduit was opened with this computer's identity somewhere else.", upgrade: false, useHere: true };
     case "reconnect_unanswered":
-      return { title: "Vault locked", body: `This vault is also open on ${by}, so it locked here.`, upgrade: false, useHere: true };
+      return { title: __tr("Vault locked"), body: `This vault is also open on ${by}, so it locked here.`, upgrade: false, useHere: true };
     case "yielded":
-      return { title: "Vault locked", body: `The vault stays open on ${by}.`, upgrade: false, useHere: true };
+      return { title: __tr("Vault locked"), body: `The vault stays open on ${by}.`, upgrade: false, useHere: true };
     case "takeover":
-      return { title: `Opened on ${by}`, body: `This vault is now open on ${by}.`, upgrade: false, useHere: true };
+      return { title: __tr("Opened on {v0}", { v0: (by) }), body: `This vault is now open on ${by}.`, upgrade: false, useHere: true };
   }
 }
 
@@ -65,7 +66,7 @@ export function displacedDetails(ev: DisplacedEvent): string[] {
 function openPricing(): void {
   syncApi.openPricing().catch((err) => {
     console.error("[sync] Failed to open pricing:", err);
-    toast.error("Could not open the pricing page");
+    toast.error(__tr("Could not open the pricing page"));
   });
 }
 
@@ -78,8 +79,8 @@ export function displacingTitle(ev: DisplacingEvent): string {
 export function DisplacingOverlay({ event }: { event: DisplacingEvent }) {
   return (
     <SyncDialogFrame icon="lock" tone="warn" title={displacingTitle(event)} footer={null}>
-      <p className="text-ink">Saving your last changes...</p>
-      <p>Your open connections keep running.</p>
+      <p className="text-ink">{__tr("Saving your last changes...")}</p>
+      <p>{__tr("Your open connections keep running.")}</p>
     </SyncDialogFrame>
   );
 }
@@ -102,17 +103,15 @@ export default function DisplacedDialog({ event }: { event: DisplacedEvent }) {
       onEscape={close}
       footer={
         <>
-          {copy.upgrade && <DialogButton onClick={openPricing}>Upgrade</DialogButton>}
-          <DialogButton onClick={close} autoFocus={!copy.useHere && !copy.update}>OK</DialogButton>
+          {copy.upgrade && <DialogButton onClick={openPricing}>{__tr("Upgrade")}</DialogButton>}
+          <DialogButton onClick={close} autoFocus={!copy.useHere && !copy.update}>{__tr("OK")}</DialogButton>
           {copy.update && (
             <DialogButton variant="primary" onClick={() => void updateConduit()} autoFocus>
-              Update Conduit
-            </DialogButton>
+              {__tr("Update Conduit")}</DialogButton>
           )}
           {copy.useHere && (
             <DialogButton variant="primary" onClick={useHere} autoFocus>
-              Use here instead
-            </DialogButton>
+              {__tr("Use here instead")}</DialogButton>
           )}
         </>
       }

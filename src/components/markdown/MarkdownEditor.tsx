@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useRef, useCallback, useId } from "react";
 import { IconButton, TabPanel, Tabs, type TabItem } from "../ui";
 import MarkdownRenderer from "./MarkdownRenderer";
@@ -8,8 +9,8 @@ import { formatSecretRef } from "../../lib/kb";
 type EditorTab = "write" | "preview";
 
 const TABS: ReadonlyArray<TabItem<EditorTab>> = [
-  { value: "write", label: "Write" },
-  { value: "preview", label: "Preview" },
+  { value: "write", label: __tr("Write") },
+  { value: "preview", label: __tr("Preview") },
 ];
 
 interface MarkdownEditorProps {
@@ -91,7 +92,7 @@ export default function MarkdownEditor({ value, onChange, placeholder = "Write m
             {value.trim() ? (
               <MarkdownRenderer content={value} />
             ) : (
-              <p className="text-body italic text-ink-faint">Nothing to preview</p>
+              <p className="text-body italic text-ink-faint">{__tr("Nothing to preview")}</p>
             )}
           </div>
         )}

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { invoke } from "../../lib/electron";
 import { errorText } from "../../lib/errorText";
@@ -44,11 +45,11 @@ export default function ChangePasswordDialog({ onClose }: ChangePasswordDialogPr
         newPassword,
         eraseRecentlyDeleted: engineSync && eraseDeleted,
       });
-      toast.success("Vault password changed successfully");
+      toast.success(__tr("Vault password changed successfully"));
       onClose();
     } catch (err) {
       // invoke() rejects with an Error, so its message is the reason (a wrong current password, say).
-      setError(errorText(err, "Failed to change password"));
+      setError(errorText(err, __tr("Failed to change password")));
       setLoading(false);
     }
   };
@@ -56,8 +57,8 @@ export default function ChangePasswordDialog({ onClose }: ChangePasswordDialogPr
   return (
     <Dialog
       open
-      title="Change Password"
-      description="Update the master password for this vault"
+      title={__tr("Change Password")}
+      description={__tr("Update the master password for this vault")}
       icon="lock"
       width={420}
       hideClose
@@ -66,21 +67,20 @@ export default function ChangePasswordDialog({ onClose }: ChangePasswordDialogPr
       onSubmit={(e) => void handleSubmit(e)}
       footer={
         <>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>{__tr("Cancel")}</Button>
           <Button type="submit" variant="primary" disabled={!isValid} loading={loading}>
-            Change Password
-          </Button>
+            {__tr("Change Password")}</Button>
         </>
       }
     >
-      <FormField label="Current Password">
+      <FormField label={__tr("Current Password")}>
         <PasswordField
           value={currentPassword}
           onChange={(value) => {
             setCurrentPassword(value);
             setError(null);
           }}
-          placeholder="Enter current password"
+          placeholder={__tr("Enter current password")}
           shown={showCurrent}
           onToggle={() => setShowCurrent(!showCurrent)}
           autoFocus
@@ -88,9 +88,9 @@ export default function ChangePasswordDialog({ onClose }: ChangePasswordDialogPr
       </FormField>
 
       <FormField
-        label="New Password"
+        label={__tr("New Password")}
         description={
-          passwordTooShort ? <span className="text-warning">Password must be at least {MIN_PASSWORD_LENGTH} characters</span> : undefined
+          passwordTooShort ? <span className="text-warning">{__tr("Password must be at least")} {MIN_PASSWORD_LENGTH} {__tr("characters")}</span> : undefined
         }
       >
         <PasswordField
@@ -99,15 +99,15 @@ export default function ChangePasswordDialog({ onClose }: ChangePasswordDialogPr
             setNewPassword(value);
             setError(null);
           }}
-          placeholder="Enter new password"
+          placeholder={__tr("Enter new password")}
           shown={showNew}
           onToggle={() => setShowNew(!showNew)}
         />
       </FormField>
 
       <FormField
-        label="Confirm New Password"
-        description={passwordsMismatch ? <span className="text-warning">Passwords do not match</span> : undefined}
+        label={__tr("Confirm New Password")}
+        description={passwordsMismatch ? <span className="text-warning">{__tr("Passwords do not match")}</span> : undefined}
       >
         <PasswordField
           value={confirmPassword}
@@ -115,7 +115,7 @@ export default function ChangePasswordDialog({ onClose }: ChangePasswordDialogPr
             setConfirmPassword(value);
             setError(null);
           }}
-          placeholder="Confirm new password"
+          placeholder={__tr("Confirm new password")}
           shown={showConfirm}
           onToggle={() => setShowConfirm(!showConfirm)}
         />
@@ -123,9 +123,7 @@ export default function ChangePasswordDialog({ onClose }: ChangePasswordDialogPr
 
       {engineSync && (
         <Checkbox checked={eraseDeleted} onChange={setEraseDeleted} className="text-label text-ink-muted">
-          Also permanently delete items in Recently deleted, on every device. Recommended if your old
-          password may have leaked.
-        </Checkbox>
+          {__tr("Also permanently delete items in Recently deleted, on every device. Recommended if your old password may have leaked.")}</Checkbox>
       )}
 
       {error && <Callout tone="danger">{error}</Callout>}
@@ -154,7 +152,7 @@ function PasswordField({ value, onChange, placeholder, shown, onToggle, autoFocu
         <IconButton
           size="sm"
           icon={shown ? "eyeOff" : "eye"}
-          label={shown ? "Hide password" : "Show password"}
+          label={shown ? __tr("Hide password") : __tr("Show password")}
           onClick={onToggle}
           tabIndex={-1}
         />

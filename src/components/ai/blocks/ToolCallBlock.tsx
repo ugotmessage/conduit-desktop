@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState } from "react";
 import { ToolIcon } from "../../../lib/icons";
 import { BlockBody, BlockChevron, BlockFrame, BlockHeader, BlockLabel, StatusGlyph } from "./BlockParts";
@@ -30,13 +31,13 @@ export default function ToolCallBlock({ name, input, output, status }: ToolCallB
         <BlockBody className="space-y-2">
           {input !== undefined && (
             <div>
-              <BlockLabel>Input</BlockLabel>
+              <BlockLabel>{__tr("Input")}</BlockLabel>
               <pre className={DETAIL}>{typeof input === "string" ? input : JSON.stringify(input, null, 2)}</pre>
             </div>
           )}
           {output !== undefined && (
             <div>
-              <BlockLabel>Output</BlockLabel>
+              <BlockLabel>{__tr("Output")}</BlockLabel>
               <pre className={DETAIL}>{output}</pre>
             </div>
           )}

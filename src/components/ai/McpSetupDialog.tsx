@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "../../lib/electron";
 import { toast } from "../common/Toast";
@@ -23,10 +24,10 @@ export default function McpSetupDialog({ onClose }: McpSetupDialogProps) {
       await navigator.clipboard.writeText(text);
     } catch (err) {
       console.error("Failed to copy the MCP command:", err);
-      toast.error("Could not copy the command");
+      toast.error(__tr("Could not copy the command"));
       return;
     }
-    toast.success("Command copied");
+    toast.success(__tr("Command copied"));
     setCopiedIdx(idx);
     setTimeout(() => setCopiedIdx(null), 2000);
   }, []);
@@ -35,21 +36,18 @@ export default function McpSetupDialog({ onClose }: McpSetupDialogProps) {
     <Dialog
       open
       onClose={onClose}
-      title="Register MCP Tools"
+      title={__tr("Register MCP Tools")}
       width={448}
       layer="sync"
       closeOnScrim
       footer={
         <Button variant="primary" onClick={onClose}>
-          Got it
-        </Button>
+          {__tr("Got it")}</Button>
       }
     >
       <div className="space-y-3 py-2">
         <p className="text-label text-ink-muted">
-          In terminal mode, CLI agents need Conduit's MCP server registered manually.
-          Run the command for your agent in your project directory:
-        </p>
+          {__tr("In terminal mode, CLI agents need Conduit's MCP server registered manually. Run the command for your agent in your project directory:")}</p>
 
         {!mcpPath || !socketPath ? (
           <Spinner size={16} text="Loading MCP path..." className="text-label text-ink-muted" />
@@ -68,7 +66,7 @@ export default function McpSetupDialog({ onClose }: McpSetupDialogProps) {
                     <IconButton
                       size="sm"
                       icon={copied ? "check" : "copy"}
-                      label="Copy command"
+                      label={__tr("Copy command")}
                       tone={copied ? "inherit" : "default"}
                       className={copied ? "text-success" : undefined}
                       onClick={() => handleCopy(idx, cmd)}

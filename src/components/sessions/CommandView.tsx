@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
@@ -280,12 +281,10 @@ export default function CommandView({
         <div className="flex-1" />
         {status === "running" ? (
           <Button size="sm" variant="danger" icon={PlayerStopIcon} onClick={handleStop}>
-            Stop
-          </Button>
+            {__tr("Stop")}</Button>
         ) : (
           <Button size="sm" variant="secondary" icon={RefreshIcon} onClick={handleRerun}>
-            Re-run
-          </Button>
+            {__tr("Re-run")}</Button>
         )}
       </div>
 
@@ -307,34 +306,30 @@ function CommandStatusLabel({ status, exitCode }: { status: CommandStatus; exitC
       return (
         <span className="flex items-center gap-1.5 text-success">
           <CircleFilledIcon size={12} className="animate-pulse motion-reduce:animate-none" />
-          Running
-        </span>
+          {__tr("Running")}</span>
       );
     case "exited":
       return exitCode === 0 ? (
         <span className="flex items-center gap-1 text-success">
           <CheckIcon size={16} />
-          Exited (0)
-        </span>
+          {__tr("Exited (0)")}</span>
       ) : (
         <span className="flex items-center gap-1 text-danger">
           <CloseIcon size={16} />
-          Exited ({exitCode})
+          {__tr("Exited (")}{exitCode})
         </span>
       );
     case "timeout":
       return (
         <span className="flex items-center gap-1 text-warning">
           <ClockIcon size={16} />
-          Timed Out
-        </span>
+          {__tr("Timed Out")}</span>
       );
     case "error":
       return (
         <span className="flex items-center gap-1 text-danger">
           <CloseIcon size={16} />
-          Error
-        </span>
+          {__tr("Error")}</span>
       );
   }
 }

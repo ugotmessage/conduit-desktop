@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { SemanticIconName } from "../../../lib/icons";
 import type { ConnectionHistoryEvent, HistoryOutcome } from "../../../types/dashboard";
 
@@ -9,11 +10,11 @@ export interface OutcomeLook {
 
 /** Icon, color and label of a history row by outcome (docs/DASHBOARD.md 8.2). */
 export const OUTCOME_LOOK: Readonly<Record<HistoryOutcome, OutcomeLook>> = {
-  open: { label: "Connected now", icon: "circleFilled", className: "text-(--c-state-connected)" },
-  closed: { label: "Connected", icon: "circleCheck", className: "text-(--c-state-connected)" },
-  dropped: { label: "Disconnected with an error", icon: "alertTriangle", className: "text-warning" },
-  failed: { label: "Could not connect", icon: "circleX", className: "text-danger" },
-  interrupted: { label: "Ended when Conduit closed", icon: "clock", className: "text-ink-faint" },
+  open: { label: __tr("Connected now"), icon: "circleFilled", className: "text-(--c-state-connected)" },
+  closed: { label: __tr("Connected"), icon: "circleCheck", className: "text-(--c-state-connected)" },
+  dropped: { label: __tr("Disconnected with an error"), icon: "alertTriangle", className: "text-warning" },
+  failed: { label: __tr("Could not connect"), icon: "circleX", className: "text-danger" },
+  interrupted: { label: __tr("Ended when Conduit closed"), icon: "clock", className: "text-ink-faint" },
 };
 
 /** "{s} s" under a minute, "{m} min" under an hour, else "{h} h {m} min". */

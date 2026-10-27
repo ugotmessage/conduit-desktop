@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useId, useState } from "react";
 import type { EntryType } from "../../../types/entry";
 import type { CredentialType } from "../../../types/credential";
@@ -47,9 +48,9 @@ const TRAILING_PADDING = 80;
 const DEFAULT_AUTH = "default";
 
 const SSH_AUTH_OPTIONS = [
-  { value: DEFAULT_AUTH, label: "Default" },
-  { value: "key", label: "SSH Key" },
-  { value: "password", label: "Password" },
+  { value: DEFAULT_AUTH, label: __tr("Default") },
+  { value: "key", label: __tr("SSH Key") },
+  { value: "password", label: __tr("Password") },
 ];
 
 export default function CredentialsTab({
@@ -97,17 +98,17 @@ export default function CredentialsTab({
     if (!publicKey) return;
     try {
       await navigator.clipboard.writeText(publicKey);
-      toast.success("Public key copied to clipboard");
+      toast.success(__tr("Public key copied to clipboard"));
     } catch (err) {
       console.error("Failed to copy the public key:", err);
-      toast.error("Could not copy the public key");
+      toast.error(__tr("Could not copy the public key"));
     }
   };
 
   return (
     <div className="space-y-4">
       {showUsername && !isSshKey && (
-        <Field label={usernameRequired ? "Username *" : "Username"}>
+        <Field label={usernameRequired ? __tr("Username *") : __tr("Username")}>
           <TextInput
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -117,7 +118,7 @@ export default function CredentialsTab({
       )}
 
       {!isSshKey && (
-        <Field label="Password" group htmlFor={passwordId}>
+        <Field label={__tr("Password")} group htmlFor={passwordId}>
           <div className="relative">
             <TextInput
               id={passwordId}
@@ -129,12 +130,12 @@ export default function CredentialsTab({
             <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-1">
               <PasswordGenerateButton onPasswordGenerated={setPassword} />
               {isEditing && entryId && (
-                <IconButton size="sm" icon="history" label="Password history" onClick={() => setShowPasswordHistory(true)} />
+                <IconButton size="sm" icon="history" label={__tr("Password history")} onClick={() => setShowPasswordHistory(true)} />
               )}
               <IconButton
                 size="sm"
                 icon={showPassword ? "eyeOff" : "eye"}
-                label={showPassword ? "Hide password" : "Show password"}
+                label={showPassword ? __tr("Hide password") : __tr("Show password")}
                 onClick={() => setShowPassword(!showPassword)}
               />
             </div>
@@ -143,7 +144,7 @@ export default function CredentialsTab({
       )}
 
       {showDomain && !isSshKey && (
-        <Field label="Domain">
+        <Field label={__tr("Domain")}>
           <TextInput value={domain} onChange={(e) => setDomain(e.target.value)} />
         </Field>
       )}
@@ -151,7 +152,7 @@ export default function CredentialsTab({
       {showTotpSection && <TotpSection {...totp} />}
 
       {showPrivateKeyField && (
-        <Field label="Private Key" group htmlFor={privateKeyId}>
+        <Field label={__tr("Private Key")} group htmlFor={privateKeyId}>
           <div className="relative">
             <Textarea
               id={privateKeyId}
@@ -174,7 +175,7 @@ export default function CredentialsTab({
               <IconButton
                 size="sm"
                 icon={showPrivateKey ? "eyeOff" : "eye"}
-                label={showPrivateKey ? "Hide private key" : "Show private key"}
+                label={showPrivateKey ? __tr("Hide private key") : __tr("Show private key")}
                 onClick={() => setShowPrivateKey(!showPrivateKey)}
               />
             </div>
@@ -185,7 +186,7 @@ export default function CredentialsTab({
       {/* Shown for SSH entries when both a key and a password are present */}
       {(entryType === "ssh" || entryType === "credential") && privateKey.trim() && password.trim() && onSshAuthMethodChange && (
         <Card className="space-y-3">
-          <p className="text-meta font-semibold text-ink-muted">SSH Authentication</p>
+          <p className="text-meta font-semibold text-ink-muted">{__tr("SSH Authentication")}</p>
           <SegmentedControl
             options={SSH_AUTH_OPTIONS}
             value={sshAuthMethod ?? DEFAULT_AUTH}
@@ -193,15 +194,14 @@ export default function CredentialsTab({
             className="w-full [&>button]:flex-1 [&>button]:justify-center"
           />
           <p className="text-meta text-ink-muted">
-            Choose which method to use when connecting. &ldquo;Default&rdquo; uses the global setting from Settings.
-          </p>
+            {__tr("Choose which method to use when connecting. “Default” uses the global setting from Settings.")}</p>
         </Card>
       )}
 
       {isSshKey && setPublicKey && (
         <Card className="space-y-3">
-          <p className="text-meta font-semibold text-ink-muted">SSH Key Metadata</p>
-          <Field label="Public Key" group htmlFor={publicKeyId}>
+          <p className="text-meta font-semibold text-ink-muted">{__tr("SSH Key Metadata")}</p>
+          <Field label={__tr("Public Key")} group htmlFor={publicKeyId}>
             <div className="relative">
               <Textarea
                 id={publicKeyId}
@@ -212,26 +212,26 @@ export default function CredentialsTab({
                 style={{ resize: "none", paddingRight: 32 }}
               />
               {publicKey && (
-                <IconButton size="sm" icon="copy" label="Copy public key" onClick={handleCopyPublicKey} className="absolute right-1 top-1" />
+                <IconButton size="sm" icon="copy" label={__tr("Copy public key")} onClick={handleCopyPublicKey} className="absolute right-1 top-1" />
               )}
             </div>
           </Field>
-          <Field label="Fingerprint">
+          <Field label={__tr("Fingerprint")}>
             <TextInput value={fingerprint ?? ""} readOnly className="cursor-default font-mono" />
           </Field>
         </Card>
       )}
 
       {isConnection && (
-        <Field label="Linked Credential" group>
+        <Field label={__tr("Linked Credential")} group>
           <button
             type="button"
             onClick={onShowCredentialPicker}
             className="h-control w-full rounded border border-input-border bg-input px-1.5 text-left text-body text-(--c-input-fg) hover:border-(--c-control-border)"
           >
             {credentialId
-              ? credentialName ?? "Unknown credential"
-              : <span className="text-(--c-input-placeholder)">None (use inline credentials)</span>}
+              ? credentialName ?? __tr("Unknown credential")
+              : <span className="text-(--c-input-placeholder)">{__tr("None (use inline credentials)")}</span>}
           </button>
         </Field>
       )}

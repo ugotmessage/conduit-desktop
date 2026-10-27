@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useVaultStore } from "../../stores/vaultStore";
 import { useTeamStore, type TeamVaultSummary } from "../../stores/teamStore";
 import { useAuthStore } from "../../stores/authStore";
@@ -135,7 +136,7 @@ export default function VaultSwitcherMenu({
       autoFocus={false}
       className="absolute top-full left-0 z-50 mt-1 w-[280px] overflow-hidden rounded-lg border border-overlay-border bg-overlay shadow-overlay"
     >
-      <MenuHeader>Personal Vaults</MenuHeader>
+      <MenuHeader>{__tr("Personal Vaults")}</MenuHeader>
 
       {/* Current vault */}
       {currentVaultPath && (
@@ -151,10 +152,10 @@ export default function VaultSwitcherMenu({
           }}
         >
           <span className={cx("min-w-0 truncate", isPersonalActive && "font-semibold text-ink")}>
-            {currentVaultPath.split(/[/\\]/).pop()?.replace(".conduit", "") ?? "Vault"}
+            {currentVaultPath.split(/[/\\]/).pop()?.replace(".conduit", "") ?? __tr("Vault")}
           </span>
           {isNetworkVault && isPersonalActive && (
-            <span title="Network vault"><NetworkIcon size={12} className="text-ink-faint flex-shrink-0" /></span>
+            <span title={__tr("Network vault")}><NetworkIcon size={12} className="text-ink-faint flex-shrink-0" /></span>
           )}
           {autoUnlockOn && isPersonalActive && (
             <span title={INDICATOR_TEXT} className="inline-flex">
@@ -183,17 +184,15 @@ export default function VaultSwitcherMenu({
 
       {/* New / Open vault */}
       <VaultMenuRow lead={<PlusIcon size={16} />} onClick={handleNewVault}>
-        New Vault...
-      </VaultMenuRow>
+        {__tr("New Vault...")}</VaultMenuRow>
       <VaultMenuRow lead={<FolderOpenIcon size={16} />} onClick={handleOpenVault}>
-        Open Vault File...
-      </VaultMenuRow>
+        {__tr("Open Vault File...")}</VaultMenuRow>
 
       {/* Team Vaults section */}
       {isSignedIn && (
         <>
           <MenuSeparator />
-          <MenuHeader>Team Vaults</MenuHeader>
+          <MenuHeader>{__tr("Team Vaults")}</MenuHeader>
 
           {isTeamMember && team ? (
             <>
@@ -227,17 +226,16 @@ export default function VaultSwitcherMenu({
                 })
               ) : (
                 <div className="px-3 py-1.5 text-label text-ink-muted">
-                  No team vaults yet.{" "}
+                  {__tr("No team vaults yet.")}{" "}
                   {myRole === "admin"
-                    ? "Create a shared vault for your team."
-                    : "A team admin can create shared vaults for your team."}
+                    ? __tr("Create a shared vault for your team.")
+                    : __tr("A team admin can create shared vaults for your team.")}
                 </div>
               )}
 
               {myRole === "admin" && (
                 <VaultMenuRow lead={<PlusIcon size={16} />} onClick={handleCreateTeamVault}>
-                  Create Team Vault...
-                </VaultMenuRow>
+                  {__tr("Create Team Vault...")}</VaultMenuRow>
               )}
             </>
           ) : (
@@ -248,7 +246,7 @@ export default function VaultSwitcherMenu({
                 invoke('auth_open_account');
               }}
             >
-              <span className="min-w-0 flex-1 truncate text-label">Upgrade to Teams for shared vaults</span>
+              <span className="min-w-0 flex-1 truncate text-label">{__tr("Upgrade to Teams for shared vaults")}</span>
               <ChevronRightIcon size={12} className="text-ink-faint flex-shrink-0" />
             </VaultMenuRow>
           )}
@@ -260,11 +258,9 @@ export default function VaultSwitcherMenu({
         <>
           <MenuSeparator />
           <VaultMenuRow lead={<LockIcon size={16} />} onClick={handleLock}>
-            Lock Current Vault
-          </VaultMenuRow>
+            {__tr("Lock Current Vault")}</VaultMenuRow>
           <VaultMenuRow lead={<ArrowsExchangeIcon size={16} />} onClick={handleLock}>
-            Switch Vault...
-          </VaultMenuRow>
+            {__tr("Switch Vault...")}</VaultMenuRow>
         </>
       )}
     </Menu>

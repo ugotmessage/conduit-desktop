@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useCallback, useEffect, useState } from "react";
 import { IconSlot, Spinner } from "../ui";
 import { syncApi } from "../../lib/sync-api";
@@ -19,20 +20,20 @@ interface ClassSpec {
 const CLASS_SPECS: Readonly<Record<CopyClass, ClassSpec>> = {
   "in-use-elsewhere": {
     text: () => "Another device syncs this copy.",
-    actions: [{ label: "Merge them...", action: "merge", primary: true }, { label: "Keep separate", action: "separate" }],
+    actions: [{ label: __tr("Merge them..."), action: "merge", primary: true }, { label: __tr("Keep separate"), action: "separate" }],
   },
   "nothing-new": {
     text: () => "Nothing new. Everything in it is already in your vault.",
-    actions: [{ label: "Move to Trash", action: "trash" }, { label: "Ignore", action: "ignore" }],
+    actions: [{ label: __tr("Move to Trash"), action: "trash" }, { label: __tr("Ignore"), action: "ignore" }],
   },
   "safe-provider-copy": {
     text: () => "A cloud drive conflict copy. Its changes were merged.",
-    actions: [{ label: "Move to Trash", action: "trash" }],
+    actions: [{ label: __tr("Move to Trash"), action: "trash" }],
   },
   "needs-review": {
     text: (c) =>
       `${plural(c.changes, "change")} not in your vault${c.deletions > 0 ? `, including ${plural(c.deletions, "deletion")}` : ""}.`,
-    actions: [{ label: "Review...", action: "review", primary: true }, { label: "Ignore this copy", action: "ignore" }],
+    actions: [{ label: __tr("Review..."), action: "review", primary: true }, { label: __tr("Ignore this copy"), action: "ignore" }],
   },
 };
 
@@ -75,7 +76,7 @@ export default function OtherCopiesPanel() {
       setCopies(await syncApi.listCopies(rescan));
     } catch (err) {
       console.error("[sync] Failed to list copies:", err);
-      toast.error("Could not list copies", errorText(err, "Try again."));
+      toast.error(__tr("Could not list copies"), errorText(err, __tr("Try again.")));
       setCopies([]);
       setLoadFailed(true);
     }
@@ -88,15 +89,14 @@ export default function OtherCopiesPanel() {
   return (
     <SyncDialogFrame
       icon="file"
-      title="Other copies of this vault"
+      title={__tr("Other copies of this vault")}
       width={600}
       onEscape={close}
       footer={
         <>
           <DialogButton icon="refresh" onClick={() => { setCopies(null); void load(true); }}>
-            Scan again
-          </DialogButton>
-          <DialogButton variant="primary" onClick={close}>Done</DialogButton>
+            {__tr("Scan again")}</DialogButton>
+          <DialogButton variant="primary" onClick={close}>{__tr("Done")}</DialogButton>
         </>
       }
     >
@@ -105,7 +105,7 @@ export default function OtherCopiesPanel() {
       ) : loadFailed ? (
         <LoadFailed what="the copies" onRetry={() => void load(true)} />
       ) : copies.length === 0 ? (
-        <p>No other copies in this vault's folder.</p>
+        <p>{__tr("No other copies in this vault's folder.")}</p>
       ) : (
         <div>{copies.map((c) => <CopyRow key={c.path} copy={c} onDone={() => void load(false)} />)}</div>
       )}

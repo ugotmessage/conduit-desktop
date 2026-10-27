@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import SshKeyGeneratorDialog from "./SshKeyGeneratorDialog";
 import { IconButton } from "../ui";
@@ -15,7 +16,7 @@ export default function SshKeyGenerateButton({
 
   return (
     <>
-      <IconButton size="sm" icon="shieldLock" label="SSH Key Generator" onClick={() => setShowDialog(true)} />
+      <IconButton size="sm" icon="shieldLock" label={__tr("SSH Key Generator")} onClick={() => setShowDialog(true)} />
       {showDialog && (
         <SshKeyGeneratorDialog
           onClose={() => setShowDialog(false)}

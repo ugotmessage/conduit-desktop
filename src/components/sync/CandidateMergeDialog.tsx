@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -20,7 +21,7 @@ function RowList({ title, rows }: { title: string; rows: readonly CandidatePrevi
       <p className="mb-1 text-label font-semibold text-ink">{title} ({rows.length})</p>
       <ul className="text-label text-ink-muted list-disc pl-5 space-y-0.5">
         {rows.slice(0, MAX_LISTED).map((r) => <li key={rowKeyString(r.row)}>{r.title}</li>)}
-        {rows.length > MAX_LISTED && <li>and {rows.length - MAX_LISTED} more</li>}
+        {rows.length > MAX_LISTED && <li>{__tr("and")} {rows.length - MAX_LISTED} {__tr("more")}</li>}
       </ul>
     </div>
   );
@@ -30,15 +31,15 @@ function ChangedFields({ preview }: { preview: CandidatePreview }) {
   if (preview.changedFields.length === 0) return null;
   return (
     <div>
-      <p className="mb-1 text-label font-semibold text-ink">Different values ({preview.changedFields.length})</p>
+      <p className="mb-1 text-label font-semibold text-ink">{__tr("Different values (")}{preview.changedFields.length})</p>
       <div className="max-h-40 overflow-y-auto rounded border border-stroke divide-y divide-stroke-dim">
         {preview.changedFields.slice(0, 50).map((f) => (
           <div key={`${rowKeyString(f.key)}:${f.key.reg}`} className="px-2 py-1.5 text-label">
             <span className="text-ink">{f.rowTitle}</span> <span className="text-ink-muted">{f.label}:</span>{" "}
             <span className="font-mono">{f.masked ? MASKED_VALUE : formatValue(f.current)}</span>
-            <span className="text-ink-muted"> in the vault, </span>
+            <span className="text-ink-muted"> {__tr("in the vault,")} </span>
             <span className="font-mono">{f.masked ? MASKED_VALUE : formatValue(f.incoming)}</span>
-            <span className="text-ink-muted"> in the copy</span>
+            <span className="text-ink-muted"> {__tr("in the copy")}</span>
           </div>
         ))}
       </div>
@@ -70,7 +71,7 @@ export default function CandidateMergeDialog({ candidateId, confirmSideFilesAfte
 
   useEffect(() => {
     syncApi.candidatePreview(candidateId).then(setPreview).catch((err) => {
-      toast.error("Could not open the copy", errorText(err, "Try again."));
+      toast.error(__tr("Could not open the copy"), errorText(err, __tr("Try again.")));
       close();
     });
   }, [candidateId]);
@@ -83,7 +84,7 @@ export default function CandidateMergeDialog({ candidateId, confirmSideFilesAfte
       if (confirmSideFilesAfter) await confirmSideFilesAfterReview();
       toast.success(message);
     } catch (err) {
-      toast.error("Could not finish", errorText(err, "Try again."));
+      toast.error(__tr("Could not finish"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -104,14 +105,14 @@ export default function CandidateMergeDialog({ candidateId, confirmSideFilesAfte
   return (
     <SyncDialogFrame
       icon="fileImport"
-      title={preview ? `Merge '${preview.label}'?` : "Merge a copy"}
+      title={preview ? __tr("Merge '{v0}'?", { v0: (preview.label) }) : __tr("Merge a copy")}
       width={560}
       onEscape={close}
       footer={
         <>
-          <DialogButton onClick={close} disabled={busy}>Later</DialogButton>
-          <DialogButton onClick={() => void discard()} disabled={busy || !preview}>Don't merge</DialogButton>
-          <DialogButton variant="primary" onClick={() => void merge()} disabled={busy || !preview}>Merge</DialogButton>
+          <DialogButton onClick={close} disabled={busy}>{__tr("Later")}</DialogButton>
+          <DialogButton onClick={() => void discard()} disabled={busy || !preview}>{__tr("Don't merge")}</DialogButton>
+          <DialogButton variant="primary" onClick={() => void merge()} disabled={busy || !preview}>{__tr("Merge")}</DialogButton>
         </>
       }
     >
@@ -121,13 +122,12 @@ export default function CandidateMergeDialog({ candidateId, confirmSideFilesAfte
         <>
           <p>{introText(preview.kind)}</p>
           <ChangedFields preview={preview} />
-          <RowList title="Only in this copy (they will be added)" rows={preview.onlyInCopy} />
-          <RowList title="Deleted in this copy (merging deletes them unless your vault changed them since)" rows={preview.deletions} />
-          <RowList title="Missing from this copy" rows={preview.missingFromCopy} />
+          <RowList title={__tr("Only in this copy (they will be added)")} rows={preview.onlyInCopy} />
+          <RowList title={__tr("Deleted in this copy (merging deletes them unless your vault changed them since)")} rows={preview.deletions} />
+          <RowList title={__tr("Missing from this copy")} rows={preview.missingFromCopy} />
           {preview.missingFromCopy.length > 0 && (
             <Checkbox checked={deleteMissing} onChange={setDeleteMissing}>
-              Delete the missing items from the vault too
-            </Checkbox>
+              {__tr("Delete the missing items from the vault too")}</Checkbox>
           )}
         </>
       )}

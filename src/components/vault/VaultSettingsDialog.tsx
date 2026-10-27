@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { invoke } from "../../lib/electron";
 import { useTeamStore, type TeamVaultMember, type FolderPermission } from "../../stores/teamStore";
@@ -30,9 +31,9 @@ interface FolderTreeNode {
 }
 
 const NAV_ITEMS: ReadonlyArray<NavItem & { id: VaultSettingsTab }> = [
-  { id: "members", icon: "users", label: "Members" },
-  { id: "permissions", icon: "shieldLock", label: "Permissions" },
-  { id: "activity", icon: "history", label: "Activity" },
+  { id: "members", icon: "users", label: __tr("Members") },
+  { id: "permissions", icon: "shieldLock", label: __tr("Permissions") },
+  { id: "activity", icon: "history", label: __tr("Activity") },
 ];
 
 const ROLE_OPTIONS: ReadonlyArray<VaultRole> = ["admin", "editor", "viewer"];
@@ -123,7 +124,7 @@ function MembersTab({
       setSelectedRole("editor");
       await loadVaultMembers();
     } catch (err) {
-      setError(errorText(err, "Failed to add member"));
+      setError(errorText(err, __tr("Failed to add member")));
     } finally {
       setActionLoading(null);
     }
@@ -138,7 +139,7 @@ function MembersTab({
       setRemovingId(null);
       await loadVaultMembers();
     } catch (err) {
-      setError(errorText(err, "Failed to remove member"));
+      setError(errorText(err, __tr("Failed to remove member")));
     } finally {
       setActionLoading(null);
     }
@@ -152,7 +153,7 @@ function MembersTab({
       await invoke("team_vault_update_member_role", { teamVaultId, userId, role });
       await loadVaultMembers();
     } catch (err) {
-      setError(errorText(err, "Failed to update role"));
+      setError(errorText(err, __tr("Failed to update role")));
     } finally {
       setActionLoading(null);
     }
@@ -166,7 +167,7 @@ function MembersTab({
       await invoke("team_vault_rotate_key", { teamVaultId });
       setShowRotateConfirm(false);
     } catch (err) {
-      setError(errorText(err, "Failed to rotate vault key"));
+      setError(errorText(err, __tr("Failed to rotate vault key")));
     } finally {
       setActionLoading(null);
     }
@@ -187,7 +188,7 @@ function MembersTab({
 
       <div className="flex-1 overflow-y-auto">
         {vaultMembers.length === 0 ? (
-          <div className="py-8 text-center text-body text-ink-faint">No members in this vault</div>
+          <div className="py-8 text-center text-body text-ink-faint">{__tr("No members in this vault")}</div>
         ) : (
           <div className="divide-y divide-divider">
             {vaultMembers.map((member) => {
@@ -207,8 +208,8 @@ function MembersTab({
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body text-ink">
-                      {member.user_display_name ?? member.user_email ?? "Unknown"}
-                      {isSelf && <span className="ml-1 text-label text-ink-faint">(you)</span>}
+                      {member.user_display_name ?? member.user_email ?? __tr("Unknown")}
+                      {isSelf && <span className="ml-1 text-label text-ink-faint">{__tr("(you)")}</span>}
                     </p>
                     {member.user_email && member.user_display_name && (
                       <p className="truncate text-badge text-ink-faint">{member.user_email}</p>
@@ -217,13 +218,11 @@ function MembersTab({
 
                   {isRemoving ? (
                     <div className="flex shrink-0 items-center gap-1.5">
-                      <span className="text-label text-danger">Remove?</span>
+                      <span className="text-label text-danger">{__tr("Remove?")}</span>
                       <Button size="sm" variant="danger" onClick={() => handleRemoveMember(member.user_id)} loading={isActionLoading}>
-                        Yes
-                      </Button>
+                        {__tr("Yes")}</Button>
                       <Button size="sm" variant="ghost" onClick={() => setRemovingId(null)}>
-                        No
-                      </Button>
+                        {__tr("No")}</Button>
                     </div>
                   ) : (
                     <div className="flex shrink-0 items-center gap-1.5">
@@ -246,7 +245,7 @@ function MembersTab({
                       )}
 
                       {isTeamAdmin && !isSelf && (
-                        <IconButton size="sm" icon="trash" tone="danger" label="Remove member" onClick={() => setRemovingId(member.user_id)} />
+                        <IconButton size="sm" icon="trash" tone="danger" label={__tr("Remove member")} onClick={() => setRemovingId(member.user_id)} />
                       )}
                     </div>
                   )}
@@ -262,7 +261,7 @@ function MembersTab({
           {addingMember ? (
             <div className="flex items-center gap-2">
               <Select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} wrapperClassName="flex-1">
-                <option value="">Select team member...</option>
+                <option value="">{__tr("Select team member...")}</option>
                 {availableMembers.map((m) => (
                   <option key={m.user_id} value={m.user_id}>
                     {m.user_display_name ?? m.user_email ?? m.user_id}
@@ -279,8 +278,7 @@ function MembersTab({
                 </Select>
               </div>
               <Button variant="primary" onClick={handleAddMember} disabled={!selectedUserId} loading={actionLoading === "add"}>
-                Add
-              </Button>
+                {__tr("Add")}</Button>
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -288,13 +286,11 @@ function MembersTab({
                   setSelectedUserId("");
                 }}
               >
-                Cancel
-              </Button>
+                {__tr("Cancel")}</Button>
             </div>
           ) : (
             <Button variant="link" icon="plus" onClick={() => setAddingMember(true)}>
-              Add Team Member
-            </Button>
+              {__tr("Add Team Member")}</Button>
           )}
         </div>
       )}
@@ -303,18 +299,15 @@ function MembersTab({
         <div className="border-t border-divider px-4 py-3">
           {showRotateConfirm ? (
             <div className="flex items-center gap-2">
-              <span className="text-label text-warning">Re-encrypt vault key for all members?</span>
+              <span className="text-label text-warning">{__tr("Re-encrypt vault key for all members?")}</span>
               <Button size="sm" variant="primary" onClick={handleRotateKey} loading={actionLoading === "rotate"}>
-                Confirm
-              </Button>
+                {__tr("Confirm")}</Button>
               <Button size="sm" variant="ghost" onClick={() => setShowRotateConfirm(false)}>
-                Cancel
-              </Button>
+                {__tr("Cancel")}</Button>
             </div>
           ) : (
             <Button size="sm" variant="ghost" icon="refresh" onClick={() => setShowRotateConfirm(true)}>
-              Rotate Key
-            </Button>
+              {__tr("Rotate Key")}</Button>
           )}
         </div>
       )}
@@ -399,7 +392,7 @@ function FolderPermissionsTab({
         return next;
       });
     } catch (err) {
-      setError(errorText(err, "Failed to load folder permissions"));
+      setError(errorText(err, __tr("Failed to load folder permissions")));
     } finally {
       setLoadingFolder(null);
     }
@@ -432,7 +425,7 @@ function FolderPermissionsTab({
       setSelectedRole("viewer");
       await loadFolderPerms(folderId);
     } catch (err) {
-      setError(errorText(err, "Failed to add permission override"));
+      setError(errorText(err, __tr("Failed to add permission override")));
     } finally {
       setActionLoading(null);
     }
@@ -449,7 +442,7 @@ function FolderPermissionsTab({
       });
       await loadFolderPerms(folderId);
     } catch (err) {
-      setError(errorText(err, "Failed to remove permission override"));
+      setError(errorText(err, __tr("Failed to remove permission override")));
     } finally {
       setActionLoading(null);
     }
@@ -466,8 +459,8 @@ function FolderPermissionsTab({
     return (
       <EmptyState
         icon="folder"
-        title="No folders in this vault yet."
-        description="Create folders to configure per-folder access restrictions."
+        title={__tr("No folders in this vault yet.")}
+        description={__tr("Create folders to configure per-folder access restrictions.")}
         className="my-4 flex-1 justify-center"
       />
     );
@@ -490,9 +483,7 @@ function FolderPermissionsTab({
       <div className="flex-1 overflow-y-auto">
         {flatNodes.length === 0 ? (
           <div className="py-8 text-center text-body text-ink-faint">
-            No folder-level restrictions configured. All members access folders
-            based on their vault role.
-          </div>
+            {__tr("No folder-level restrictions configured. All members access folders based on their vault role.")}</div>
         ) : (
           <div className="divide-y divide-divider">
             {flatNodes.map((node) => {
@@ -519,7 +510,7 @@ function FolderPermissionsTab({
                     <span className="flex-1 truncate text-body text-ink">{node.folder.name}</span>
                     {count > 0 && (
                       <Badge className="shrink-0">
-                        {count} {count === 1 ? "override" : "overrides"}
+                        {count} {count === 1 ? __tr("override") : __tr("overrides")}
                       </Badge>
                     )}
                   </button>
@@ -532,8 +523,7 @@ function FolderPermissionsTab({
                         </div>
                       ) : perms.length === 0 && !isAddingHere ? (
                         <div className="px-6 py-3 text-label text-ink-faint">
-                          No overrides. Members use their vault-level role for this folder.
-                        </div>
+                          {__tr("No overrides. Members use their vault-level role for this folder.")}</div>
                       ) : (
                         <div className="divide-y divide-divider">
                           {perms.map((perm) => {
@@ -545,7 +535,7 @@ function FolderPermissionsTab({
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <p className="truncate text-label text-ink">
-                                    {perm.user_display_name ?? perm.user_email ?? "Unknown"}
+                                    {perm.user_display_name ?? perm.user_email ?? __tr("Unknown")}
                                   </p>
                                 </div>
                                 <Badge>{perm.role}</Badge>
@@ -559,7 +549,7 @@ function FolderPermissionsTab({
                                       size="sm"
                                       icon="trash"
                                       tone="danger"
-                                      label="Remove override"
+                                      label={__tr("Remove override")}
                                       onClick={() => handleRemoveOverride(folderId, perm.user_id)}
                                     />
                                   ))}
@@ -574,7 +564,7 @@ function FolderPermissionsTab({
                           {isAddingHere ? (
                             <div className="flex items-center gap-2">
                               <Select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} wrapperClassName="flex-1">
-                                <option value="">Select member...</option>
+                                <option value="">{__tr("Select member...")}</option>
                                 {availableForOverride.map((m) => (
                                   <option key={m.user_id} value={m.user_id}>
                                     {m.user_display_name ?? m.user_email ?? m.user_id}
@@ -593,8 +583,7 @@ function FolderPermissionsTab({
                                 disabled={!selectedUserId}
                                 loading={actionLoading === "add"}
                               >
-                                Add
-                              </Button>
+                                {__tr("Add")}</Button>
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -603,8 +592,7 @@ function FolderPermissionsTab({
                                   setSelectedUserId("");
                                 }}
                               >
-                                Cancel
-                              </Button>
+                                {__tr("Cancel")}</Button>
                             </div>
                           ) : (
                             <Button
@@ -618,8 +606,7 @@ function FolderPermissionsTab({
                               }}
                               disabled={availableForOverride.length === 0}
                             >
-                              Add Override
-                            </Button>
+                              {__tr("Add Override")}</Button>
                           )}
                         </div>
                       )}
@@ -635,8 +622,7 @@ function FolderPermissionsTab({
       {flatNodes.length > 0 && Array.from(overrideCounts.values()).every((c) => c === 0) && (
         <div className="border-t border-divider px-4 py-3">
           <p className="text-center text-label text-ink-faint">
-            No folder-level restrictions configured. All members access folders based on their vault role.
-          </p>
+            {__tr("No folder-level restrictions configured. All members access folders based on their vault role.")}</p>
         </div>
       )}
     </div>
@@ -688,7 +674,7 @@ export default function VaultSettingsDialog({
   const navItems = NAV_ITEMS.filter((item) => item.id !== "activity" || myTeamRole === "admin");
 
   return (
-    <Dialog open title="Vault Settings" width={900} closeOnEscape={false} onClose={onClose} layout="custom">
+    <Dialog open title={__tr("Vault Settings")} width={900} closeOnEscape={false} onClose={onClose} layout="custom">
       <DialogHeader subtitle={activeVault?.name} />
 
       <div className="flex min-h-0 flex-1 border-y border-divider">
@@ -725,7 +711,7 @@ export default function VaultSettingsDialog({
       </div>
 
       <DialogFooter divided>
-        <Button onClick={onClose}>Done</Button>
+        <Button onClick={onClose}>{__tr("Done")}</Button>
       </DialogFooter>
     </Dialog>
   );

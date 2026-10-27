@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useRef } from "react";
 import { useVaultStore } from "../../stores/vaultStore";
 import type { CredentialMeta } from "../../types/credential";
@@ -34,7 +35,7 @@ export default function CredentialPicker({ selectedId, onSelect, onClose }: Cred
   return (
     <Dialog
       open
-      title="Select Credential"
+      title={__tr("Select Credential")}
       icon="key"
       width={448}
       style={{ maxHeight: "60vh" }}
@@ -50,7 +51,7 @@ export default function CredentialPicker({ selectedId, onSelect, onClose }: Cred
         <TextInput
           ref={searchRef}
           leading={<SearchIcon size={16} />}
-          placeholder="Search credentials..."
+          placeholder={__tr("Search credentials...")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -66,16 +67,16 @@ export default function CredentialPicker({ selectedId, onSelect, onClose }: Cred
             selectedId === null ? "bg-selected text-ink" : "text-ink-secondary hover:bg-hover",
           )}
         >
-          <span className="text-body">None (use inline credentials)</span>
+          <span className="text-body">{__tr("None (use inline credentials)")}</span>
           {selectedId === null && <CheckIcon size={16} className="text-link" />}
         </button>
 
         <div className="my-1 h-px bg-divider" />
 
         {credentials.length === 0 ? (
-          <EmptyState icon="key" title="No credentials stored" description="Create credentials via the sidebar or Credential Manager" />
+          <EmptyState icon="key" title={__tr("No credentials stored")} description={__tr("Create credentials via the sidebar or Credential Manager")} />
         ) : filteredCredentials.length === 0 ? (
-          <EmptyState icon="search" title="No matching credentials" />
+          <EmptyState icon="search" title={__tr("No matching credentials")} />
         ) : (
           <div className="space-y-px">
             {filteredCredentials.map((cred) => (

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useStartupVaultStore } from "../../stores/startupVaultStore";
 import { Button, Callout, Checkbox } from "../ui";
 
@@ -8,8 +9,7 @@ export function AutoUnlockFallbackNote({ onTurnOff }: { onTurnOff: () => void })
   if (fallback?.kind === "stale") {
     return (
       <Callout tone="warning">
-        Conduit couldn't open {fallback.name} automatically. The master password may have changed on another device. Enter it to open the vault.
-      </Callout>
+        {__tr("Conduit couldn't open")} {fallback.name} {__tr("automatically. The master password may have changed on another device. Enter it to open the vault.")}</Callout>
     );
   }
   if (fallback?.kind === "unreadable") {
@@ -18,12 +18,10 @@ export function AutoUnlockFallbackNote({ onTurnOff }: { onTurnOff: () => void })
         tone="warning"
         actions={
           <Button variant="link" size="sm" onClick={onTurnOff}>
-            Turn Off Automatic Unlock
-          </Button>
+            {__tr("Turn Off Automatic Unlock")}</Button>
         }
       >
-        Conduit couldn't read the saved unlock from the {storeName}. Enter your master password.
-      </Callout>
+        {__tr("Conduit couldn't read the saved unlock from the")} {storeName}{__tr(". Enter your master password.")}</Callout>
     );
   }
   return null;
@@ -40,9 +38,9 @@ export function AutoUnlockCheckbox({ keepMode, checked, onChange }: AutoUnlockCh
     <Checkbox
       checked={checked}
       onChange={onChange}
-      description={keepMode ? "Saves the password you enter now." : "Opens this vault when Conduit starts, without the password."}
+      description={keepMode ? __tr("Saves the password you enter now.") : __tr("Opens this vault when Conduit starts, without the password.")}
     >
-      <span className="font-medium text-ink">{keepMode ? "Keep unlocking automatically at startup" : "Unlock automatically at startup"}</span>
+      <span className="font-medium text-ink">{keepMode ? __tr("Keep unlocking automatically at startup") : __tr("Unlock automatically at startup")}</span>
     </Checkbox>
   );
 }

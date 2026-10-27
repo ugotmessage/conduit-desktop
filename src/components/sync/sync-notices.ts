@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { toast, type ToastAction } from "../common/Toast";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -29,24 +30,24 @@ export function transientToast(notice: TransientNotice): NoticeToast {
       const provider = param(notice, "provider");
       const name = param(notice, "name");
       const who = provider ? `${providerName(provider)} made` : "your cloud drive made";
-      return { type: "info", title: `Merged changes from a copy ${who}.`, message: name ? `'${baseName(name)}'` : undefined, action: "other-copies" };
+      return { type: "info", title: __tr("Merged changes from a copy {v0}.", { v0: (who) }), message: name ? `'${baseName(name)}'` : undefined, action: "other-copies" };
     }
     case "rebound":
-      return { type: "info", title: "Found the vault file under its new name.", message: param(notice, "to") ?? undefined, action: "undo-rebind" };
+      return { type: "info", title: __tr("Found the vault file under its new name."), message: param(notice, "to") ?? undefined, action: "undo-rebind" };
     case "side-files-reminder":
-      return { type: "warning", title: "Syncing is paused until the older Conduit is closed." };
+      return { type: "warning", title: __tr("Syncing is paused until the older Conduit is closed.") };
     case "regression-backoff":
-      return { type: "warning", title: "Your cloud drive keeps restoring an older copy.", message: "Your changes are safe on this device." };
+      return { type: "warning", title: __tr("Your cloud drive keeps restoring an older copy."), message: __tr("Your changes are safe on this device.") };
     case "network-root":
-      return { type: "info", title: "Sync data is on a network drive, so Conduit uses a slower safe mode." };
+      return { type: "info", title: __tr("Sync data is on a network drive, so Conduit uses a slower safe mode.") };
     case "dev-collision":
-      return { type: "info", title: "Conduit fixed a copied device identity." };
+      return { type: "info", title: __tr("Conduit fixed a copied device identity.") };
     case "publish-failed":
-      return { type: "warning", title: "Could not save to the shared file. Will retry." };
+      return { type: "warning", title: __tr("Could not save to the shared file. Will retry.") };
     case "content-repaired":
-      return { type: "info", title: "Updated the shared file for older Conduit apps." };
+      return { type: "info", title: __tr("Updated the shared file for older Conduit apps.") };
     case "pending-at-start":
-      return { type: "info", title: `${plural(Math.max(1, countParam(notice)), "change")} exist only on this device.` };
+      return { type: "info", title: __tr("{v0} exist only on this device.", { v0: (plural(Math.max(1, countParam(notice)), "change")) }) };
   }
 }
 
@@ -60,9 +61,9 @@ export function persistedToast(notice: LocalNotice): NoticeToast | null {
 async function undoRebind(): Promise<void> {
   try {
     const ok = await syncApi.undoRebind();
-    if (!ok) toast.info("Nothing to undo.");
+    if (!ok) toast.info(__tr("Nothing to undo."));
   } catch (err) {
-    toast.error("Could not undo", errorText(err, "Try again."));
+    toast.error(__tr("Could not undo"), errorText(err, __tr("Try again.")));
   }
 }
 
@@ -70,11 +71,11 @@ function actionsFor(t: NoticeToast, notice: LocalNotice | TransientNotice): Toas
   const store = useSyncStore.getState();
   switch (t.action) {
     case "undo-rebind":
-      return [{ label: "Undo", variant: "primary", onClick: () => void undoRebind() }];
+      return [{ label: __tr("Undo"), variant: "primary", onClick: () => void undoRebind() }];
     case "other-copies":
-      return [{ label: "Show copies", onClick: () => store.openView({ kind: "other-copies" }) }];
+      return [{ label: __tr("Show copies"), onClick: () => store.openView({ kind: "other-copies" }) }];
     case "mass-change":
-      return [{ label: "Review", variant: "primary", onClick: () => store.openView({ kind: "mass-change", noticeId: notice.id }) }];
+      return [{ label: __tr("Review"), variant: "primary", onClick: () => store.openView({ kind: "mass-change", noticeId: notice.id }) }];
     default:
       return undefined;
   }

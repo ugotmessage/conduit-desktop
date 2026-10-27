@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect, useState } from "react";
 import { invoke } from "../../../lib/electron";
 import { errorText } from "../../../lib/errorText";
@@ -35,11 +36,11 @@ export default function UpdatesSetting() {
     try {
       const result = await invoke<UpdateCheckResult | null>("updater_set_beta_updates", { enabled });
       setInfo({ ...info, betaUpdates: enabled });
-      if (!enabled) toast.success("Beta updates are off");
+      if (!enabled) toast.success(__tr("Beta updates are off"));
       else if (result) showCheckResult(result, info.version);
-      else toast.success("Beta updates are on", "You'll get the next beta when it comes out.");
+      else toast.success(__tr("Beta updates are on"), __tr("You'll get the next beta when it comes out."));
     } catch (err) {
-      toast.error("Couldn't change beta updates", errorText(err, "Try again."));
+      toast.error(__tr("Couldn't change beta updates"), errorText(err, __tr("Try again.")));
     } finally {
       setSwitching(false);
     }
@@ -51,7 +52,7 @@ export default function UpdatesSetting() {
       const result = await invoke<UpdateCheckResult | null>("force_check_for_updates");
       showCheckResult(result, info?.version ?? "");
     } catch (err) {
-      toast.error("Couldn't check for updates", errorText(err, "Try again."));
+      toast.error(__tr("Couldn't check for updates"), errorText(err, __tr("Try again.")));
     } finally {
       setChecking(false);
     }
@@ -59,9 +60,9 @@ export default function UpdatesSetting() {
 
   return (
     <div>
-      <SectionHeader title="Updates" />
+      <SectionHeader title={__tr("Updates")} />
       <SettingsRow
-        title="Version"
+        title={__tr("Version")}
         description={
           <span className="flex items-center gap-2">
             <span>{info?.version ?? ""}</span>
@@ -70,12 +71,11 @@ export default function UpdatesSetting() {
         }
       >
         <Button size="sm" onClick={() => void checkNow()} loading={checking} loadingLabel="Checking...">
-          Check for updates
-        </Button>
+          {__tr("Check for updates")}</Button>
       </SettingsRow>
       <SettingsRow
-        title="Get beta updates"
-        description="Try new features early. Beta builds use your normal account and data."
+        title={__tr("Get beta updates")}
+        description={__tr("Try new features early. Beta builds use your normal account and data.")}
         toggle={
           <Switch
             checked={info?.betaUpdates ?? false}
@@ -85,7 +85,7 @@ export default function UpdatesSetting() {
         }
       >
         {info?.isPrerelease && !info.betaUpdates && (
-          <p className="text-label text-ink-muted">You'll move to the next regular release when it comes out.</p>
+          <p className="text-label text-ink-muted">{__tr("You'll move to the next regular release when it comes out.")}</p>
         )}
       </SettingsRow>
     </div>

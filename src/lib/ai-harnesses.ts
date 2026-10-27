@@ -1,3 +1,4 @@
+import { t as __tr } from "./i18n";
 export type EngineType =
   | "claude-code"
   | "codex"
@@ -32,7 +33,7 @@ const HARNESSES: Record<EngineType, AiHarnessInfo> = {
   "claude-code": {
     id: "claude-code",
     name: "Claude Code",
-    description: "Anthropic's coding agent. Uses your Claude subscription.",
+    description: __tr("Anthropic's coding agent. Uses your Claude subscription."),
     cli: "claude",
     loginHintInstalled: "Authenticated via claude login",
     loginHintMissing: "Run 'claude login' in your terminal to authenticate",
@@ -40,7 +41,7 @@ const HARNESSES: Record<EngineType, AiHarnessInfo> = {
   codex: {
     id: "codex",
     name: "Codex",
-    description: "OpenAI's coding agent. Uses your ChatGPT or API plan.",
+    description: __tr("OpenAI's coding agent. Uses your ChatGPT or API plan."),
     cli: "codex",
     loginHintInstalled: "Authenticated via codex login",
     loginHintMissing: "Run 'codex login' in your terminal to authenticate",
@@ -48,7 +49,7 @@ const HARNESSES: Record<EngineType, AiHarnessInfo> = {
   grok: {
     id: "grok",
     name: "Grok Build",
-    description: "xAI's coding agent. Uses your Grok / xAI plan.",
+    description: __tr("xAI's coding agent. Uses your Grok / xAI plan."),
     cli: "grok",
     loginHintInstalled: "Authenticated via grok login",
     loginHintMissing: "Run 'grok login' in your terminal to authenticate",
@@ -56,7 +57,7 @@ const HARNESSES: Record<EngineType, AiHarnessInfo> = {
   cursor: {
     id: "cursor",
     name: "Cursor Agent",
-    description: "Cursor's terminal agent. Uses your Cursor subscription.",
+    description: __tr("Cursor's terminal agent. Uses your Cursor subscription."),
     cli: "cursor-agent",
     loginHintInstalled: "Authenticated via cursor-agent login",
     loginHintMissing: "Run 'cursor-agent login' in your terminal to authenticate",
@@ -64,7 +65,7 @@ const HARNESSES: Record<EngineType, AiHarnessInfo> = {
   openclaw: {
     id: "openclaw",
     name: "OpenClaw",
-    description: "OpenClaw's local TUI agent. Uses your configured providers.",
+    description: __tr("OpenClaw's local TUI agent. Uses your configured providers."),
     cli: "openclaw",
     loginHintInstalled: "Configured via openclaw onboard",
     loginHintMissing: "Run 'openclaw onboard' in your terminal to set up",
@@ -72,7 +73,7 @@ const HARNESSES: Record<EngineType, AiHarnessInfo> = {
   gemini: {
     id: "gemini",
     name: "Gemini CLI",
-    description: "Google's coding agent. Uses your Gemini / Google plan.",
+    description: __tr("Google's coding agent. Uses your Gemini / Google plan."),
     cli: "gemini",
     loginHintInstalled: "Authenticated via Gemini CLI sign-in",
     loginHintMissing: "Run 'gemini' and sign in when prompted",
@@ -80,7 +81,7 @@ const HARNESSES: Record<EngineType, AiHarnessInfo> = {
   copilot: {
     id: "copilot",
     name: "GitHub Copilot",
-    description: "GitHub's terminal coding agent. Uses your Copilot plan.",
+    description: __tr("GitHub's terminal coding agent. Uses your Copilot plan."),
     cli: "copilot",
     loginHintInstalled: "Authenticated via copilot login",
     loginHintMissing: "Run 'copilot login' in your terminal to authenticate",
@@ -88,7 +89,7 @@ const HARNESSES: Record<EngineType, AiHarnessInfo> = {
   opencode: {
     id: "opencode",
     name: "OpenCode",
-    description: "Open-source terminal coding agent. Bring your own provider.",
+    description: __tr("Open-source terminal coding agent. Bring your own provider."),
     cli: "opencode",
     loginHintInstalled: "Configured via opencode auth",
     loginHintMissing: "Run 'opencode auth' in your terminal to add a provider",

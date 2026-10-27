@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import {
   TerminalIcon,
   DesktopIcon,
@@ -32,27 +33,27 @@ export interface TypeCategory {
 
 export const ENTRY_TYPE_CATEGORIES: readonly TypeCategory[] = [
   {
-    label: "Connections",
+    label: __tr("Connections"),
     items: [
-      { type: "ssh", label: "SSH", description: "Terminal", icon: TerminalIcon, iconName: "terminal", color: "text-entry-ssh" },
-      { type: "rdp", label: "RDP", description: "Remote Desktop", icon: DesktopIcon, iconName: "desktop", color: "text-entry-rdp" },
-      { type: "vnc", label: "VNC", description: "Screen Share", icon: ServerAltIcon, iconName: "serverAlt", color: "text-entry-vnc" },
-      { type: "web", label: "Web", description: "Browser Session", icon: GlobeIcon, iconName: "globe", color: "text-entry-web" },
+      { type: "ssh", label: "SSH", description: __tr("Terminal"), icon: TerminalIcon, iconName: "terminal", color: "text-entry-ssh" },
+      { type: "rdp", label: "RDP", description: __tr("Remote Desktop"), icon: DesktopIcon, iconName: "desktop", color: "text-entry-rdp" },
+      { type: "vnc", label: "VNC", description: __tr("Screen Share"), icon: ServerAltIcon, iconName: "serverAlt", color: "text-entry-vnc" },
+      { type: "web", label: __tr("Web"), description: __tr("Browser Session"), icon: GlobeIcon, iconName: "globe", color: "text-entry-web" },
     ],
   },
   {
-    label: "Documents",
-    items: [{ type: "document", label: "Document", description: "Markdown", icon: FileTextIcon, iconName: "fileText", color: "text-entry-document" }],
+    label: __tr("Documents"),
+    items: [{ type: "document", label: __tr("Document"), description: "Markdown", icon: FileTextIcon, iconName: "fileText", color: "text-entry-document" }],
   },
   {
-    label: "Automation",
-    items: [{ type: "command", label: "Command", description: "Run As User", icon: PlayerPlayIcon, iconName: "playerPlay", color: "text-entry-command" }],
+    label: __tr("Automation"),
+    items: [{ type: "command", label: __tr("Command"), description: __tr("Run As User"), icon: PlayerPlayIcon, iconName: "playerPlay", color: "text-entry-command" }],
   },
   {
-    label: "Credentials",
+    label: __tr("Credentials"),
     items: [
-      { type: "credential", label: "Password", description: "Username & password", icon: KeyIcon, iconName: "key", color: "text-entry-credential", credentialType: "generic" },
-      { type: "credential", label: "SSH Key", description: "Key pair & fingerprint", icon: ShieldLockIcon, iconName: "shieldLock", color: "text-entry-sshkey", credentialType: "ssh_key" },
+      { type: "credential", label: __tr("Password"), description: __tr("Username & password"), icon: KeyIcon, iconName: "key", color: "text-entry-credential", credentialType: "generic" },
+      { type: "credential", label: __tr("SSH Key"), description: __tr("Key pair & fingerprint"), icon: ShieldLockIcon, iconName: "shieldLock", color: "text-entry-sshkey", credentialType: "ssh_key" },
     ],
   },
 ];

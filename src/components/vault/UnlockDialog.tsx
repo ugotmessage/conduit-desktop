@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useRef } from "react";
 import { useVaultStore, type UnlockOptions } from "../../stores/vaultStore";
 import { useAuthStore } from "../../stores/authStore";
@@ -215,7 +216,7 @@ export default function UnlockDialog({ onSuccess, onCancel }: UnlockDialogProps)
             await enableCloudSync();
           } catch (err) {
             console.error("[vault] Failed to enable cloud backup:", err);
-            toast.error("Could not turn on cloud backup", errorText(err, "Try again in Settings > Backup."));
+            toast.error(__tr("Could not turn on cloud backup"), errorText(err, __tr("Try again in Settings > Backup.")));
           }
         }
       } else {
@@ -287,7 +288,7 @@ export default function UnlockDialog({ onSuccess, onCancel }: UnlockDialogProps)
   return (
     <Dialog
       open
-      title={isInitializing ? "Create Vault" : "Unlock Vault"}
+      title={isInitializing ? __tr("Create Vault") : __tr("Unlock Vault")}
       icon="lock"
       width={384}
       hideClose
@@ -295,9 +296,9 @@ export default function UnlockDialog({ onSuccess, onCancel }: UnlockDialogProps)
       onSubmit={(e) => void handleSubmit(e)}
       footer={
         <>
-          <Button onClick={cancel}>Cancel</Button>
+          <Button onClick={cancel}>{__tr("Cancel")}</Button>
           <Button type="submit" variant="primary" disabled={!canSubmit} loading={isLoading} loadingLabel="Please wait...">
-            {isInitializing ? "Create Vault" : "Unlock"}
+            {isInitializing ? __tr("Create Vault") : __tr("Unlock")}
           </Button>
         </>
       }
@@ -312,12 +313,12 @@ export default function UnlockDialog({ onSuccess, onCancel }: UnlockDialogProps)
           {!choice.keepMode && (
             <p className="text-body text-ink-muted">
               {isInitializing
-                ? "Set a master password to protect your credentials"
+                ? __tr("Set a master password to protect your credentials")
                 : biometricUnlockInProgress
-                ? "Authenticating..."
+                ? __tr("Authenticating...")
                 : takeoverMode
-                ? "Unlock to use this vault here. It locks on the other device."
-                : (choice.afterLockLine ?? "Enter your master password to access credentials")}
+                ? __tr("Unlock to use this vault here. It locks on the other device.")
+                : (choice.afterLockLine ?? __tr("Enter your master password to access credentials"))}
             </p>
           )}
         </div>
@@ -332,19 +333,19 @@ export default function UnlockDialog({ onSuccess, onCancel }: UnlockDialogProps)
         />
       )}
 
-      <FormField label="Master Password">
+      <FormField label={__tr("Master Password")}>
         <TextInput
           type={passwordType}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter master password"
+          placeholder={__tr("Enter master password")}
           autoFocus={!biometricEnabled}
           disabled={biometricUnlockInProgress}
           trailing={
             <IconButton
               size="sm"
               icon={showPassword ? "eyeOff" : "eye"}
-              label={showPassword ? "Hide password" : "Show password"}
+              label={showPassword ? __tr("Hide password") : __tr("Show password")}
               onClick={() => setShowPassword(!showPassword)}
             />
           }
@@ -353,18 +354,18 @@ export default function UnlockDialog({ onSuccess, onCancel }: UnlockDialogProps)
 
       {!isInitializing && biometricAvailable && biometricEnabled && (
         <Button icon="fingerprint" fullWidth size="lg" onClick={handleBiometricUnlock} disabled={biometricUnlockInProgress}>
-          {biometricUnlockInProgress ? "Authenticating..." : "Quick Unlock"}
+          {biometricUnlockInProgress ? __tr("Authenticating...") : __tr("Quick Unlock")}
         </Button>
       )}
 
       {isInitializing && (
         <>
-          <FormField label="Confirm Password" error={confirmMismatch ? "Passwords do not match" : undefined}>
+          <FormField label={__tr("Confirm Password")} error={confirmMismatch ? "Passwords do not match" : undefined}>
             <TextInput
               type={passwordType}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm master password"
+              placeholder={__tr("Confirm master password")}
               invalid={confirmMismatch}
             />
           </FormField>
@@ -372,12 +373,11 @@ export default function UnlockDialog({ onSuccess, onCancel }: UnlockDialogProps)
             <Checkbox
               checked={cloudBackup}
               onChange={setCloudBackup}
-              description="End-to-end encrypted with AES-256-GCM. Your master password never leaves this device."
+              description={__tr("End-to-end encrypted with AES-256-GCM. Your master password never leaves this device.")}
             >
               <span className="inline-flex items-center gap-1.5 font-medium text-ink">
                 <CloudIcon size={16} className="text-info" />
-                Back up to the cloud
-              </span>
+                {__tr("Back up to the cloud")}</span>
             </Checkbox>
           )}
         </>
@@ -391,8 +391,7 @@ export default function UnlockDialog({ onSuccess, onCancel }: UnlockDialogProps)
           actions={
             lineRetryable && lineError ? (
               <Button variant="link" size="sm" onClick={() => void handleRetry({ password: null, opts: {} })} disabled={retrying}>
-                Try Again
-              </Button>
+                {__tr("Try Again")}</Button>
             ) : undefined
           }
         >

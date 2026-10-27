@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEntryStore } from "../../../stores/entryStore";
 import { toast } from "../../common/Toast";
 
@@ -11,14 +12,14 @@ export async function copyPassword(entryId: string): Promise<void> {
     password = null;
   }
   if (!password) {
-    toast.error("No password available");
+    toast.error(__tr("No password available"));
     return;
   }
   try {
     await navigator.clipboard.writeText(password);
-    toast.success("Password copied");
+    toast.success(__tr("Password copied"));
   } catch (err) {
     console.warn("[home] clipboard write failed:", err);
-    toast.error("Couldn't copy the password");
+    toast.error(__tr("Couldn't copy the password"));
   }
 }

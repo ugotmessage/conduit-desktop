@@ -1,8 +1,9 @@
+import { t as __tr } from "../lib/i18n";
 export type CredentialType = 'generic' | 'ssh_key';
 
 export const CREDENTIAL_TYPES: Record<CredentialType, { label: string; description: string }> = {
-  generic: { label: 'Generic', description: 'Username, password, domain, private key' },
-  ssh_key: { label: 'SSH Key', description: 'SSH key pair with public key and fingerprint' },
+  generic: { label: __tr("Generic"), description: __tr("Username, password, domain, private key") },
+  ssh_key: { label: __tr("SSH Key"), description: __tr("SSH key pair with public key and fingerprint") },
 };
 
 /** Resolve a raw credential_type string to a known type. Falls back to 'generic'. */

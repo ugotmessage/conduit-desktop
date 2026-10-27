@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { useAuthStore } from "../../stores/authStore";
 import type { OpenErrorPayload } from "../../types/sync";
@@ -12,7 +13,7 @@ interface NotOwnerDialogProps {
   onCancel: () => void;
 }
 
-export const NOT_OWNER_TITLE = "This vault belongs to another account";
+export const NOT_OWNER_TITLE = __tr("This vault belongs to another account");
 
 /** S4 body; S8b when this account released the vault earlier. */
 export function notOwnerBody(payload: NotOwner): string {
@@ -31,11 +32,10 @@ function OfflineNotOwner({ onCancel }: { onCancel: () => void }) {
       onEscape={onCancel}
       footer={
         <DialogButton variant="primary" onClick={onCancel} autoFocus>
-          OK
-        </DialogButton>
+          {__tr("OK")}</DialogButton>
       }
     >
-      <p className="text-ink">Connect to the internet so Conduit can check who owns this vault, then try again.</p>
+      <p className="text-ink">{__tr("Connect to the internet so Conduit can check who owns this vault, then try again.")}</p>
     </SyncDialogFrame>
   );
 }
@@ -74,26 +74,24 @@ export default function NotOwnerDialog({ payload, onCancel }: NotOwnerDialogProp
       onEscape={onCancel}
       footer={
         <>
-          <DialogButton onClick={switchTo} disabled={busy}>Switch account</DialogButton>
-          <DialogButton onClick={openTeamTrial} disabled={busy}>Try Team free</DialogButton>
-          <DialogButton onClick={onCancel} disabled={busy}>Cancel</DialogButton>
+          <DialogButton onClick={switchTo} disabled={busy}>{__tr("Switch account")}</DialogButton>
+          <DialogButton onClick={openTeamTrial} disabled={busy}>{__tr("Try Team free")}</DialogButton>
+          <DialogButton onClick={onCancel} disabled={busy}>{__tr("Cancel")}</DialogButton>
           {ticket !== null && (
             <DialogButton variant="primary" onClick={() => void copy()} loading={busy} loadingLabel="Making your copy..." autoFocus>
-              Make my own copy
-            </DialogButton>
+              {__tr("Make my own copy")}</DialogButton>
           )}
         </>
       }
     >
       <p className="text-ink">{notOwnerBody(payload)}</p>
       {email && (
-        <p>You're signed in as {email}. If this is your vault, sign in with the account you use on your other devices.</p>
+        <p>{__tr("You're signed in as")} {email}{__tr(". If this is your vault, sign in with the account you use on your other devices.")}</p>
       )}
       <p>
-        Made a copy on another device already?{" "}
+        {__tr("Made a copy on another device already?")}{" "}
         <Button variant="link" size="sm" onClick={openOther} disabled={busy}>
-          Open a vault...
-        </Button>
+          {__tr("Open a vault...")}</Button>
       </p>
     </SyncDialogFrame>
   );

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useRef, useState } from "react";
 import { ChevronDownIcon } from "../../lib/icons";
 import { getHarness } from "../../lib/ai-harnesses";
@@ -26,7 +27,7 @@ export default function PaneEngineSwitcher({ engineType, focused, onSelect }: Pr
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        title={`Switch this agent's engine (${name})`}
+        title={__tr("Switch this agent's engine ({v0})", { v0: (name) })}
         className={cx(
           "flex h-5 min-w-0 items-center gap-1.5 rounded px-1 text-label hover:bg-hover hover:text-ink",
           focused ? "text-ink" : "text-ink-muted",

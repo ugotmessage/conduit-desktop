@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect } from "react";
 import { invoke, listenSync } from "../../lib/electron";
 import { useSyncStore } from "../../stores/syncStore";
@@ -29,7 +30,7 @@ function onDisplaced(ev: DisplacedEvent): void {
   useEntryStore.getState().clearSelection();
   useEntryStore.setState({ entries: [], folders: [] });
   if (ev.reason === "yielded") {
-    toast.info("Vault locked on this device.", `It stays open on ${deviceNameOr(ev.byDeviceName)}.`);
+    toast.info(__tr("Vault locked on this device."), __tr("It stays open on {v0}.", { v0: (deviceNameOr(ev.byDeviceName)) }));
     return;
   }
   useSyncStore.getState().setDisplaced(ev);

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useEntryStore } from "../../stores/entryStore";
 import MarkdownRenderer from "../markdown/MarkdownRenderer";
@@ -105,7 +106,7 @@ export default function DocumentView({ entryId, isActive, onDirtyChange }: Docum
   if (!entry) {
     return (
       <div className="flex-1 flex items-center justify-center bg-editor">
-        <p className="text-ink-faint">Document not found</p>
+        <p className="text-ink-faint">{__tr("Document not found")}</p>
       </div>
     );
   }
@@ -122,10 +123,9 @@ export default function DocumentView({ entryId, isActive, onDirtyChange }: Docum
         <div className="flex items-center gap-3 px-4 py-2 border-b border-divider bg-editor">
           <FileTextIcon size={16} className="text-entry-document" />
           <span className="text-body font-semibold text-ink truncate flex-1">{entry.name}</span>
-          <span className="text-meta text-ink-faint">{wordCount} words</span>
+          <span className="text-meta text-ink-faint">{wordCount} {__tr("words")}</span>
           <Button size="sm" variant="primary" icon={PencilIcon} onClick={handleEdit}>
-            Edit
-          </Button>
+            {__tr("Edit")}</Button>
         </div>
 
         {article && <ArticleHeader entry={entry} kb={article.kb} />}
@@ -139,10 +139,9 @@ export default function DocumentView({ entryId, isActive, onDirtyChange }: Docum
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-ink-faint">
               <FileTextIcon size={48} stroke={1} className="mb-3 opacity-30" />
-              <p className="text-body">This document is empty</p>
+              <p className="text-body">{__tr("This document is empty")}</p>
               <Button variant="link" className="mt-3" onClick={handleEdit}>
-                Start writing
-              </Button>
+                {__tr("Start writing")}</Button>
             </div>
           )}
         </div>
@@ -159,16 +158,14 @@ export default function DocumentView({ entryId, isActive, onDirtyChange }: Docum
           <FileTextIcon size={16} className="text-entry-document" />
           <span className="text-body font-semibold text-ink truncate">{entry.name}</span>
           {isDirty && (
-            <span className="text-meta text-warning font-semibold">Unsaved changes</span>
+            <span className="text-meta text-warning font-semibold">{__tr("Unsaved changes")}</span>
           )}
           <div className="flex-1" />
-          <span className="text-meta text-ink-faint">{wordCount} words</span>
+          <span className="text-meta text-ink-faint">{wordCount} {__tr("words")}</span>
           <Button size="sm" variant="ghost" icon={CloseIcon} onClick={handleCancel}>
-            Cancel
-          </Button>
+            {__tr("Cancel")}</Button>
           <Button size="sm" variant="primary" icon={FloppyIcon} onClick={handleSave}>
-            Save
-          </Button>
+            {__tr("Save")}</Button>
         </div>
 
         {/* Split pane */}
@@ -198,7 +195,7 @@ export default function DocumentView({ entryId, isActive, onDirtyChange }: Docum
               ref={textareaRef}
               value={draftContent}
               onChange={(e) => setDraftContent(e.target.value)}
-              placeholder="Write markdown..."
+              placeholder={__tr("Write markdown...")}
               autoFocus
               className="flex-1 w-full px-4 py-3 bg-transparent text-body text-ink resize-none font-mono"
             />
@@ -206,11 +203,11 @@ export default function DocumentView({ entryId, isActive, onDirtyChange }: Docum
 
           {/* Preview pane */}
           <div className="flex-1 overflow-y-auto p-4 min-w-0 allow-select">
-            <div className="text-meta font-semibold text-ink-muted mb-2">Preview</div>
+            <div className="text-meta font-semibold text-ink-muted mb-2">{__tr("Preview")}</div>
             {draftContent.trim() ? (
               <MarkdownRenderer content={draftContent} />
             ) : (
-              <p className="text-body text-ink-faint italic">Nothing to preview</p>
+              <p className="text-body text-ink-faint italic">{__tr("Nothing to preview")}</p>
             )}
           </div>
         </div>
@@ -218,9 +215,9 @@ export default function DocumentView({ entryId, isActive, onDirtyChange }: Docum
 
       {showCloseConfirm && (
         <ConfirmDialog
-          title="Unsaved Changes"
-          message="You have unsaved changes. Are you sure you want to discard them?"
-          confirmLabel="Discard"
+          title={__tr("Unsaved Changes")}
+          message={__tr("You have unsaved changes. Are you sure you want to discard them?")}
+          confirmLabel={__tr("Discard")}
           variant="danger"
           onConfirm={handleConfirmDiscard}
           onCancel={() => setShowCloseConfirm(false)}

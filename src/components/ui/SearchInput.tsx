@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useRef, type ComponentPropsWithRef } from "react";
 import { SearchIcon } from "../../lib/icons";
 import { cx } from "./cx";
@@ -41,7 +42,7 @@ export function SearchInput({ value, onChange, onClear, wrapperClassName, classN
         <IconButton
           size="sm"
           icon="close"
-          label="Clear search"
+          label={__tr("Clear search")}
           onClick={() => {
             onChange("");
             onClear?.();

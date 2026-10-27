@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useRef, useMemo } from "react";
 import type { CredentialMeta } from "../../types/credential";
 import { resolveCredentialType, CREDENTIAL_TYPES } from "../../types/credential";
@@ -68,7 +69,7 @@ export default function PickerCredentialList({ credentials, onSelect }: PickerCr
           ref={searchRef}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search credentials..."
+          placeholder={__tr("Search credentials...")}
           leading={<SearchIcon size={16} />}
         />
       </div>
@@ -76,7 +77,7 @@ export default function PickerCredentialList({ credentials, onSelect }: PickerCr
       {/* Credential list */}
       {filtered.length === 0 ? (
         <div className="flex flex-1 items-center justify-center text-body text-ink-muted">
-          {search ? "No matches" : "No credentials"}
+          {search ? __tr("No matches") : __tr("No credentials")}
         </div>
       ) : (
         <div ref={listRef} className="flex-1 overflow-y-auto p-1">

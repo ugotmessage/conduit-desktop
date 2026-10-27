@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { useAuthStore } from "../../stores/authStore";
 import { useSyncStore } from "../../stores/syncStore";
@@ -19,7 +20,7 @@ export function NotOwnerLockBanner() {
     <SyncBanner
       tone="lock"
       text="This vault belongs to another Conduit account. Your open connections keep running."
-      actions={[{ label: "Close vault", onClick: closeVault }]}
+      actions={[{ label: __tr("Close vault"), onClick: closeVault }]}
     />
   );
 }
@@ -31,8 +32,8 @@ export function UpdateRequiredLockBanner() {
       tone="lock"
       text="Update Conduit to use this vault. Your open connections keep running."
       actions={[
-        { label: "Update Conduit", primary: true, onClick: () => void updateConduit() },
-        { label: "Close vault", onClick: closeVault },
+        { label: __tr("Update Conduit"), primary: true, onClick: () => void updateConduit() },
+        { label: __tr("Close vault"), onClick: closeVault },
       ]}
     />
   );
@@ -76,11 +77,11 @@ function GraceBanner({ lineageId, untilMs, canCopy }: { lineageId: string; until
       tone="warn"
       text={`This vault belongs to another Conduit account. You can use it until ${formatShortDate(untilMs)}. The owner can move it into a Team vault and invite you.${signedIn}`}
       actions={[
-        { label: "Switch account", onClick: () => void switchAccount() },
-        { label: "Later", onClick: dismiss },
-        { label: "Try Team free", onClick: openTeamTrial },
+        { label: __tr("Switch account"), onClick: () => void switchAccount() },
+        { label: __tr("Later"), onClick: dismiss },
+        { label: __tr("Try Team free"), onClick: openTeamTrial },
         // A private vault has no working copy to fork while open.
-        ...(canCopy ? [{ label: "Make my own copy", primary: true, onClick: () => void makeOwnCopyWhileOpen(vaultPath) }] : []),
+        ...(canCopy ? [{ label: __tr("Make my own copy"), primary: true, onClick: () => void makeOwnCopyWhileOpen(vaultPath) }] : []),
       ]}
     />
   );
@@ -96,9 +97,9 @@ function SharedBanner({ lineageId, ownership }: { lineageId: string; ownership: 
       tone="info"
       text={`Another Conduit account is using this vault until ${formatShortDate(ownership.sharedUntilMs)}.${tooSoon && ownership.releaseAfterMs !== null ? ` ${releaseAfterText(ownership.releaseAfterMs)}` : ""}`}
       actions={[
-        { label: "Later", onClick: dismiss },
-        { label: "Try Team free", onClick: openTeamTrial },
-        { label: "Release this vault...", primary: true, disabled: tooSoon, onClick: () => useSyncStore.getState().setReleaseDialogOpen(true) },
+        { label: __tr("Later"), onClick: dismiss },
+        { label: __tr("Try Team free"), onClick: openTeamTrial },
+        { label: __tr("Release this vault..."), primary: true, disabled: tooSoon, onClick: () => useSyncStore.getState().setReleaseDialogOpen(true) },
       ]}
     />
   );

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEntryStore } from "../../../stores/entryStore";
 import { openDashboardForEntry } from "../../../lib/openDashboard";
 import { getEntryColor, getEntryIcon } from "../../entries/entryIcons";
@@ -53,15 +54,15 @@ function FolderEntryRow({ item, lastConnected, reachability }: { item: FolderLis
             <IconButton
               size="sm"
               icon="plug"
-              label="Check if it is up"
+              label={__tr("Check if it is up")}
               disabled={reachability.checking.has(entry.id)}
               onClick={() => void reachability.check(entry.id)}
             />
           )}
           {entry.entry_type !== "credential" && (
-            <IconButton size="sm" icon="playerPlay" label="Open" onClick={() => openItem(item)} />
+            <IconButton size="sm" icon="playerPlay" label={__tr("Open")} onClick={() => openItem(item)} />
           )}
-          <IconButton size="sm" icon="infoCircle" label="View info" onClick={() => openDashboardForEntry(entry.id)} />
+          <IconButton size="sm" icon="infoCircle" label={__tr("View info")} onClick={() => openDashboardForEntry(entry.id)} />
         </>
       }
     >
@@ -73,7 +74,7 @@ function FolderEntryRow({ item, lastConnected, reachability }: { item: FolderLis
 /** The folder view's recursive entry list (docs/DASHBOARD.md 5). */
 export default function FolderEntryList({ items, lastConnected, reachability }: FolderEntryListProps) {
   if (items.length === 0) {
-    return <p className="py-6 text-center text-label text-ink-faint">No entries match your search</p>;
+    return <p className="py-6 text-center text-label text-ink-faint">{__tr("No entries match your search")}</p>;
   }
   return (
     <div className="space-y-px" data-cv-folder-list="">

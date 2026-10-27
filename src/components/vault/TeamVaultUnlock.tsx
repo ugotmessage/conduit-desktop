@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { useVaultStore } from "../../stores/vaultStore";
 import ProVaultLockDialog from "./ProVaultLockDialog";
@@ -90,25 +91,24 @@ export default function TeamVaultUnlock({
   const footer =
     status === "error" ? (
       <>
-        <Button onClick={onCancel}>Cancel</Button>
+        <Button onClick={onCancel}>{__tr("Cancel")}</Button>
         <Button variant="primary" onClick={handleRetry}>
-          Try Again
-        </Button>
+          {__tr("Try Again")}</Button>
       </>
     ) : status === "connecting" ? (
-      <Button onClick={onCancel}>Cancel</Button>
+      <Button onClick={onCancel}>{__tr("Cancel")}</Button>
     ) : undefined;
 
   return (
-    <Dialog open title="Team Vault" icon="lock" width={400} hideClose closeOnEscape={false} onClose={onCancel} footer={footer}>
+    <Dialog open title={__tr("Team Vault")} icon="lock" width={400} hideClose closeOnEscape={false} onClose={onCancel} footer={footer}>
       <p className="-mt-2 pl-9 text-body text-ink-secondary">{vaultName}</p>
 
       {status === "connecting" && (
         <div className="flex flex-col items-center gap-3 py-6">
           <Spinner size={24} className="text-ink-muted" />
           <div className="text-center">
-            <p className="text-body text-ink">Connecting to team vault...</p>
-            <p className="mt-1 text-label text-ink-muted">Decrypting vault key with your identity</p>
+            <p className="text-body text-ink">{__tr("Connecting to team vault...")}</p>
+            <p className="mt-1 text-label text-ink-muted">{__tr("Decrypting vault key with your identity")}</p>
           </div>
         </div>
       )}

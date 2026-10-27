@@ -1,3 +1,4 @@
+import { t as __tr } from "./i18n";
 import { useSessionStore } from "../stores/sessionStore";
 import { useEntryStore } from "../stores/entryStore";
 import { KNOWLEDGE_SESSION_ID, KNOWLEDGE_TITLE, entryInfoSessionId, folderViewSessionId } from "./dashboardSessions";
@@ -17,7 +18,7 @@ export function openDashboardForEntry(entryId: string): void {
   addSession({
     id: dashboardSessionId,
     type: "dashboard",
-    title: `${entry.name} (Info)`,
+    title: __tr("{v0} (Info)", { v0: (entry.name) }),
     status: "connected",
     entryId,
   });

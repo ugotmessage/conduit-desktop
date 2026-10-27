@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { invoke, listen, listenSync } from "../../lib/electron";
 import { useWebTabStore, type WebTabInfo } from "../../stores/webTabStore";
@@ -536,17 +537,17 @@ export default function WebView({ sessionId, entryId, isActive = true }: WebView
       const { downloadId, filename, totalBytes } = event.payload;
       const sizeStr = totalBytes > 0 ? formatFileSize(totalBytes) : "Unknown size";
 
-      const promptToastId = toast.info(`Download: ${filename}`, {
+      const promptToastId = toast.info(__tr("Download: {v0}", { v0: (filename) }), {
         message: sizeStr,
         persistent: true,
         dismissOnAction: true,
         actions: [
           {
-            label: "Open",
+            label: __tr("Open"),
             variant: "primary",
             onClick: () => {
               invoke("web_download_respond", { downloadId, action: "open" }).catch((err) => {
-                toast.error("Download failed", String(err));
+                toast.error(__tr("Download failed"), String(err));
               });
               const entry = downloadMapRef.current.get(downloadId);
               if (entry) entry.action = "open";
@@ -554,10 +555,10 @@ export default function WebView({ sessionId, entryId, isActive = true }: WebView
             },
           },
           {
-            label: "Save As",
+            label: __tr("Save As"),
             onClick: () => {
               invoke("web_download_respond", { downloadId, action: "save_as" }).catch((err) => {
-                toast.error("Download failed", String(err));
+                toast.error(__tr("Download failed"), String(err));
               });
               const entry = downloadMapRef.current.get(downloadId);
               if (entry) entry.action = "save";
@@ -565,7 +566,7 @@ export default function WebView({ sessionId, entryId, isActive = true }: WebView
             },
           },
           {
-            label: "Cancel",
+            label: __tr("Cancel"),
             onClick: () => {
               invoke("web_download_respond", { downloadId, action: "cancel" }).catch(() => {});
               downloadMapRef.current.delete(downloadId);
@@ -585,7 +586,7 @@ export default function WebView({ sessionId, entryId, isActive = true }: WebView
     dlLastTimeRef.current = 0;
     dlLastSpeedRef.current = undefined;
 
-    const progressToastId = toast.info(`Downloading: ${filename}`, {
+    const progressToastId = toast.info(__tr("Downloading: {v0}", { v0: (filename) }), {
       persistent: true,
       progress: {
         percent: 0,
@@ -663,12 +664,12 @@ export default function WebView({ sessionId, entryId, isActive = true }: WebView
             // Silent — file opens automatically via backend, no toast needed
           } else if (action === "save") {
             const displayName = event.payload.savePath?.split(/[\\/]/).pop() ?? "File";
-            toast.success("File saved", displayName);
+            toast.success(__tr("File saved"), displayName);
           }
         } else if (event.payload.state === "cancelled") {
           // Silent — user cancelled intentionally
         } else {
-          toast.error("Download failed", event.payload.state ?? "Unknown error");
+          toast.error(__tr("Download failed"), event.payload.state ?? "Unknown error");
         }
       }
     );
@@ -765,13 +766,13 @@ export default function WebView({ sessionId, entryId, isActive = true }: WebView
           />
         )}
         {!isReady && !error && (
-          <SessionStatePanel surface={false} className="absolute inset-0 text-body">Loading web session...</SessionStatePanel>
+          <SessionStatePanel surface={false} className="absolute inset-0 text-body">{__tr("Loading web session...")}</SessionStatePanel>
         )}
         {error && (
           <SessionError
             surface={false}
             className="absolute inset-0 px-6"
-            title="Failed to load web session"
+            title={__tr("Failed to load web session")}
             message={error}
             actions={
               <Button
@@ -781,8 +782,7 @@ export default function WebView({ sessionId, entryId, isActive = true }: WebView
                   createWebview();
                 }}
               >
-                Retry
-              </Button>
+                {__tr("Retry")}</Button>
             }
           />
         )}

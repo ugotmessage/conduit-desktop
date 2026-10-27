@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import { IconSlot } from "../ui";
 import { syncApi } from "../../lib/sync-api";
@@ -40,7 +41,7 @@ export default function SyncDevicesList() {
             <div className="min-w-0">
               <p data-cv-device-name="" className="truncate text-body text-ink">
                 {d.name}
-                {d.thisDevice && <span className="text-label text-ink-muted"> (this device)</span>}
+                {d.thisDevice && <span className="text-label text-ink-muted"> {__tr("(this device)")}</span>}
               </p>
               <p data-cv-device-line="" className="truncate text-label text-ink-muted">{deviceLine(d)}</p>
             </div>

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import { Checkbox, Spinner } from "../ui";
 import { syncApi } from "../../lib/sync-api";
@@ -52,7 +53,7 @@ export default function MassChangeNotice({ noticeId }: { noticeId: string }) {
       })
       .catch((err) => {
         console.error("[sync] Failed to load the undo preview:", err);
-        toast.error("Could not load the change", errorText(err, "Try again."));
+        toast.error(__tr("Could not load the change"), errorText(err, __tr("Try again.")));
         setLoaded(null);
         setLoadFailed(true);
       });
@@ -81,16 +82,16 @@ export default function MassChangeNotice({ noticeId }: { noticeId: string }) {
       const rowKeys: SyncRowKey[] = loaded.preview.rows.filter((r) => rows.has(rowKeyString(r.row))).map((r) => r.row);
       const fieldKeys: SyncRegKey[] = loaded.preview.fields.filter((f) => fields.has(regKeyString(f.key))).map((f) => f.key);
       const res = await syncApi.undoApply(loaded.snapshot.id, rowKeys, fieldKeys);
-      toast.success(`Undid ${plural(res.applied, "change")}.`);
+      toast.success(__tr("Undid {v0}.", { v0: (plural(res.applied, "change")) }));
       await keepChanges();
     } catch (err) {
-      toast.error("Could not undo", errorText(err, "Try again."));
+      toast.error(__tr("Could not undo"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
   };
 
-  const title = loaded ? massChangeTitle(loaded.snapshot) : "Large change from a sync";
+  const title = loaded ? massChangeTitle(loaded.snapshot) : __tr("Large change from a sync");
   return (
     <SyncDialogFrame
       icon="history"
@@ -100,19 +101,19 @@ export default function MassChangeNotice({ noticeId }: { noticeId: string }) {
       onEscape={close}
       footer={
         <>
-          <DialogButton onClick={close} disabled={busy}>Later</DialogButton>
-          <DialogButton onClick={() => void keepChanges()} disabled={busy}>Keep changes</DialogButton>
-          <DialogButton variant="primary" onClick={() => void undo()} disabled={busy || !loaded || rows.size + fields.size === 0}>Undo selected</DialogButton>
+          <DialogButton onClick={close} disabled={busy}>{__tr("Later")}</DialogButton>
+          <DialogButton onClick={() => void keepChanges()} disabled={busy}>{__tr("Keep changes")}</DialogButton>
+          <DialogButton variant="primary" onClick={() => void undo()} disabled={busy || !loaded || rows.size + fields.size === 0}>{__tr("Undo selected")}</DialogButton>
         </>
       }
     >
       {loaded === undefined && <Spinner text="Loading..." />}
       {loaded === null && loadFailed && <LoadFailed what="this change" onRetry={() => setAttempt((n) => n + 1)} />}
-      {loaded === null && !loadFailed && <p>The saved copy for this change is no longer available, so it can't be undone here.</p>}
+      {loaded === null && !loadFailed && <p>{__tr("The saved copy for this change is no longer available, so it can't be undone here.")}</p>}
       {loaded && (
         <>
-          <p>Undo only changes what you select. Nothing else changes.</p>
-          {loaded.preview.rows.length > 0 && <p className="text-label font-semibold text-ink">Deleted items</p>}
+          <p>{__tr("Undo only changes what you select. Nothing else changes.")}</p>
+          {loaded.preview.rows.length > 0 && <p className="text-label font-semibold text-ink">{__tr("Deleted items")}</p>}
           <div className="max-h-48 overflow-y-auto">
             {loaded.preview.rows.map((r) => (
               <Checkbox
@@ -123,11 +124,11 @@ export default function MassChangeNotice({ noticeId }: { noticeId: string }) {
                 className="w-full py-1"
               >
                 <span data-cv-row-title="" className="text-ink">{r.title}</span>
-                {!r.stillDeleted && <span className="text-ink-muted"> (already back)</span>}
+                {!r.stillDeleted && <span className="text-ink-muted"> {__tr("(already back)")}</span>}
               </Checkbox>
             ))}
           </div>
-          {loaded.preview.fields.length > 0 && <p className="text-label font-semibold text-ink">Changed fields (optional)</p>}
+          {loaded.preview.fields.length > 0 && <p className="text-label font-semibold text-ink">{__tr("Changed fields (optional)")}</p>}
           <div className="max-h-40 overflow-y-auto">
             {loaded.preview.fields.map((f) => (
               <Checkbox
@@ -138,7 +139,7 @@ export default function MassChangeNotice({ noticeId }: { noticeId: string }) {
                 className="w-full py-1"
               >
                 <span data-cv-row-title="" className="text-ink">{f.label}</span>
-                {!f.stillMerged && <span className="text-ink-muted"> (changed again since)</span>}
+                {!f.stillMerged && <span className="text-ink-muted"> {__tr("(changed again since)")}</span>}
               </Checkbox>
             ))}
           </div>

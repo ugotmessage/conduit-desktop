@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { EntryMeta, EntryType, FolderData } from "../../../types/entry";
 import { getEntryColor, getEntryIcon } from "../../entries/entryIcons";
 import { useEntryStore } from "../../../stores/entryStore";
@@ -52,8 +53,8 @@ export function EntryRowActions({ entryId }: { entryId: string }) {
   const locked = useTierStore((s) => s.lockedEntryIds.has(entryId));
   return (
     <>
-      {!locked && <IconButton size="sm" icon="key" label="Copy password" onClick={() => void copyPassword(entryId)} />}
-      <IconButton size="sm" icon="infoCircle" label="View info" onClick={() => openDashboardForEntry(entryId)} />
+      {!locked && <IconButton size="sm" icon="key" label={__tr("Copy password")} onClick={() => void copyPassword(entryId)} />}
+      <IconButton size="sm" icon="infoCircle" label={__tr("View info")} onClick={() => openDashboardForEntry(entryId)} />
     </>
   );
 }

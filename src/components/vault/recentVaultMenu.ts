@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 /**
  * The recent-vault and team-vault context menus of the Vault Hub and the vault menu (docs/AUTO_UNLOCK.md
  * 2.6), so both stay the same. A change that would forget a saved unlock asks first through the
@@ -30,7 +31,7 @@ async function setStartup(choice: StartupChoice, name: string, previousSaved: st
     if (forgot && previousSaved) toastAutoUnlockOff(vaultName(previousSaved));
     toastStartupSet(name);
   } catch (err) {
-    toast.error("Couldn't change the startup vault", errorText(err, "Try again in Settings > General."));
+    toast.error(__tr("Couldn't change the startup vault"), errorText(err, __tr("Try again in Settings > General.")));
   }
 }
 
@@ -43,9 +44,9 @@ function openAtStartup(status: StartupStatus | null, choice: StartupChoice, name
     return;
   }
   useStartupVaultStore.getState().askConfirm({
-    title: "Turn off automatic unlock?",
-    message: `${vaultName(saved)} unlocks automatically at startup. Choosing another startup vault turns that off and forgets the saved password.`,
-    confirmLabel: "Continue",
+    title: __tr("Turn off automatic unlock?"),
+    message: __tr("{v0} unlocks automatically at startup. Choosing another startup vault turns that off and forgets the saved password.", { v0: (vaultName(saved)) }),
+    confirmLabel: __tr("Continue"),
     run: () => setStartup(choice, name, saved),
   });
 }
@@ -59,12 +60,12 @@ export async function openRecentVaultMenu(e: React.MouseEvent, vaultPath: string
   const saved = status?.savedPath === vaultPath;
   const name = vaultName(vaultPath);
   const selected = await showContextMenu(e.clientX, e.clientY, [
-    isStartup ? { id: "stop", label: "Stop Opening at Startup", icon: "ban" } : { id: "start", label: "Open at Startup", icon: "rocket" },
-    ...(saved ? [{ id: "off", label: "Turn Off Automatic Unlock", icon: "lock" } as PopupMenuItem] : []),
+    isStartup ? { id: "stop", label: __tr("Stop Opening at Startup"), icon: "ban" } : { id: "start", label: __tr("Open at Startup"), icon: "rocket" },
+    ...(saved ? [{ id: "off", label: __tr("Turn Off Automatic Unlock"), icon: "lock" } as PopupMenuItem] : []),
     SEPARATOR,
-    { id: "remove", label: "Remove from Recents", icon: "close" },
+    { id: "remove", label: __tr("Remove from Recents"), icon: "close" },
     { ...SEPARATOR, id: "sep2" },
-    { id: "copy", label: "Copy Path", icon: "copy" },
+    { id: "copy", label: __tr("Copy Path"), icon: "copy" },
   ]);
   if (selected === "start") openAtStartup(status, { kind: "personal", path: vaultPath }, name);
   else if (selected === "stop") await setStartup({ kind: "hub" }, name, null);
@@ -85,7 +86,7 @@ export async function openTeamVaultMenu(e: React.MouseEvent, vault: TeamVaultSum
   const sv = status?.startupVault;
   const isStartup = sv?.kind === "team" && sv.teamVaultId === vault.id;
   const selected = await showContextMenu(e.clientX, e.clientY, [
-    isStartup ? { id: "stop", label: "Stop Opening at Startup", icon: "ban" } : { id: "start", label: "Open at Startup", icon: "rocket" },
+    isStartup ? { id: "stop", label: __tr("Stop Opening at Startup"), icon: "ban" } : { id: "start", label: __tr("Open at Startup"), icon: "rocket" },
   ]);
   if (selected === "start") openAtStartup(status, { kind: "team", teamVaultId: vault.id }, vault.name);
   else if (selected === "stop") await setStartup({ kind: "hub" }, vault.name, null);
@@ -107,9 +108,9 @@ export async function clearRecentVaultsWithConfirm(): Promise<void> {
     return;
   }
   useStartupVaultStore.getState().askConfirm({
-    title: "Clear recent vaults?",
-    message: `${vaultName(saved)} unlocks automatically at startup. Clearing the list turns that off.`,
-    confirmLabel: "Clear All",
+    title: __tr("Clear recent vaults?"),
+    message: __tr("{v0} unlocks automatically at startup. Clearing the list turns that off.", { v0: (vaultName(saved)) }),
+    confirmLabel: __tr("Clear All"),
     run: clear,
   });
 }

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import { useAiStore, type EngineType } from "../../stores/aiStore";
 import { invoke } from "../../lib/electron";
@@ -58,10 +59,9 @@ export default function EnginePicker({ onPick }: Props) {
     <div className="flex h-full items-center justify-center overflow-y-auto px-4">
       <div className="w-full max-w-sm py-4">
         <div className="mb-5 text-center">
-          <p className="mb-1 text-body font-semibold text-ink">Choose your AI agent</p>
+          <p className="mb-1 text-body font-semibold text-ink">{__tr("Choose your AI agent")}</p>
           <p className="text-label text-ink-muted">
-            Conduit uses your local CLI agent. Pick which one to use — you can change this any time in Settings &gt; AI &gt; Agent.
-          </p>
+            {__tr("Conduit uses your local CLI agent. Pick which one to use — you can change this any time in Settings > AI > Agent.")}</p>
         </div>
 
         <div className="mb-4 space-y-2">
@@ -82,7 +82,7 @@ export default function EnginePicker({ onPick }: Props) {
                   <div className="min-w-0 flex-1">
                     <div className="mb-0.5 flex items-center gap-2">
                       <span className="text-body font-semibold text-ink">{opt.name}</span>
-                      <Badge tone={available ? "success" : "warning"}>{available ? "Installed" : "Not installed"}</Badge>
+                      <Badge tone={available ? "success" : "warning"}>{available ? __tr("Installed") : __tr("Not installed")}</Badge>
                     </div>
                     <p className="mb-2 text-label text-ink-muted">{opt.description}</p>
                     {available ? (
@@ -93,12 +93,11 @@ export default function EnginePicker({ onPick }: Props) {
                         loading={isBusy}
                         loadingLabel="Starting…"
                       >
-                        {`Use ${opt.name}`}
+                        {__tr("Use {v0}", { v0: (opt.name) })}
                       </Button>
                     ) : (
                       <Button variant="secondary" onClick={() => handleInstall(opt.id)}>
-                        Install instructions
-                      </Button>
+                        {__tr("Install instructions")}</Button>
                     )}
                   </div>
                 </div>
@@ -111,8 +110,7 @@ export default function EnginePicker({ onPick }: Props) {
 
         <div className="flex justify-center">
           <Button variant="ghost" size="sm" icon="refresh" onClick={() => checkEngineAvailability()}>
-            Re-check availability
-          </Button>
+            {__tr("Re-check availability")}</Button>
         </div>
       </div>
     </div>

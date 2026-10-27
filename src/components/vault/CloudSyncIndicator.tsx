@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useVaultStore } from "../../stores/vaultStore";
 import { AlertTriangleIcon, CloudIcon, CloudOffIcon } from "../../lib/icons";
 
@@ -26,7 +27,7 @@ export default function CloudSyncIndicator() {
     return (
       <div
         className="flex size-toolbar shrink-0 items-center justify-center text-success"
-        title={`Cloud synced${lastSyncedAt ? `: ${formatTime(lastSyncedAt)}` : ""}`}
+        title={__tr("Cloud synced{v0}", { v0: (lastSyncedAt ? `: ${formatTime(lastSyncedAt)}` : "") })}
       >
         <CloudIcon size={16} />
       </div>
@@ -35,7 +36,7 @@ export default function CloudSyncIndicator() {
 
   if (status === "syncing") {
     return (
-      <div className="flex size-toolbar shrink-0 items-center justify-center text-info animate-pulse" title="Syncing...">
+      <div className="flex size-toolbar shrink-0 items-center justify-center text-info animate-pulse" title={__tr("Syncing...")}>
         <CloudIcon size={16} />
       </div>
     );
@@ -45,7 +46,7 @@ export default function CloudSyncIndicator() {
     return (
       <div
         className="flex size-toolbar shrink-0 items-center justify-center text-warning"
-        title={`Sync error: ${error ?? "Unknown error"}`}
+        title={__tr("Sync error: {v0}", { v0: (error ?? "Unknown error") })}
       >
         <AlertTriangleIcon size={16} />
       </div>
@@ -54,7 +55,7 @@ export default function CloudSyncIndicator() {
 
   // idle
   return (
-    <div className="flex size-toolbar shrink-0 items-center justify-center text-ink-faint" title="Cloud backup enabled">
+    <div className="flex size-toolbar shrink-0 items-center justify-center text-ink-faint" title={__tr("Cloud backup enabled")}>
       <CloudOffIcon size={16} />
     </div>
   );

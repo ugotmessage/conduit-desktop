@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { CheckIcon, AlertTriangleIcon } from "../../lib/icons";
 import { EmptyState } from "../ui";
 import type { RdpGlobalDefaults, WebGlobalDefaults, TerminalGlobalDefaults, SshGlobalDefaults } from "../../types/entry";
@@ -5,6 +6,7 @@ import { HARDCODED_RDP_DEFAULTS, HARDCODED_WEB_DEFAULTS, HARDCODED_TERMINAL_DEFA
 import type { EngineType } from "../../lib/ai-harnesses";
 
 export interface Settings {
+  ui_language?: "system" | "en" | "zh-TW";
   theme: string;
   color_scheme: string;
   icon_pack: string;
@@ -128,7 +130,7 @@ export function UsageBar({ used, limit, label, resetsAt }: {
         <span className="text-label font-semibold text-ink-secondary">{label}</span>
         <span className="text-label text-ink-muted">
           {isUnlimited
-            ? `${formatTokens(used)} used (unlimited)`
+            ? __tr("{v0} used (unlimited)", { v0: (formatTokens(used)) })
             : `${formatTokens(used)} / ${formatTokens(limit)}`}
         </span>
       </div>
@@ -140,11 +142,11 @@ export function UsageBar({ used, limit, label, resetsAt }: {
       <div className="mt-0.5 flex items-center justify-between">
         {!isUnlimited && (
           <span className={`text-meta ${tone.text}`}>
-            {isExhausted ? "Limit reached" : `${formatTokens(limit - used)} remaining`}
+            {isExhausted ? __tr("Limit reached") : __tr("{v0} remaining", { v0: (formatTokens(limit - used)) })}
           </span>
         )}
         {resetsLabel && !isUnlimited && (
-          <span className="text-meta text-ink-muted">Resets {resetsLabel}</span>
+          <span className="text-meta text-ink-muted">{__tr("Resets")} {resetsLabel}</span>
         )}
       </div>
     </div>
@@ -155,8 +157,8 @@ export function SessionEmptyState({ type }: { type: string }) {
   return (
     <EmptyState
       className="py-12"
-      title={`No ${type} settings yet`}
-      description={`Session-specific settings for ${type} connections will appear here.`}
+      title={__tr("No {v0} settings yet", { v0: (type) })}
+      description={__tr("Session-specific settings for {v0} connections will appear here.", { v0: (type) })}
     />
   );
 }

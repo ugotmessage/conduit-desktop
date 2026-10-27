@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect } from "react";
 import { COLOR_SCHEMES, type SchemePreview } from "../../../lib/schemes";
 import { DEFAULT_ICON_PACK, ICON_PACKS, Icon, isIconPackId, preloadAllIconPacks, type IconPackId, type SemanticIconName } from "../../../lib/icons";
@@ -10,9 +11,9 @@ const PACK_PREVIEW: ReadonlyArray<SemanticIconName> = ["folder", "terminal", "de
 type Brightness = "dark" | "light" | "system";
 
 const BRIGHTNESS_OPTIONS: ReadonlyArray<SegmentOption<Brightness>> = [
-  { value: "dark", label: "Dark" },
-  { value: "light", label: "Light" },
-  { value: "system", label: "System" },
+  { value: "dark", label: __tr("Dark") },
+  { value: "light", label: __tr("Light") },
+  { value: "system", label: __tr("System") },
 ];
 
 function isBrightness(value: string): value is Brightness {
@@ -60,7 +61,7 @@ export default function AppearanceTab({ settings, setSettings }: TabProps) {
       />
 
       <div data-cv-appearance="scheme">
-        <label id="appearance-scheme-label" className={`${SECTION_LABEL} mb-2`}>Color Scheme</label>
+        <label id="appearance-scheme-label" className={`${SECTION_LABEL} mb-2`}>{__tr("Color Scheme")}</label>
         <ChoiceGroup
           aria-labelledby="appearance-scheme-label"
           value={settings.color_scheme}
@@ -80,7 +81,7 @@ export default function AppearanceTab({ settings, setSettings }: TabProps) {
 
       <div className="flex gap-4">
         <div data-cv-appearance="mode" className="flex-1">
-          <label id="appearance-mode-label" className={`${SECTION_LABEL} mb-1`}>Brightness</label>
+          <label id="appearance-mode-label" className={`${SECTION_LABEL} mb-1`}>{__tr("Brightness")}</label>
           <SegmentedControl
             aria-labelledby="appearance-mode-label"
             options={BRIGHTNESS_OPTIONS}
@@ -95,7 +96,7 @@ export default function AppearanceTab({ settings, setSettings }: TabProps) {
 
         <div data-cv-appearance="scale" className="flex-1">
           <div className="mb-1 flex items-center justify-between">
-            <label htmlFor="appearance-ui-scale" className={SECTION_LABEL}>UI Scale</label>
+            <label htmlFor="appearance-ui-scale" className={SECTION_LABEL}>{__tr("UI Scale")}</label>
             <div className="flex items-center gap-2">
               <span className={CAPTION}>{Math.round(scale * 100)}%</span>
               {scale !== 1 && (
@@ -107,8 +108,7 @@ export default function AppearanceTab({ settings, setSettings }: TabProps) {
                     window.electron?.send?.("set-zoom-factor", 1);
                   }}
                 >
-                  Reset
-                </Button>
+                  {__tr("Reset")}</Button>
               )}
             </div>
           </div>
@@ -134,7 +134,7 @@ function IconPackSection({ value, onChange }: { value: IconPackId; onChange: (pa
 
   return (
     <div data-cv-appearance="icon-pack">
-      <label id="appearance-icon-pack-label" className={`${SECTION_LABEL} mb-2`}>Icon pack</label>
+      <label id="appearance-icon-pack-label" className={`${SECTION_LABEL} mb-2`}>{__tr("Icon pack")}</label>
       <ChoiceGroup aria-labelledby="appearance-icon-pack-label" value={value} onChange={onChange} columns={2}>
         {ICON_PACKS.map((pack) => (
           <ChoiceCard
@@ -143,7 +143,7 @@ function IconPackSection({ value, onChange }: { value: IconPackId; onChange: (pa
             label={
               <span className="inline-flex items-center gap-1.5">
                 {pack.label}
-                {pack.id === DEFAULT_ICON_PACK && <Badge tone="neutral">Default</Badge>}
+                {pack.id === DEFAULT_ICON_PACK && <Badge tone="neutral">{__tr("Default")}</Badge>}
               </span>
             }
             description={pack.description}

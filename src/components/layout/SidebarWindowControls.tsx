@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { IconButton } from "../ui";
 
 interface SidebarWindowControlsProps {
@@ -19,13 +20,13 @@ export default function SidebarWindowControls({ isPinned, isDocked, onClose, onT
     <>
       <IconButton
         icon={isPinned ? "pinFilled" : "pin"}
-        label={isPinned ? "Unpin sidebar" : "Pin sidebar open"}
+        label={isPinned ? __tr("Unpin sidebar") : __tr("Pin sidebar open")}
         title={pinTitle(isPinned, isDocked)}
         pressed={isPinned}
         onClick={onTogglePin}
         className={isPinned && !isDocked ? "opacity-60" : undefined}
       />
-      {!isPinned && <IconButton icon="close" label="Close sidebar" title="Close sidebar (Ctrl+B)" onClick={onClose} />}
+      {!isPinned && <IconButton icon="close" label={__tr("Close sidebar")} title={__tr("Close sidebar (Ctrl+B)")} onClick={onClose} />}
     </>
   );
 }

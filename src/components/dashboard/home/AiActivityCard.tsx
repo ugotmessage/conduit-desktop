@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useMemo } from "react";
 import { openDashboardForEntry } from "../../../lib/openDashboard";
 import { useEntryStore } from "../../../stores/entryStore";
@@ -21,7 +22,7 @@ export default function AiActivityCard({ className, active = true }: { className
   if (!items || items.length === 0) return null;
   return (
     <Card className={className}>
-      <SectionHeader title="AI activity" description="Recent tool calls from AI agents on this device" />
+      <SectionHeader title={__tr("AI activity")} description={__tr("Recent tool calls from AI agents on this device")} />
       <div className="space-y-px">
         {items.map((item, index) => {
           const target = activityTarget(item, entryNames, sessionTitles);

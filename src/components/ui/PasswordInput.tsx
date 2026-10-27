@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { IconButton } from "./IconButton";
 import { TextInput, type TextInputProps } from "./TextInput";
@@ -11,7 +12,7 @@ export function PasswordInput(props: PasswordInputProps) {
       {...props}
       type={show ? "text" : "password"}
       trailing={
-        <IconButton size="sm" icon={show ? "eyeOff" : "eye"} label={show ? "Hide password" : "Show password"} onClick={() => setShow((s) => !s)} />
+        <IconButton size="sm" icon={show ? "eyeOff" : "eye"} label={show ? __tr("Hide password") : __tr("Show password")} onClick={() => setShow((s) => !s)} />
       }
     />
   );

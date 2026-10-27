@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useCallback, useState } from "react";
 import { Badge, IconButton, Textarea, TextInput } from "../ui";
 import { syncApi } from "../../lib/sync-api";
@@ -38,7 +39,7 @@ async function resolveField(field: FieldConflict, choice: FieldChoiceDto, succes
     toast.success(success);
     return true;
   } catch (err) {
-    toast.error("Could not save your choice", errorText(err, "Try again."));
+    toast.error(__tr("Could not save your choice"), errorText(err, __tr("Try again.")));
     return false;
   }
 }
@@ -77,7 +78,7 @@ function VersionLine({ field, version, busy, names, onUse }: VersionLineProps) {
       const res = await syncApi.revealSecret(field.key, version.id);
       setRevealed(res.plaintext ?? "(empty)");
     } catch (err) {
-      toast.error("Could not show the value", errorText(err, "Try again."));
+      toast.error(__tr("Could not show the value"), errorText(err, __tr("Try again.")));
     }
   };
   return (
@@ -88,18 +89,17 @@ function VersionLine({ field, version, busy, names, onUse }: VersionLineProps) {
             <VersionValue field={field} text={versionText(field, version, revealed, names)} />
           </div>
           {version.masked && canUseVersion(version) && (
-            <IconButton size="sm" icon={revealed === null ? "eye" : "eyeOff"} label={revealed === null ? "Show" : "Hide"} onClick={() => void toggleReveal()} />
+            <IconButton size="sm" icon={revealed === null ? "eye" : "eyeOff"} label={revealed === null ? __tr("Show") : __tr("Hide")} onClick={() => void toggleReveal()} />
           )}
           {version.provisional && (
-            <Badge tone="accent" className="shrink-0">In use now</Badge>
+            <Badge tone="accent" className="shrink-0">{__tr("In use now")}</Badge>
           )}
         </div>
         <p className="mt-0.5 text-meta text-ink-muted">{versionCaption(version)}</p>
       </div>
       {canUseVersion(version) && (
         <SmallButton disabled={busy} onClick={() => onUse(version)}>
-          Use this
-        </SmallButton>
+          {__tr("Use this")}</SmallButton>
       )}
     </div>
   );
@@ -143,7 +143,7 @@ export default function ConflictFieldRow({ field, itemTitle, compact = false }: 
     try {
       await useSyncStore.getState().snooze(field.snoozeKey);
     } catch (err) {
-      toast.error("Could not snooze", errorText(err, "Try again."));
+      toast.error(__tr("Could not snooze"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -153,14 +153,13 @@ export default function ConflictFieldRow({ field, itemTitle, compact = false }: 
     <div data-cv-review-field="" className="space-y-2 rounded-md border border-card-border bg-well p-3">
       <div className="flex items-center justify-between gap-2">
         <span data-cv-review-field-label="" className="text-body font-semibold text-ink">{field.label}</span>
-        <span className="text-meta text-warning">{field.versions.length} versions</span>
+        <span className="text-meta text-warning">{field.versions.length} {__tr("versions")}</span>
       </div>
-      {field.staleRevert && <p className="text-label text-ink-muted">An older Conduit app changed this back to an earlier value.</p>}
-      {field.invariantGuard && <p className="text-label text-ink-muted">Two versions were kept after a repair.</p>}
+      {field.staleRevert && <p className="text-label text-ink-muted">{__tr("An older Conduit app changed this back to an earlier value.")}</p>}
+      {field.invariantGuard && <p className="text-label text-ink-muted">{__tr("Two versions were kept after a repair.")}</p>}
       {field.secret && SINGLE_VERSION_KEY_REGS.has(field.key.reg) && (
         <p className="text-label text-warning">
-          The versions you don't pick are removed from this item. Reveal and copy any key you still need before you choose.
-        </p>
+          {__tr("The versions you don't pick are removed from this item. Reveal and copy any key you still need before you choose.")}</p>
       )}
       <div>
         {field.versions.map((v) => (
@@ -183,26 +182,23 @@ export default function ConflictFieldRow({ field, itemTitle, compact = false }: 
               <TextInput type={field.secret ? "password" : "text"} value={draft} onChange={(e) => setDraft(e.target.value)} autoFocus />
             )}
           </div>
-          <SmallButton primary disabled={busy} onClick={saveDraft}>Save</SmallButton>
-          <SmallButton onClick={() => setEditing(false)}>Cancel</SmallButton>
+          <SmallButton primary disabled={busy} onClick={saveDraft}>{__tr("Save")}</SmallButton>
+          <SmallButton onClick={() => setEditing(false)}>{__tr("Cancel")}</SmallButton>
         </div>
       )}
       {draftError && <p data-cv-error="" className="text-label text-danger">{draftError}</p>}
       <div className="flex flex-wrap gap-2 pt-1">
         {!editing && offersEnteredValue(field) && (
           <SmallButton disabled={busy} onClick={() => setEditing(true)}>
-            Enter a different value...
-          </SmallButton>
+            {__tr("Enter a different value...")}</SmallButton>
         )}
         {field.keepBothOffered && (
           <SmallButton disabled={busy} onClick={() => void run({ kind: "keep-both", copyNames: keepBothCopyNames(itemTitle, field) }, "Kept both versions.")}>
-            Keep both
-          </SmallButton>
+            {__tr("Keep both")}</SmallButton>
         )}
         {!compact && (
           <SmallButton disabled={busy} onClick={() => void decideLater()}>
-            Decide later
-          </SmallButton>
+            {__tr("Decide later")}</SmallButton>
         )}
       </div>
     </div>

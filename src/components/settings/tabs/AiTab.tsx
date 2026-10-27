@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState, useEffect } from "react";
 import { invoke } from "../../../lib/electron";
 import { useAiStore } from "../../../stores/aiStore";
@@ -22,7 +23,7 @@ export default function AiTab({ settings, setSettings }: TabProps) {
   return (
     <div className="space-y-4">
       <div>
-        <label className={`${SECTION_LABEL} mb-1`}>Default Engine</label>
+        <label className={`${SECTION_LABEL} mb-1`}>{__tr("Default Engine")}</label>
         <div className="grid grid-cols-2 gap-2">
           {AI_HARNESSES.map((harness) => {
             const selected = settings.default_engine === harness.id;
@@ -42,7 +43,7 @@ export default function AiTab({ settings, setSettings }: TabProps) {
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-body text-ink">{harness.name}</span>
                   <span className={cx("block text-meta", available ? "text-success" : "text-ink-faint")}>
-                    {available ? "Installed" : "Not installed"}
+                    {available ? __tr("Installed") : __tr("Not installed")}
                   </span>
                 </span>
                 {selected && <span className="shrink-0 text-meta text-(--c-accent)">●</span>}
@@ -51,22 +52,21 @@ export default function AiTab({ settings, setSettings }: TabProps) {
           })}
         </div>
         <p className={`mt-2 ${HINT}`}>
-          Engine selected by default when opening the AI panel. You can switch anytime in the chat header.
-        </p>
+          {__tr("Engine selected by default when opening the AI panel. You can switch anytime in the chat header.")}</p>
       </div>
 
       <div>
-        <label htmlFor="ai-working-directory" className={`${SECTION_LABEL} mb-1`}>Default Working Directory</label>
+        <label htmlFor="ai-working-directory" className={`${SECTION_LABEL} mb-1`}>{__tr("Default Working Directory")}</label>
         <div className="flex items-center gap-2">
           <TextInput
             id="ai-working-directory"
             value={settings.default_working_directory ?? ""}
             onChange={(e) => setSettings({ ...settings, default_working_directory: e.target.value || null })}
-            placeholder="Leave empty for home directory"
+            placeholder={__tr("Leave empty for home directory")}
           />
           <IconButton
             icon={FolderIcon}
-            label="Browse"
+            label={__tr("Browse")}
             onClick={async () => {
               const folder = await invoke<string | null>("dialog_select_folder");
               if (folder) {
@@ -76,25 +76,22 @@ export default function AiTab({ settings, setSettings }: TabProps) {
           />
         </div>
         <p className={`mt-1 ${HINT}`}>
-          Starting directory for agent sessions.
-        </p>
+          {__tr("Starting directory for agent sessions.")}</p>
       </div>
 
       <div className="flex items-center justify-between gap-4">
         <div>
-          <label className={SECTION_LABEL}>MCP Server Setup</label>
+          <label className={SECTION_LABEL}>{__tr("MCP Server Setup")}</label>
           <p className={`mt-0.5 ${HINT}`}>
-            Show the commands to connect each CLI agent to Conduit's MCP server.
-          </p>
+            {__tr("Show the commands to connect each CLI agent to Conduit's MCP server.")}</p>
         </div>
         <Button icon={PlugIcon} onClick={() => setShowMcpSetup(true)} className="shrink-0">
-          Show setup commands
-        </Button>
+          {__tr("Show setup commands")}</Button>
       </div>
 
       <div>
         <div className="mb-1 flex items-center justify-between">
-          <label htmlFor="ai-terminal-font-size" className={SECTION_LABEL}>Terminal Font Size</label>
+          <label htmlFor="ai-terminal-font-size" className={SECTION_LABEL}>{__tr("Terminal Font Size")}</label>
           <span className={CAPTION}>{settings.cli_font_size}px</span>
         </div>
         <Slider
@@ -112,7 +109,7 @@ export default function AiTab({ settings, setSettings }: TabProps) {
       </div>
 
       <div className="space-y-2 border-t border-divider pt-4">
-        <label className={`${SECTION_LABEL} mb-2`}>Engine Status</label>
+        <label className={`${SECTION_LABEL} mb-2`}>{__tr("Engine Status")}</label>
         {AI_HARNESSES.map((harness) => {
           const available = engineAvailability?.[harness.id] ?? false;
           return (

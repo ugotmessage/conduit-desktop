@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback } from 'react';
 import type { ReleaseNotesManifest, ReleaseEntry } from '../../types/whats-new';
 import { errorText } from '../../lib/errorText';
@@ -72,7 +73,7 @@ async function fetchManifest(): Promise<void> {
     console.log('[whats-new] Loaded', cachedReleases.length, 'releases');
   } catch (err) {
     cachedReleases = null;
-    cachedError = errorText(err, 'Failed to fetch release notes');
+    cachedError = errorText(err, __tr("Failed to fetch release notes"));
     console.error('[whats-new] Fetch error:', cachedError);
   }
 }

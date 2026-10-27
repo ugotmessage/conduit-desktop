@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import SyncDialogFrame, { DialogButton } from "./SyncDialogFrame";
 import { updateConduit } from "./plan-actions";
@@ -17,18 +18,17 @@ export default function UpdateRequiredDialog({ minVersion, onCancel }: { minVers
     <SyncDialogFrame
       icon="download"
       tone="warn"
-      title="Update required"
+      title={__tr("Update required")}
       onEscape={onCancel}
       footer={
         <>
-          <DialogButton onClick={onCancel} disabled={busy}>Cancel</DialogButton>
+          <DialogButton onClick={onCancel} disabled={busy}>{__tr("Cancel")}</DialogButton>
           <DialogButton variant="primary" onClick={() => void update()} loading={busy} loadingLabel="Checking..." autoFocus>
-            Update Conduit
-          </DialogButton>
+            {__tr("Update Conduit")}</DialogButton>
         </>
       }
     >
-      <p className="text-ink">This version of Conduit can't open your vaults anymore. Update to version {minVersion} or later.</p>
+      <p className="text-ink">{__tr("This version of Conduit can't open your vaults anymore. Update to version")} {minVersion} {__tr("or later.")}</p>
     </SyncDialogFrame>
   );
 }

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { EntryType } from "../../../types/entry";
 import Field from "../Field";
 import { getEntryIcon, getEntryColor } from "../entryIcons";
@@ -42,18 +43,18 @@ export default function GeneralTab({
 
   return (
     <div className="space-y-4">
-      <Field label="Name" required>
+      <Field label={__tr("Name")} required>
         <TextInput
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={entryType === "web" ? "Google" : entryType === "document" ? "Meeting Notes" : "Production Server"}
+          placeholder={entryType === "web" ? "Google" : entryType === "document" ? __tr("Meeting Notes") : __tr("Production Server")}
           autoFocus
         />
       </Field>
 
       {isConnection && (
         <div className="flex gap-2">
-          <Field label={entryType === "web" ? "URL" : "Host"} className="flex-1">
+          <Field label={entryType === "web" ? "URL" : __tr("Host")} className="flex-1">
             <TextInput
               value={host}
               onChange={(e) => setHost(e.target.value)}
@@ -61,7 +62,7 @@ export default function GeneralTab({
             />
           </Field>
           {entryType !== "web" && (
-            <Field label="Port" className="w-24">
+            <Field label={__tr("Port")} className="w-24">
               <TextInput type="number" value={port} onChange={(e) => setPort(e.target.value)} />
             </Field>
           )}
@@ -69,12 +70,12 @@ export default function GeneralTab({
       )}
 
       {entryType === "rdp" && (
-        <Field label="Domain">
+        <Field label={__tr("Domain")}>
           <TextInput value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="DOMAIN" />
         </Field>
       )}
 
-      <Field label="Appearance" group>
+      <Field label={__tr("Appearance")} group>
         <AppearancePickers
           Icon={Icon}
           colorResult={colorResult}
@@ -82,8 +83,8 @@ export default function GeneralTab({
           setCustomIcon={setCustomIcon}
           customColor={customColor}
           setCustomColor={setCustomColor}
-          iconLabels={["Default Icon", "Custom Icon"]}
-          colorLabels={["Default Color", "Custom Color"]}
+          iconLabels={[__tr("Default Icon"), __tr("Custom Icon")]}
+          colorLabels={[__tr("Default Color"), __tr("Custom Color")]}
         />
       </Field>
     </div>

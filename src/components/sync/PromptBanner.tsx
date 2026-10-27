@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useSyncStore } from "../../stores/syncStore";
 import type { SyncPrompt } from "../../types/sync";
 import SyncBanner, { type BannerAction } from "./SyncBanner";
@@ -48,50 +49,50 @@ function putOff(promptId: string): void {
 }
 
 function bannerSpec(prompt: SyncPrompt, fileName: string): BannerSpec | null {
-  const keepWorking = { label: "Keep working on this device", onClick: () => putOff(prompt.id) };
+  const keepWorking = { label: __tr("Keep working on this device"), onClick: () => putOff(prompt.id) };
   switch (prompt.kind) {
     case "file-missing":
       return {
         text: `Vault file not found at ${prompt.path}. It may have been moved or renamed.`,
-        actions: [{ label: "Locate...", primary: true, onClick: () => void locateVaultFile() }, keepWorking, { label: "Save a new copy here", onClick: () => void saveNewCopyHere() }],
+        actions: [{ label: __tr("Locate..."), primary: true, onClick: () => void locateVaultFile() }, keepWorking, { label: __tr("Save a new copy here"), onClick: () => void saveNewCopyHere() }],
       };
     case "foreign-other-vault":
       return {
         text: `The file at ${prompt.path} is now a different vault.`,
         actions: [
-          { label: "Locate this vault's file...", primary: true, onClick: () => void locateVaultFile() },
-          { label: "Open the other vault instead", onClick: () => void openOtherVault(prompt.path) },
+          { label: __tr("Locate this vault's file..."), primary: true, onClick: () => void locateVaultFile() },
+          { label: __tr("Open the other vault instead"), onClick: () => void openOtherVault(prompt.path) },
           keepWorking,
         ],
       };
     case "foreign-newer-format":
       return {
         text: "This vault was updated by a newer version of Conduit. Update Conduit to keep syncing. Your changes are saved on this device.",
-        actions: [{ label: "OK", onClick: () => putOff(prompt.id) }],
+        actions: [{ label: __tr("OK"), onClick: () => putOff(prompt.id) }],
       };
     case "held-legacy":
       return {
         text: `While an older Conduit had this vault open, it ${heldChangesText(prompt.deletes, prompt.reverts)}.`,
-        actions: [{ label: "Apply these changes", onClick: () => void applyHeld("apply") }, { label: "Keep my versions", primary: true, onClick: () => void applyHeld("keep-mine") }],
+        actions: [{ label: __tr("Apply these changes"), onClick: () => void applyHeld("apply") }, { label: __tr("Keep my versions"), primary: true, onClick: () => void applyHeld("keep-mine") }],
       };
     case "copy-review":
       return {
         text: `'${prompt.copy.name}' is a copy of this vault ${copyText(prompt.copy.changes, prompt.copy.deletions)}.`,
-        actions: [{ label: "Review...", primary: true, onClick: () => void copyAction(prompt.copy, "review") }, { label: "Ignore this copy", onClick: () => void copyAction(prompt.copy, "ignore") }],
+        actions: [{ label: __tr("Review..."), primary: true, onClick: () => void copyAction(prompt.copy, "review") }, { label: __tr("Ignore this copy"), onClick: () => void copyAction(prompt.copy, "ignore") }],
       };
     case "same-device-copy":
       return {
         text: `'${prompt.copy.name}' is a copy of '${fileName}'.`,
         actions: [
-          { label: "Use as a separate vault", onClick: () => void copyAction(prompt.copy, "separate") },
-          { label: "It's the same vault, merge", primary: true, onClick: () => void copyAction(prompt.copy, "merge") },
-          { label: "Ignore", onClick: () => void copyAction(prompt.copy, "ignore") },
+          { label: __tr("Use as a separate vault"), onClick: () => void copyAction(prompt.copy, "separate") },
+          { label: __tr("It's the same vault, merge"), primary: true, onClick: () => void copyAction(prompt.copy, "merge") },
+          { label: __tr("Ignore"), onClick: () => void copyAction(prompt.copy, "ignore") },
         ],
       };
     case "candidate":
       return {
         text: `Changes from ${prompt.label} are ready to review.`,
-        actions: [{ label: "Review", primary: true, onClick: () => reviewCandidate(prompt.candidateId) }, { label: "Later", onClick: () => useSyncStore.getState().deferPrompt(prompt.id) }],
+        actions: [{ label: __tr("Review"), primary: true, onClick: () => reviewCandidate(prompt.candidateId) }, { label: __tr("Later"), onClick: () => useSyncStore.getState().deferPrompt(prompt.id) }],
       };
     default:
       return null;

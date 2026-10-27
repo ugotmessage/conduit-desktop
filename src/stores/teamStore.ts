@@ -1,10 +1,11 @@
+import { t as __tr } from "../lib/i18n";
 import { create } from 'zustand';
 import { invoke } from '../lib/electron';
 import { errorText } from '../lib/errorText';
 import { toast } from '../components/common/Toast';
 
-const ACCEPT_ERROR_TITLE = 'Could not join the team';
-const ACCEPT_RETRY_TEXT = 'Check your connection and try again.';
+const ACCEPT_ERROR_TITLE = __tr("Could not join the team");
+const ACCEPT_RETRY_TEXT = __tr("Check your connection and try again.");
 
 // ---------- Types ----------
 

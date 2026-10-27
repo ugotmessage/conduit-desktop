@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { invoke } from "../../lib/electron";
 import { useTeamStore } from "../../stores/teamStore";
@@ -52,7 +53,7 @@ export default function CreateTeamVaultDialog({
       setPassphrase(result.recoveryPassphrase);
       setStep("show-passphrase");
     } catch (err) {
-      setError(errorText(err, "Failed to generate identity key"));
+      setError(errorText(err, __tr("Failed to generate identity key")));
     } finally {
       setLoading(false);
     }
@@ -66,7 +67,7 @@ export default function CreateTeamVaultDialog({
   const handleCreate = async () => {
     if (!name.trim()) return;
     if (!teamId) {
-      setError("No team found. Please ensure you are a member of a team.");
+      setError(__tr("No team found. Please ensure you are a member of a team."));
       return;
     }
 
@@ -84,7 +85,7 @@ export default function CreateTeamVaultDialog({
       await useEntryStore.getState().loadAll();
       onClose();
     } catch (err) {
-      setError(errorText(err, "Failed to create team vault"));
+      setError(errorText(err, __tr("Failed to create team vault")));
       setStep("form");
     } finally {
       setLoading(false);
@@ -104,24 +105,22 @@ export default function CreateTeamVaultDialog({
   const footer =
     step === "generate-key" ? (
       <>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{__tr("Cancel")}</Button>
         <Button variant="primary" onClick={handleGenerateKey} loading={loading}>
-          Generate Identity Key
-        </Button>
+          {__tr("Generate Identity Key")}</Button>
       </>
     ) : step === "form" ? (
       <>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{__tr("Cancel")}</Button>
         <Button variant="primary" onClick={handleCreate} disabled={!name.trim()} loading={loading}>
-          Create Vault
-        </Button>
+          {__tr("Create Vault")}</Button>
       </>
     ) : undefined;
 
   return (
     <Dialog
       open
-      title="Create Team Vault"
+      title={__tr("Create Team Vault")}
       icon="users"
       width={440}
       hideClose
@@ -129,7 +128,7 @@ export default function CreateTeamVaultDialog({
       onClose={onClose}
       footer={footer}
     >
-      <p className="-mt-2 pl-9 text-label text-ink-muted">Shared, zero-knowledge encrypted</p>
+      <p className="-mt-2 pl-9 text-label text-ink-muted">{__tr("Shared, zero-knowledge encrypted")}</p>
 
       {step === "identity-check" && (
         <div className="flex items-center justify-center py-8">
@@ -139,22 +138,19 @@ export default function CreateTeamVaultDialog({
 
       {step === "generate-key" && (
         <>
-          <Callout tone="info" icon="shieldCheck" title="Identity Key Required">
-            Team vaults use zero-knowledge encryption. You need an identity
-            key to encrypt and decrypt vault data. A recovery passphrase
-            will be generated for backup.
-          </Callout>
+          <Callout tone="info" icon="shieldCheck" title={__tr("Identity Key Required")}>
+            {__tr("Team vaults use zero-knowledge encryption. You need an identity key to encrypt and decrypt vault data. A recovery passphrase will be generated for backup.")}</Callout>
           {error && <Callout tone="danger">{error}</Callout>}
         </>
       )}
 
       {step === "form" && (
         <>
-          <FormField label="Name">
+          <FormField label={__tr("Name")}>
             <TextInput
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Production Credentials"
+              placeholder={__tr("e.g. Production Credentials")}
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === "Enter" && name.trim()) handleCreate();
@@ -165,24 +161,21 @@ export default function CreateTeamVaultDialog({
           <FormField
             label={
               <>
-                Description
-                <span className="ml-1 font-normal text-ink-faint">(optional)</span>
+                {__tr("Description")}<span className="ml-1 font-normal text-ink-faint">{__tr("(optional)")}</span>
               </>
             }
           >
             <TextInput
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of what this vault contains"
+              placeholder={__tr("Brief description of what this vault contains")}
             />
           </FormField>
 
           <div className="flex items-start gap-2 rounded-md border border-card-border bg-well p-2.5">
             <LockIcon size={16} className="mt-px shrink-0 text-ink-faint" />
             <p className="text-label text-ink-muted">
-              This vault will be encrypted with zero-knowledge keys. Only team
-              members you add will have access.
-            </p>
+              {__tr("This vault will be encrypted with zero-knowledge keys. Only team members you add will have access.")}</p>
           </div>
 
           {error && <Callout tone="danger">{error}</Callout>}
@@ -192,7 +185,7 @@ export default function CreateTeamVaultDialog({
       {step === "creating" && (
         <div className="flex flex-col items-center gap-3 py-8">
           <Spinner size={24} className="text-ink-muted" />
-          <p className="text-body text-ink">Creating team vault...</p>
+          <p className="text-body text-ink">{__tr("Creating team vault...")}</p>
         </div>
       )}
     </Dialog>

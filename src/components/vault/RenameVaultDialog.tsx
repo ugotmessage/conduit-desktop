@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { invoke } from "../../lib/electron";
 import { useVaultStore } from "../../stores/vaultStore";
@@ -56,10 +57,10 @@ export default function RenameVaultDialog({ onClose }: RenameVaultDialogProps) {
         });
       }
 
-      toast.success(`Vault renamed to "${newName.trim()}"`);
+      toast.success(__tr("Vault renamed to \"{v0}\"", { v0: (newName.trim()) }));
       onClose();
     } catch (err) {
-      setError(errorText(err, "Failed to rename vault"));
+      setError(errorText(err, __tr("Failed to rename vault")));
       setLoading(false);
     }
   };
@@ -67,8 +68,8 @@ export default function RenameVaultDialog({ onClose }: RenameVaultDialogProps) {
   return (
     <Dialog
       open
-      title="Rename Vault"
-      description="Change the display name of this vault"
+      title={__tr("Rename Vault")}
+      description={__tr("Change the display name of this vault")}
       icon="pencil"
       width={400}
       hideClose
@@ -77,16 +78,15 @@ export default function RenameVaultDialog({ onClose }: RenameVaultDialogProps) {
       onSubmit={(e) => void handleRename(e)}
       footer={
         <>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>{__tr("Cancel")}</Button>
           <Button type="submit" variant="primary" disabled={!isValid} loading={loading}>
-            Rename
-          </Button>
+            {__tr("Rename")}</Button>
         </>
       }
     >
       <FormField
-        label="Vault Name"
-        description={isTeamVault ? undefined : <>File will be renamed to &ldquo;{newName.trim() || "..."}.conduit&rdquo;</>}
+        label={__tr("Vault Name")}
+        description={isTeamVault ? undefined : <>{__tr("File will be renamed to “")}{newName.trim() || "..."}{__tr(".conduit”")}</>}
       >
         <TextInput
           value={newName}
@@ -94,7 +94,7 @@ export default function RenameVaultDialog({ onClose }: RenameVaultDialogProps) {
             setNewName(e.target.value);
             setError(null);
           }}
-          placeholder="Enter new vault name"
+          placeholder={__tr("Enter new vault name")}
           autoFocus
         />
       </FormField>

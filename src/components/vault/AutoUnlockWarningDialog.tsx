@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { useVaultStore } from "../../stores/vaultStore";
 import { useTeamStore } from "../../stores/teamStore";
@@ -66,7 +67,7 @@ export default function AutoUnlockWarningDialog({ mode, layer, onClose }: AutoUn
       toastAutoUnlockOn(name, platform);
       onClose(true);
     } catch (err) {
-      const message = errorText(err, "Couldn't turn on automatic unlock.");
+      const message = errorText(err, __tr("Couldn't turn on automatic unlock."));
       if (proof.kind === "recent-unlock" && message === PROOF_EXPIRED_MESSAGE) setNeedsPassword(true);
       else setError(message);
     } finally {
@@ -81,10 +82,10 @@ export default function AutoUnlockWarningDialog({ mode, layer, onClose }: AutoUn
       const { forgot } = await useStartupVaultStore.getState().setStartup({ kind: "personal", path });
       if (forgot && otherSaved) toastAutoUnlockOff(vaultName(otherSaved));
       if (!biometricEnabled) await enableBiometric();
-      toast.success(`${name} opens at startup`, "Touch ID unlocks it.");
+      toast.success(__tr("{v0} opens at startup", { v0: (name) }), __tr("Touch ID unlocks it."));
       onClose(false);
     } catch (err) {
-      setError(errorText(err, "Couldn't set up Touch ID for this vault."));
+      setError(errorText(err, __tr("Couldn't set up Touch ID for this vault.")));
     } finally {
       setBusy(false);
     }
@@ -101,7 +102,7 @@ export default function AutoUnlockWarningDialog({ mode, layer, onClose }: AutoUn
       open
       tone="warn"
       icon="alertTriangle"
-      title={`Unlock ${name} automatically?`}
+      title={__tr("Unlock {v0} automatically?", { v0: (name) })}
       width={420}
       layer={layer}
       hideClose
@@ -116,41 +117,36 @@ export default function AutoUnlockWarningDialog({ mode, layer, onClose }: AutoUn
       footer={
         <>
           <Button onClick={() => onClose(false)} disabled={busy}>
-            Cancel
-          </Button>
+            {__tr("Cancel")}</Button>
           <Button type="submit" variant="primary" disabled={busy || (needsPassword && password.length === 0)} loading={busy} loadingLabel="Turning on...">
-            Turn On
-          </Button>
+            {__tr("Turn On")}</Button>
         </>
       }
     >
       <p className="text-ink-muted">
-        Conduit will keep the master password for {vaultFileName(path)} in the {storeName} and open this vault when Conduit starts, without asking.
-      </p>
+        {__tr("Conduit will keep the master password for")} {vaultFileName(path)} {__tr("in the")} {storeName} {__tr("and open this vault when Conduit starts, without asking.")}</p>
       <Callout tone="warning">{AUTO_UNLOCK_WARNING}</Callout>
       {replacement && <p className="text-ink-muted">{replacement}</p>}
-      {otherSaved && <p className="text-ink-muted">{vaultName(otherSaved)} will stop unlocking automatically.</p>}
+      {otherSaved && <p className="text-ink-muted">{vaultName(otherSaved)} {__tr("will stop unlocking automatically.")}</p>}
       {needsPassword && (
         <>
           <p className="text-ink-muted">
-            {mode === "settings" ? "Enter your master password to turn this on." : "It's been a while since you unlocked. Enter your master password to turn this on."}
+            {mode === "settings" ? __tr("Enter your master password to turn this on.") : __tr("It's been a while since you unlocked. Enter your master password to turn this on.")}
           </p>
-          <FormField label="Master Password">
-            <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter master password" autoFocus disabled={busy} />
+          <FormField label={__tr("Master Password")}>
+            <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder={__tr("Enter master password")} autoFocus disabled={busy} />
           </FormField>
           {touchIdHere && biometricEnabled && (
             <Button icon="fingerprint" fullWidth onClick={() => void turnOn({ kind: "biometric" })} disabled={busy}>
-              Use Touch ID
-            </Button>
+              {__tr("Use Touch ID")}</Button>
           )}
         </>
       )}
       {touchIdHere && (
         <p className="text-meta text-ink-muted">
-          Safer: open {name} at startup and unlock it with Touch ID.{" "}
+          {__tr("Safer: open")} {name} {__tr("at startup and unlock it with Touch ID.")}{" "}
           <Button variant="link" size="sm" onClick={() => void useTouchIdInstead()} disabled={busy}>
-            Use Touch ID Instead
-          </Button>
+            {__tr("Use Touch ID Instead")}</Button>
         </p>
       )}
       {error && <Callout tone="danger">{error}</Callout>}

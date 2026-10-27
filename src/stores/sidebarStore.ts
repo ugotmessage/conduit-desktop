@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 import { create } from "zustand";
 import { useSessionStore } from "./sessionStore";
 import { toast } from "../components/common/Toast";
@@ -135,7 +136,7 @@ export const useSidebarStore = create<SidebarState>((set, get) => {
       }
       set({ isPinned: true, isExpanded: true, openWhenDocked: true });
       if (!fitsDocked(get())) {
-        toast.info("Sidebar pinned. The window is too narrow to dock it, so it will float until there is more room.");
+        toast.info(__tr("Sidebar pinned. The window is too narrow to dock it, so it will float until there is more room."));
       }
     },
 

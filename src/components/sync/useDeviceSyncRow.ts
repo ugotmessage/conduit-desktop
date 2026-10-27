@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useSyncStore } from "../../stores/syncStore";
 import { activeStatus } from "../../stores/sync-reducers";
 import type { SyncStateResponse } from "../../types/sync";
@@ -22,7 +23,7 @@ const ROW_STATUS: Readonly<Record<StatusTone, DashboardRowStatus>> = {
 export function deviceSyncRow(state: SyncStateResponse | null): DeviceSyncRow | null {
   if (state === null || state.vault === null || !state.vault.shared) return null;
   const status = activeStatus(state);
-  if (status === null) return { status: "disabled", detail: state.enabled ? "Locked" : "Off" };
+  if (status === null) return { status: "disabled", detail: state.enabled ? __tr("Locked") : __tr("Off") };
   const review = status.conflictCount > 0 ? `, ${status.conflictCount} to review` : "";
   return { status: ROW_STATUS[statusTone(status, state.killSwitch)], detail: `${statusLabel(status, state.killSwitch)}${review}` };
 }

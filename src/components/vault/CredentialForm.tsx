@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { useVaultStore } from "../../stores/vaultStore";
 import PasswordGenerateButton from "../tools/PasswordGenerateButton";
@@ -13,9 +14,9 @@ import { errorText } from "../../lib/errorText";
 
 const DEFAULT_AUTH = "default";
 const SSH_AUTH_OPTIONS = [
-  { value: DEFAULT_AUTH, label: "Default" },
-  { value: "key", label: "SSH Key" },
-  { value: "password", label: "Password" },
+  { value: DEFAULT_AUTH, label: __tr("Default") },
+  { value: "key", label: __tr("SSH Key") },
+  { value: "password", label: __tr("Password") },
 ];
 
 interface CredentialFormProps {
@@ -114,7 +115,7 @@ export default function CredentialForm({
         })
         .catch((err: unknown) => {
           setError(
-            errorText(err, "Failed to load credential")
+            errorText(err, __tr("Failed to load credential"))
           );
         })
         .finally(() => setIsFetching(false));
@@ -170,7 +171,7 @@ export default function CredentialForm({
       onSaved();
     } catch (err) {
       setError(
-        errorText(err, "Failed to save credential")
+        errorText(err, __tr("Failed to save credential"))
       );
     } finally {
       setIsLoading(false);
@@ -215,9 +216,9 @@ export default function CredentialForm({
       setTotpDigits(result.digits);
       setTotpPeriod(result.period);
       setShowTotpManual(false);
-      toast.success("QR code imported successfully");
+      toast.success(__tr("QR code imported successfully"));
     } catch (err) {
-      toast.error(errorText(err, "Failed to decode QR code"));
+      toast.error(errorText(err, __tr("Failed to decode QR code")));
     }
   };
 
@@ -234,23 +235,23 @@ export default function CredentialForm({
   const handleCopyPublicKey = async () => {
     if (publicKey) {
       await navigator.clipboard.writeText(publicKey);
-      toast.success("Public key copied to clipboard");
+      toast.success(__tr("Public key copied to clipboard"));
     }
   };
 
   const credentialTypeEntries = Object.entries(CREDENTIAL_TYPES) as [CredentialType, { label: string; description: string }][];
 
   const title = isEditing
-    ? "Edit Credential"
+    ? __tr("Edit Credential")
     : presetType && presetType !== "generic"
-      ? `New ${CREDENTIAL_TYPES[presetType].label} Credential`
-      : "New Credential";
+      ? __tr("New {v0} Credential", { v0: (CREDENTIAL_TYPES[presetType].label) })
+      : __tr("New Credential");
 
   const footer = isFetching ? undefined : (
     <>
-      <Button onClick={onClose}>Cancel</Button>
+      <Button onClick={onClose}>{__tr("Cancel")}</Button>
       <Button type="submit" variant="primary" disabled={!name.trim() || isLoading}>
-        {isLoading ? "Saving..." : isEditing ? "Save Changes" : "Create"}
+        {isLoading ? __tr("Saving...") : isEditing ? __tr("Save Changes") : __tr("Create")}
       </Button>
     </>
   );
@@ -266,13 +267,13 @@ export default function CredentialForm({
       footer={footer}
     >
       {isFetching ? (
-        <div className="p-4 text-center text-ink-muted">Loading...</div>
+        <div className="p-4 text-center text-ink-muted">{__tr("Loading...")}</div>
       ) : (
         <>
           <FormField
             label={
               <>
-                Name <span className="text-danger">*</span>
+                {__tr("Name")} <span className="text-danger">*</span>
               </>
             }
           >
@@ -280,9 +281,9 @@ export default function CredentialForm({
           </FormField>
 
           <div>
-            <span className="mb-1 block text-label font-semibold text-ink-secondary">Type</span>
+            <span className="mb-1 block text-label font-semibold text-ink-secondary">{__tr("Type")}</span>
             <SegmentedControl
-              aria-label="Type"
+              aria-label={__tr("Type")}
               options={credentialTypeEntries.map(([key, meta]) => ({
                 value: key,
                 label: <span title={meta.description}>{meta.label}</span>,
@@ -292,11 +293,11 @@ export default function CredentialForm({
             />
           </div>
 
-          <FormField label="Username">
+          <FormField label={__tr("Username")}>
             <TextInput value={username} onChange={(e) => setUsername(e.target.value)} placeholder="" />
           </FormField>
 
-          <FormField label="Password">
+          <FormField label={__tr("Password")}>
             <div className="relative">
               <TextInput
                 type={showPassword ? "text" : "password"}
@@ -310,14 +311,14 @@ export default function CredentialForm({
                 <IconButton
                   size="sm"
                   icon={showPassword ? "eyeOff" : "eye"}
-                  label={showPassword ? "Hide password" : "Show password"}
+                  label={showPassword ? __tr("Hide password") : __tr("Show password")}
                   onClick={() => setShowPassword(!showPassword)}
                 />
               </div>
             </div>
           </FormField>
 
-          <FormField label="Domain">
+          <FormField label={__tr("Domain")}>
             <TextInput value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="" />
           </FormField>
 
@@ -326,7 +327,7 @@ export default function CredentialForm({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <ShieldLockIcon size={16} className="text-ink-muted" />
-                  <p className="text-meta font-semibold text-ink-muted">One-Time Password (TOTP)</p>
+                  <p className="text-meta font-semibold text-ink-muted">{__tr("One-Time Password (TOTP)")}</p>
                 </div>
                 {totpSecret && (
                   <button
@@ -335,38 +336,34 @@ export default function CredentialForm({
                     className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-label text-danger transition-colors hover:bg-hover"
                   >
                     <TrashIcon size={12} compact />
-                    Remove
-                  </button>
+                    {__tr("Remove")}</button>
                 )}
               </div>
 
               {!totpSecret ? (
                 <div className="flex gap-2">
                   <Button icon="qrcode" onClick={handleImportQr} className="flex-1">
-                    Import QR Code
-                  </Button>
+                    {__tr("Import QR Code")}</Button>
                   <Button icon="keyboard" onClick={() => setShowTotpManual(!showTotpManual)} className="flex-1">
-                    Enter Secret Key
-                  </Button>
+                    {__tr("Enter Secret Key")}</Button>
                 </div>
               ) : (
                 <>
                   {totpIssuer && (
                     <div className="text-label text-ink-secondary">
-                      <span className="text-ink-faint">Issuer:</span> {totpIssuer}
-                      {totpLabel && <> &middot; <span className="text-ink-faint">Account:</span> {totpLabel}</>}
+                      <span className="text-ink-faint">{__tr("Issuer:")}</span> {totpIssuer}
+                      {totpLabel && <> &middot; <span className="text-ink-faint">{__tr("Account:")}</span> {totpLabel}</>}
                     </div>
                   )}
                   <div className="text-label text-ink-faint">
-                    {totpAlgorithm} &middot; {totpDigits} digits &middot; {totpPeriod}s period
-                  </div>
+                    {totpAlgorithm} &middot; {totpDigits} {__tr("digits ·")} {totpPeriod}{__tr("s period")}</div>
                   {totpPreview && (
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-title text-link">
                         {totpPreview.slice(0, Math.ceil(totpPreview.length / 2))}{" "}
                         {totpPreview.slice(Math.ceil(totpPreview.length / 2))}
                       </span>
-                      <span className="text-label text-success">Preview</span>
+                      <span className="text-label text-success">{__tr("Preview")}</span>
                     </div>
                   )}
                 </>
@@ -374,7 +371,7 @@ export default function CredentialForm({
 
               {showTotpManual && !totpSecret && (
                 <div className="space-y-2">
-                  <FormField label="Secret Key (Base32)">
+                  <FormField label={__tr("Secret Key (Base32)")}>
                     <TextInput
                       value={totpSecret}
                       onChange={(e) => setTotpSecret(e.target.value.toUpperCase().replace(/\s/g, ""))}
@@ -383,10 +380,10 @@ export default function CredentialForm({
                     />
                   </FormField>
                   <div className="flex gap-2">
-                    <FormField label="Issuer" className="flex-1">
+                    <FormField label={__tr("Issuer")} className="flex-1">
                       <TextInput value={totpIssuer} onChange={(e) => setTotpIssuer(e.target.value)} placeholder="" />
                     </FormField>
-                    <FormField label="Account" className="flex-1">
+                    <FormField label={__tr("Account")} className="flex-1">
                       <TextInput value={totpLabel} onChange={(e) => setTotpLabel(e.target.value)} placeholder="" />
                     </FormField>
                   </div>
@@ -395,7 +392,7 @@ export default function CredentialForm({
             </Card>
           )}
 
-          <FormField label="Private Key">
+          <FormField label={__tr("Private Key")}>
             <div className="relative">
               <Textarea
                 value={privateKey}
@@ -418,7 +415,7 @@ export default function CredentialForm({
                 <IconButton
                   size="sm"
                   icon={showPrivateKey ? "eyeOff" : "eye"}
-                  label={showPrivateKey ? "Hide private key" : "Show private key"}
+                  label={showPrivateKey ? __tr("Hide private key") : __tr("Show private key")}
                   onClick={() => setShowPrivateKey(!showPrivateKey)}
                 />
               </div>
@@ -427,33 +424,31 @@ export default function CredentialForm({
 
           {privateKey.trim() && password.trim() && (
             <Card className="space-y-3">
-              <p className="text-meta font-semibold text-ink-muted">SSH Authentication</p>
+              <p className="text-meta font-semibold text-ink-muted">{__tr("SSH Authentication")}</p>
               <SegmentedControl
-                aria-label="SSH Authentication"
+                aria-label={__tr("SSH Authentication")}
                 options={SSH_AUTH_OPTIONS}
                 value={sshAuthMethod ?? DEFAULT_AUTH}
                 onChange={(value) => setSshAuthMethod(value === DEFAULT_AUTH ? null : value)}
               />
               <p className="text-label text-ink-muted">
-                Choose which method to use when connecting. &ldquo;Default&rdquo; uses the global setting from Settings.
-              </p>
+                {__tr("Choose which method to use when connecting. “Default” uses the global setting from Settings.")}</p>
             </Card>
           )}
 
           {credentialType === "ssh_key" && (
             <Card className="space-y-3">
-              <p className="text-meta font-semibold text-ink-muted">SSH Key Metadata</p>
+              <p className="text-meta font-semibold text-ink-muted">{__tr("SSH Key Metadata")}</p>
               <div>
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="text-label font-semibold text-ink-secondary">Public Key</span>
+                  <span className="text-label font-semibold text-ink-secondary">{__tr("Public Key")}</span>
                   {publicKey && (
                     <Button size="sm" variant="ghost" icon="copy" onClick={handleCopyPublicKey}>
-                      Copy
-                    </Button>
+                      {__tr("Copy")}</Button>
                   )}
                 </div>
                 <Textarea
-                  aria-label="Public Key"
+                  aria-label={__tr("Public Key")}
                   value={publicKey}
                   onChange={(e) => setPublicKey(e.target.value)}
                   placeholder=""
@@ -461,24 +456,24 @@ export default function CredentialForm({
                   className="font-mono"
                 />
               </div>
-              <FormField label="Fingerprint">
+              <FormField label={__tr("Fingerprint")}>
                 <TextInput value={fingerprint} readOnly placeholder="" className="cursor-default font-mono" />
               </FormField>
             </Card>
           )}
 
           <div>
-            <span className="mb-1 block text-label font-semibold text-ink-secondary">Tags</span>
+            <span className="mb-1 block text-label font-semibold text-ink-secondary">{__tr("Tags")}</span>
             <div className="flex gap-2">
               <TextInput
-                aria-label="Tags"
+                aria-label={__tr("Tags")}
                 leading={<TagIcon size={16} />}
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagKeyDown}
                 placeholder=""
               />
-              <Button icon="plus" aria-label="Add tag" title="Add tag" onClick={addTag} disabled={!tagInput.trim()} />
+              <Button icon="plus" aria-label={__tr("Add tag")} title={__tr("Add tag")} onClick={addTag} disabled={!tagInput.trim()} />
             </div>
             {tags.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -488,8 +483,8 @@ export default function CredentialForm({
                     <button
                       type="button"
                       onClick={() => removeTag(tag)}
-                      aria-label={`Remove ${tag}`}
-                      title={`Remove ${tag}`}
+                      aria-label={__tr("Remove {v0}", { v0: (tag) })}
+                      title={__tr("Remove {v0}", { v0: (tag) })}
                       className="text-ink-muted hover:text-danger"
                     >
                       <CloseIcon size={12} compact />

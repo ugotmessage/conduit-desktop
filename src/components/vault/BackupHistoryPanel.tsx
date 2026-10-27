@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useMemo } from "react";
 import { useVaultStore } from "../../stores/vaultStore";
 import { useAuthStore } from "../../stores/authStore";
@@ -26,9 +27,9 @@ export default function BackupHistoryPanel({ onOpenManager }: Props) {
   const tierName = profile?.is_team_member ? "Team" : (profile?.tier?.display_name ?? "Free");
   const limitLabel =
     cloudBackupRetentionDays === -1
-      ? `Retain backups indefinitely (${tierName})`
+      ? __tr("Retain backups indefinitely ({v0})", { v0: (tierName) })
       : cloudBackupRetentionDays !== null && cloudBackupRetentionDays > 0
-      ? `Retain backups for ${cloudBackupRetentionDays} day${cloudBackupRetentionDays !== 1 ? "s" : ""} (${tierName})`
+      ? __tr("Retain backups for {v0} day{v1} ({v2})", { v0: (cloudBackupRetentionDays), v1: (cloudBackupRetentionDays !== 1 ? "s" : ""), v2: (tierName) })
       : null;
 
   const vaultCount = useMemo(
@@ -41,7 +42,7 @@ export default function BackupHistoryPanel({ onOpenManager }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <HistoryIcon size={16} className="shrink-0 text-ink-muted" />
-          <span className="text-label font-semibold text-ink-secondary">Backup History</span>
+          <span className="text-label font-semibold text-ink-secondary">{__tr("Backup History")}</span>
         </div>
         {limitLabel && (
           <span className="text-badge text-ink-muted">{limitLabel}</span>
@@ -52,20 +53,18 @@ export default function BackupHistoryPanel({ onOpenManager }: Props) {
         <Spinner size={12} text="Loading backups..." className="py-2 text-label text-ink-muted" />
       ) : cloudBackups.length === 0 ? (
         <p className="text-label text-ink-muted py-1">
-          No backup snapshots yet. Backups are created automatically each time your vault syncs.
-        </p>
+          {__tr("No backup snapshots yet. Backups are created automatically each time your vault syncs.")}</p>
       ) : (
         <div className="flex items-center justify-between py-2 px-3 rounded-md bg-well">
           <div className="flex items-center gap-2">
             <DatabaseIcon size={16} className="text-ink-muted" />
             <span className="text-label text-ink-secondary">
-              {cloudBackups.length} backup{cloudBackups.length !== 1 ? "s" : ""} across{" "}
-              {vaultCount} vault{vaultCount !== 1 ? "s" : ""}
+              {cloudBackups.length} {__tr("backup")}{cloudBackups.length !== 1 ? "s" : ""} {__tr("across")}{" "}
+              {vaultCount} {__tr("vault")}{vaultCount !== 1 ? "s" : ""}
             </span>
           </div>
           <Button variant="link" size="sm" onClick={onOpenManager}>
-            Manage Backups...
-          </Button>
+            {__tr("Manage Backups...")}</Button>
         </div>
       )}
     </div>

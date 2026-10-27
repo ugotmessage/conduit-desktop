@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from 'react';
 import { useAppIcon } from '../../hooks/useAppIcon';
 import { useAuthStore } from '../../stores/authStore';
@@ -28,12 +29,11 @@ export default function AuthScreen() {
         <div className="text-center mb-8">
           <img src={appIcon} alt="Conduit" className="w-16 h-16 rounded-2xl mx-auto mb-4" />
           <h1 className="text-display font-semibold text-ink">Conduit</h1>
-          <p className="text-body text-ink-muted mt-1">Remote Connection Manager</p>
+          <p className="text-body text-ink-muted mt-1">{__tr("Remote Connection Manager")}</p>
         </div>
 
-        <Callout tone="info" icon={SparklesIcon} title="30-day free trial of Pro" className="mb-4">
-          Use one vault on all your devices at once. No commitment.
-        </Callout>
+        <Callout tone="info" icon={SparklesIcon} title={__tr("30-day free trial of Pro")} className="mb-4">
+          {__tr("Use one vault on all your devices at once. No commitment.")}</Callout>
 
         <div className="rounded-lg border border-card-border bg-sidebar p-6">
           {error && (
@@ -47,65 +47,55 @@ export default function AuthScreen() {
               <div className="flex justify-center mb-4">
                 <Spinner size={24} className="text-link" />
               </div>
-              <p className="text-body text-ink mb-1">Complete sign-in in your browser...</p>
+              <p className="text-body text-ink mb-1">{__tr("Complete sign-in in your browser...")}</p>
               <p className="text-label text-ink-muted mb-6">
-                A browser window has been opened. Return here after signing in.
-              </p>
+                {__tr("A browser window has been opened. Return here after signing in.")}</p>
               <Button variant="link" size="lg" onClick={handleSignIn}>
-                Open browser again
-              </Button>
+                {__tr("Open browser again")}</Button>
             </div>
           ) : (
             <div className="space-y-3">
               <Button variant="primary" size="lg" icon={ExternalLinkIcon} fullWidth onClick={handleSignIn}>
-                Sign In
-              </Button>
+                {__tr("Sign In")}</Button>
 
               <p className="text-center text-body text-ink-muted">
-                Don't have an account?{' '}
+                {__tr("Don't have an account?")}{' '}
                 <Button variant="link" size="lg" onClick={handleSignUp}>
-                  Create Account
-                </Button>
+                  {__tr("Create Account")}</Button>
               </p>
 
               <div className="relative pt-2">
                 <div className="absolute inset-x-0 top-1/2 h-px bg-divider" />
                 <span className="relative mx-auto block w-fit bg-sidebar px-2 text-meta text-ink-faint">
-                  or
-                </span>
+                  {__tr("or")}</span>
               </div>
 
               <Button variant="secondary" size="lg" fullWidth onClick={enterLocalMode}>
-                Continue without signing in
-              </Button>
+                {__tr("Continue without signing in")}</Button>
             </div>
           )}
         </div>
 
         {/* Feature preview */}
         <div className="mt-6 text-center">
-          <p className="text-label text-ink-faint mb-2">Free accounts include</p>
+          <p className="text-label text-ink-faint mb-2">{__tr("Free accounts include")}</p>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-label text-ink-muted">
             <span className="flex items-center gap-1.5 whitespace-nowrap">
               <ServerIcon size={16} className="text-link" />
-              SSH · RDP · VNC · Web
-            </span>
+              {__tr("SSH · RDP · VNC · Web")}</span>
             <span className="flex items-center gap-1.5 whitespace-nowrap">
               <ShieldLockIcon size={16} className="text-link" />
-              Encrypted Vault
-            </span>
+              {__tr("Encrypted Vault")}</span>
             <span className="flex items-center gap-1.5 whitespace-nowrap">
               <BoltIcon size={16} className="text-link" />
-              Unlimited MCP Tools
-            </span>
+              {__tr("Unlimited MCP Tools")}</span>
           </div>
         </div>
 
         {/* Open-source footer */}
         <div className="text-center mt-8">
           <p className="text-meta text-ink-faint/50">
-            Open source · Apache 2.0
-          </p>
+            {__tr("Open source · Apache 2.0")}</p>
         </div>
       </div>
     </div>

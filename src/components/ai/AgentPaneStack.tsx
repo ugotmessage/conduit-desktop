@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { Fragment, useRef, useState, type PointerEvent } from "react";
 import { useAgentPaneStore } from "../../stores/agentPaneStore";
 import AgentPane from "./AgentPane";
@@ -61,7 +62,7 @@ export default function AgentPaneStack({ epoch }: { epoch: number }) {
             <div
               role="separator"
               aria-orientation="horizontal"
-              aria-label="Resize agents"
+              aria-label={__tr("Resize agents")}
               data-orientation="horizontal"
               data-dragging={dragging === index - 1 ? "" : undefined}
               className="cv-split-sash cv-split-sash-ai"

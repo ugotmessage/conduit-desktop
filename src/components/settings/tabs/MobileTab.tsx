@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { DeviceMobileIcon } from "../../../lib/icons";
 import { SectionHeader } from "../../ui";
 import { HINT } from "../settings-styles";
@@ -29,7 +30,7 @@ function AppStoreQrCode({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 31 31"
       shapeRendering="crispEdges"
-      aria-label="QR code to download Conduit on the App Store"
+      aria-label={__tr("QR code to download Conduit on the App Store")}
     >
       <path fill="none" d="M0 0h31v31H0z" />
       <path
@@ -43,7 +44,7 @@ function AppStoreQrCode({ className }: { className?: string }) {
 export default function MobileTab() {
   return (
     <div className="space-y-6">
-      <SectionHeader title="Conduit Mobile" description="Access your vault on the go with Conduit for iOS and iPadOS." />
+      <SectionHeader title={__tr("Conduit Mobile")} description={__tr("Access your vault on the go with Conduit for iOS and iPadOS.")} />
 
       {/* App Store card */}
       <div className="overflow-hidden rounded-md border border-card-border">
@@ -64,16 +65,14 @@ export default function MobileTab() {
             </div>
 
             <p className={`leading-relaxed ${HINT}`}>
-              Scan the QR code with your device camera to download from the App Store.
-            </p>
+              {__tr("Scan the QR code with your device camera to download from the App Store.")}</p>
           </div>
         </div>
 
         <div className="flex items-start gap-2.5 border-t border-card-border px-4 py-3">
           <AppleIcon size={16} className="mt-0.5 shrink-0 text-ink-muted" />
           <p className={`leading-relaxed ${HINT}`}>
-            Keep your vault file in iCloud Drive, OneDrive, or Dropbox to use it on all your devices. Conduit merges the changes from each one. On the Free plan a vault can be open on one device at a time.
-          </p>
+            {__tr("Keep your vault file in iCloud Drive, OneDrive, or Dropbox to use it on all your devices. Conduit merges the changes from each one. On the Free plan a vault can be open on one device at a time.")}</p>
         </div>
       </div>
     </div>

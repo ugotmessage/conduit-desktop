@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import type { SyncPrompt } from "../../types/sync";
 import SyncBanner from "./SyncBanner";
@@ -22,10 +23,10 @@ export default function SideFilesPausedBanner({ prompt }: { prompt: SideFilesPro
     setBusy(false);
   };
   const label = prompt.walNonEmpty
-    ? "Review unsaved changes first"
+    ? __tr("Review unsaved changes first")
     : prompt.upgradeWording
-      ? "Continue"
-      : "Conduit is closed on my other computers";
+      ? __tr("Continue")
+      : __tr("Conduit is closed on my other computers");
   const action = prompt.walNonEmpty ? reviewSideFileWal : confirmSideFiles;
   return (
     <SyncBanner

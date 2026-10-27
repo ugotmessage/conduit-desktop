@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../../../stores/authStore";
 import { useVaultStore } from "../../../stores/vaultStore";
@@ -25,7 +26,7 @@ export default function BackupTab() {
         <LocalBackupSection />
       ) : (
         <div className="py-4 text-center">
-          <p className={HINT}>Unlock your vault to configure local backups</p>
+          <p className={HINT}>{__tr("Unlock your vault to configure local backups")}</p>
         </div>
       )}
 

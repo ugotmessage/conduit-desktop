@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { toast } from "../common/Toast";
 import { Button, Checkbox, Dialog } from "../ui";
@@ -25,18 +26,18 @@ export default function RecoveryPassphraseDialog({
       await navigator.clipboard.writeText(passphrase);
     } catch (err) {
       console.error("[vault] Failed to copy the recovery passphrase:", err);
-      toast.error("Could not copy the passphrase", "Write it down instead.");
+      toast.error(__tr("Could not copy the passphrase"), __tr("Write it down instead."));
       return;
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast.success("Recovery passphrase copied");
+    toast.success(__tr("Recovery passphrase copied"));
   };
 
   return (
     <Dialog
       open
-      title="Save Your Recovery Passphrase"
+      title={__tr("Save Your Recovery Passphrase")}
       icon="key"
       tone="warn"
       width={440}
@@ -45,11 +46,10 @@ export default function RecoveryPassphraseDialog({
       footer={
         <>
           <Button icon={copied ? "check" : "copy"} onClick={() => void handleCopy()}>
-            {copied ? "Copied" : "Copy to Clipboard"}
+            {copied ? __tr("Copied") : __tr("Copy to Clipboard")}
           </Button>
           <Button variant="primary" onClick={onConfirm} disabled={!confirmed}>
-            I've Saved It
-          </Button>
+            {__tr("I've Saved It")}</Button>
         </>
       }
     >
@@ -67,13 +67,10 @@ export default function RecoveryPassphraseDialog({
       </div>
 
       <p>
-        Write this down and store it safely. You'll need it to access team
-        vaults from new devices. This passphrase cannot be recovered if lost.
-      </p>
+        {__tr("Write this down and store it safely. You'll need it to access team vaults from new devices. This passphrase cannot be recovered if lost.")}</p>
 
       <Checkbox checked={confirmed} onChange={setConfirmed}>
-        I have saved my recovery passphrase in a secure location
-      </Checkbox>
+        {__tr("I have saved my recovery passphrase in a secure location")}</Checkbox>
     </Dialog>
   );
 }

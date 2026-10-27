@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useVaultStore } from "../../stores/vaultStore";
 import { useTeamStore, type TeamVaultSummary } from "../../stores/teamStore";
 import { CircleFilledIcon } from "../../lib/icons";
@@ -6,15 +7,15 @@ import { IconButton } from "../ui";
 function syncTooltip(status: string): string {
   switch (status) {
     case "synced":
-      return "Synced";
+      return __tr("Synced");
     case "syncing":
-      return "Syncing…";
+      return __tr("Syncing\u2026");
     case "offline":
-      return "Offline";
+      return __tr("Offline");
     case "error":
-      return "Sync error";
+      return __tr("Sync error");
     default:
-      return "Idle";
+      return __tr("Idle");
   }
 }
 
@@ -52,12 +53,12 @@ export default function VaultContextBar() {
         <span className="flex shrink-0" title={syncTooltip(syncStatus)}>
           <CircleFilledIcon size={12} className={syncDotClass(syncStatus)} />
         </span>
-        <span className="text-meta text-ink-muted select-none">Team</span>
+        <span className="text-meta text-ink-muted select-none">{__tr("Team")}</span>
       </div>
       <IconButton
         size="sm"
         icon="settings"
-        label="Vault settings"
+        label={__tr("Vault settings")}
         onClick={() =>
           document.dispatchEvent(
             new CustomEvent("conduit:vault-settings", {

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { CloseIcon } from "../../lib/icons";
 import { Button } from "../ui";
 
@@ -28,8 +29,7 @@ export default function ScreenshotPicker({ screenshots, max, disabled, onPick, o
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <Button icon="photo" onClick={onPick} disabled={disabled || screenshots.length >= max}>
-          Attach Screenshots
-        </Button>
+          {__tr("Attach Screenshots")}</Button>
         {screenshots.length > 0 && (
           <span className="text-meta text-ink-faint">
             {screenshots.length} / {max}
@@ -56,7 +56,7 @@ export default function ScreenshotPicker({ screenshots, max, disabled, onPick, o
                 type="button"
                 onClick={() => onRemove(idx)}
                 className="absolute right-0.5 top-0.5 rounded-full bg-black/60 p-0.5 opacity-0 transition-opacity hover:bg-black/80 focus-visible:opacity-100 group-hover:opacity-100"
-                title="Remove"
+                title={__tr("Remove")}
               >
                 <CloseIcon size={12} className="text-white" />
               </button>

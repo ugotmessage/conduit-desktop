@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useMemo } from "react";
 import { hasUnseenAgentEdit, readKb } from "../../lib/kb";
 import { NotesIcon } from "../../lib/icons";
@@ -30,7 +31,7 @@ export default function KnowledgeBadge({ info }: { info: KnowledgeCount | undefi
   return (
     <span
       className="flex shrink-0 items-center gap-0.5 text-meta text-ink-faint"
-      title={`${info.count} knowledge ${info.count === 1 ? "article" : "articles"}${info.unseen ? ", agent edits to review" : ""}`}
+      title={__tr("{v0} knowledge {v1}{v2}", { v0: (info.count), v1: (info.count === 1 ? "article" : "articles"), v2: (info.unseen ? ", agent edits to review" : "") })}
       data-cv-kb-badge={info.count}
     >
       <NotesIcon size={12} />

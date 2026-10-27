@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import type { PopupMenuItem } from "../../utils/contextMenu";
 import type { EntryType } from "../../types/entry";
 import type { CredentialType } from "../../types/credential";
@@ -27,11 +28,11 @@ const entryItemId = (option: TypeOption) =>
 
 const ALL_OPTIONS: readonly TypeOption[] = ENTRY_TYPE_CATEGORIES.flatMap((c) => c.items);
 
-const NEW_FOLDER_ITEM: PopupMenuItem = { id: NEW_FOLDER_ID, label: "New Folder", icon: "folderPlus" };
+const NEW_FOLDER_ITEM: PopupMenuItem = { id: NEW_FOLDER_ID, label: __tr("New Folder"), icon: "folderPlus" };
 
 export const newFolderItem = (): PopupMenuItem => ({ ...NEW_FOLDER_ITEM });
 
-const VIEW_ONLY_MENU: readonly PopupMenuItem[] = [{ id: "view_only", label: "View-only access", type: "header" }];
+const VIEW_ONLY_MENU: readonly PopupMenuItem[] = [{ id: "view_only", label: __tr("View-only access"), type: "header" }];
 
 /** Every entry type, grouped as on the type picker. */
 function entryTypeItems(): PopupMenuItem[] {
@@ -42,7 +43,7 @@ function entryTypeItems(): PopupMenuItem[] {
 }
 
 export function newEntrySubmenu(): PopupMenuItem {
-  return { id: "new_entry", label: "New Entry", icon: "plus", children: entryTypeItems() };
+  return { id: "new_entry", label: __tr("New Entry"), icon: "plus", children: entryTypeItems() };
 }
 
 /** The entry types plus New Folder, for creating next to an entry. */
@@ -60,7 +61,7 @@ export function headerCreateMenu(): PopupMenuItem[] {
   return [
     ...entryTypeItems(),
     SEPARATOR("sep_header_more"),
-    { id: PICK_TYPE_ID, label: "Choose Type…", icon: "plus" },
+    { id: PICK_TYPE_ID, label: __tr("Choose Type…"), icon: "plus" },
     NEW_FOLDER_ITEM,
   ];
 }

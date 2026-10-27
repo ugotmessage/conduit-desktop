@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { BadgeTone } from "../../ui";
 import { REACHABILITY_TIMEOUT_MS, type ReachabilityResult, type ReachabilityStatus } from "../../../types/dashboard";
 
@@ -18,17 +19,17 @@ export function reachabilityText(result: Pick<ReachabilityResult, "status" | "po
     case "reachable":
       return { badge: "Up", tone: "success", detail: answeredIn(result.latencyMs) };
     case "refused":
-      return { badge: "Port closed", tone: "warning", detail: `Nothing is listening on port ${result.port ?? "?"}` };
+      return { badge: "Port closed", tone: "warning", detail: __tr("Nothing is listening on port {v0}", { v0: (result.port ?? "?") }) };
     case "timeout":
-      return { badge: "No answer", tone: "warning", detail: `No answer in ${TIMEOUT_SECONDS} seconds` };
+      return { badge: "No answer", tone: "warning", detail: __tr("No answer in {v0} seconds", { v0: (TIMEOUT_SECONDS) }) };
     case "unreachable":
-      return { badge: "Down", tone: "danger", detail: "No route to this host" };
+      return { badge: "Down", tone: "danger", detail: __tr("No route to this host") };
     case "not_found":
-      return { badge: "Unknown host", tone: "danger", detail: "Could not find this host name" };
+      return { badge: "Unknown host", tone: "danger", detail: __tr("Could not find this host name") };
     case "invalid":
-      return { badge: "Cannot check", tone: "neutral", detail: "The host or port of this entry is not valid" };
+      return { badge: "Cannot check", tone: "neutral", detail: __tr("The host or port of this entry is not valid") };
     case "not_checkable":
-      return { badge: "Cannot check", tone: "neutral", detail: "This entry has no host and port to check" };
+      return { badge: "Cannot check", tone: "neutral", detail: __tr("This entry has no host and port to check") };
   }
 }
 

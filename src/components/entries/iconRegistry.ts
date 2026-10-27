@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 /**
  * Curated icon registry for custom entry/folder icons.
  * Only icons referenced here are bundled (tree-shaking friendly).
@@ -124,7 +125,7 @@ export interface IconCategory {
 
 export const ICON_CATEGORIES: IconCategory[] = [
   {
-    label: "Connections",
+    label: __tr("Connections"),
     icons: [
       { name: "IconTerminal2", component: IconTerminal2 },
       { name: "IconDeviceDesktop", component: IconDeviceDesktop },
@@ -141,7 +142,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Security",
+    label: __tr("Security"),
     icons: [
       { name: "IconKey", component: IconKey },
       { name: "IconLock", component: IconLock },
@@ -151,7 +152,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Development",
+    label: __tr("Development"),
     icons: [
       { name: "IconCode", component: IconCode },
       { name: "IconBug", component: IconBug },
@@ -164,7 +165,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Platforms",
+    label: __tr("Platforms"),
     icons: [
       { name: "IconBrandAws", component: IconBrandAws },
       { name: "IconBrandAzure", component: IconBrandAzure },
@@ -176,7 +177,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Hardware",
+    label: __tr("Hardware"),
     icons: [
       { name: "IconCpu", component: IconCpu },
       { name: "IconDeviceFloppy", component: IconDeviceFloppy },
@@ -185,7 +186,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Files",
+    label: __tr("Files"),
     icons: [
       { name: "IconFolder", component: IconFolder },
       { name: "IconFolderOpen", component: IconFolderOpen },
@@ -195,7 +196,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Organization",
+    label: __tr("Organization"),
     icons: [
       { name: "IconHome", component: IconHome },
       { name: "IconBuilding", component: IconBuilding },
@@ -206,7 +207,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Status",
+    label: __tr("Status"),
     icons: [
       { name: "IconStar", component: IconStar },
       { name: "IconHeart", component: IconHeart },
@@ -223,7 +224,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Analytics",
+    label: __tr("Analytics"),
     icons: [
       { name: "IconChartBar", component: IconChartBar },
       { name: "IconChartPie", component: IconChartPie },
@@ -231,7 +232,7 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ],
   },
   {
-    label: "Misc",
+    label: __tr("Misc"),
     icons: [
       { name: "IconPlayerPlay", component: IconPlayerPlay },
       { name: "IconPuzzle", component: IconPuzzle },

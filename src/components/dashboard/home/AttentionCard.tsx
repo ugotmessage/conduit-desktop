@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect, useMemo, useState } from "react";
 import { PASSWORD_AGE_LIST_LIMIT, type AttentionAction, type AttentionItem, type HomeSettings, type PasswordAgeItem } from "../../../types/dashboard";
 import type { EntryMeta } from "../../../types/entry";
@@ -89,7 +90,7 @@ function PasswordList({ entryIds, entries, setAt }: PasswordListProps) {
           {entry.name}
         </ListRow>
       ))}
-      {more > 0 && <p className="px-2 text-meta text-ink-faint">And {more} more</p>}
+      {more > 0 && <p className="px-2 text-meta text-ink-faint">{__tr("And")} {more} {__tr("more")}</p>}
     </div>
   );
 }
@@ -97,7 +98,7 @@ function PasswordList({ entryIds, entries, setAt }: PasswordListProps) {
 function AttentionRow({ item, entries, setAt }: { item: AttentionItem } & Omit<PasswordListProps, "entryIds">) {
   const [showList, setShowList] = useState(false);
   const isPasswords = item.action === "show-passwords";
-  const label = isPasswords && showList ? "Hide entries" : item.actionLabel;
+  const label = isPasswords && showList ? __tr("Hide entries") : item.actionLabel;
   return (
     <div data-attention={item.kind}>
       <div className="flex items-start gap-2">
@@ -158,7 +159,7 @@ export default function AttentionCard({ settings }: { settings: HomeSettings }) 
   if (items.length === 0) return null;
   return (
     <Card>
-      <SectionHeader title="Needs attention" />
+      <SectionHeader title={__tr("Needs attention")} />
       <div className="space-y-3">
         {items.map((item) => (
           <AttentionRow key={item.kind} item={item} entries={entries} setAt={setAt} />

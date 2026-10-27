@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState } from "react";
 import { invoke } from "../../../lib/electron";
 import { errorText } from "../../../lib/errorText";
@@ -16,9 +17,9 @@ export default function EncryptNotesSetting() {
     try {
       const { entries, secrets } = await invoke<{ entries: number; secrets: number }>("secret_encrypt_all");
       await loadAll();
-      toast.success(secrets === 0 ? "No unencrypted secrets found" : `${secrets} secrets encrypted in ${entries} ${entries === 1 ? "entry" : "entries"}`);
+      toast.success(secrets === 0 ? __tr("No unencrypted secrets found") : __tr("{v0} secrets encrypted in {v1} {v2}", { v0: (secrets), v1: (entries), v2: (entries === 1 ? "entry" : "entries") }));
     } catch (err) {
-      toast.error(errorText(err, "Couldn't encrypt the secrets"));
+      toast.error(errorText(err, __tr("Couldn't encrypt the secrets")));
     } finally {
       setBusy(false);
     }
@@ -26,14 +27,11 @@ export default function EncryptNotesSetting() {
 
   return (
     <div>
-      <SectionHeader title="Secrets in notes" />
+      <SectionHeader title={__tr("Secrets in notes")} />
       <p className={HINT}>
-        Older notes may hold secrets written as !!secret!!, which are hidden on screen but stored unencrypted. This turns
-        every one in this vault into an encrypted secret and keeps a link to it in the text.
-      </p>
+        {__tr("Older notes may hold secrets written as !!secret!!, which are hidden on screen but stored unencrypted. This turns every one in this vault into an encrypted secret and keeps a link to it in the text.")}</p>
       <Button className="mt-2" onClick={() => void encryptAll()} loading={busy}>
-        Encrypt secrets in all notes
-      </Button>
+        {__tr("Encrypt secrets in all notes")}</Button>
     </div>
   );
 }

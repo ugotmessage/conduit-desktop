@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { QUICK_SEARCH_LIMIT } from "../../../types/dashboard";
 import { useEntryStore } from "../../../stores/entryStore";
@@ -10,7 +11,7 @@ import { searchQuick, type QuickResult } from "./quickSearch";
 import { selectEntries, selectFolders } from "./storeSelectors";
 
 const IS_MAC = navigator.platform.toUpperCase().includes("MAC");
-const CREATE_DISABLED_REASON = "View-only access";
+const CREATE_DISABLED_REASON = __tr("View-only access");
 
 function openResult(result: QuickResult): void {
   if (result.kind === "folder") openFolderView(result.id);
@@ -69,8 +70,8 @@ export default function QuickBar() {
           value={query}
           onChange={changeQuery}
           onKeyDown={onKeyDown}
-          placeholder="Search entries and folders..."
-          aria-label="Search entries and folders"
+          placeholder={__tr("Search entries and folders...")}
+          aria-label={__tr("Search entries and folders")}
           role="combobox"
           aria-expanded={open}
           aria-controls={listId}
@@ -79,8 +80,7 @@ export default function QuickBar() {
           wrapperClassName="flex-1"
         />
         <Button variant="primary" className="gap-2" onClick={() => document.dispatchEvent(new CustomEvent("conduit:quick-connect"))}>
-          Quick Connect
-          <Kbd onFilled>{IS_MAC ? "⌘N" : "Ctrl+N"}</Kbd>
+          {__tr("Quick Connect")}<Kbd onFilled>{IS_MAC ? "⌘N" : "Ctrl+N"}</Kbd>
         </Button>
         <Button
           icon="plus"
@@ -88,15 +88,14 @@ export default function QuickBar() {
           title={createDisabled ? CREATE_DISABLED_REASON : undefined}
           onClick={() => document.dispatchEvent(new CustomEvent("conduit:new-entry"))}
         >
-          New Entry
-        </Button>
+          {__tr("New Entry")}</Button>
       </div>
       {open && (
         <Card>
           {results.length === 0 ? (
-            <p className="text-label text-ink-faint">No entries or folders match</p>
+            <p className="text-label text-ink-faint">{__tr("No entries or folders match")}</p>
           ) : (
-            <div id={listId} role="listbox" aria-label="Search results" className="space-y-px">
+            <div id={listId} role="listbox" aria-label={__tr("Search results")} className="space-y-px">
               {results.map((result, index) => (
                 <ListRow
                   key={`${result.kind}:${result.id}`}

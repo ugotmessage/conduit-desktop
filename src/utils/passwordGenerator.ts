@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 // Password generation utilities - pure functions, no React dependencies
 
 export type GeneratorMode = "default" | "passphrase" | "pronounceable";
@@ -292,7 +293,7 @@ export function generatePassword(settings: GeneratorSettings): string {
 }
 
 export function scorePassword(password: string): StrengthResult {
-  if (!password) return { score: 0, label: "Very Weak", color: "red-500", percent: 10 };
+  if (!password) return { score: 0, label: __tr("Very Weak"), color: "red-500", percent: 10 };
 
   let score = 0;
 
@@ -334,11 +335,11 @@ export function scorePassword(password: string): StrengthResult {
   const clamped = Math.max(0, Math.min(4, Math.round(score / 2)));
 
   const mapping: Record<number, { label: string; color: string; percent: number }> = {
-    0: { label: "Very Weak", color: "red-500", percent: 10 },
-    1: { label: "Weak", color: "orange-500", percent: 30 },
-    2: { label: "Fair", color: "yellow-500", percent: 55 },
-    3: { label: "Strong", color: "green-500", percent: 80 },
-    4: { label: "Very Strong", color: "emerald-500", percent: 100 },
+    0: { label: __tr("Very Weak"), color: "red-500", percent: 10 },
+    1: { label: __tr("Weak"), color: "orange-500", percent: 30 },
+    2: { label: __tr("Fair"), color: "yellow-500", percent: 55 },
+    3: { label: __tr("Strong"), color: "green-500", percent: 80 },
+    4: { label: __tr("Very Strong"), color: "emerald-500", percent: 100 },
   };
 
   return { score: clamped, ...mapping[clamped] };

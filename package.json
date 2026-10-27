@@ -15,7 +15,7 @@
     "dev:electron:owner-bypass": "cross-env CONDUIT_DEV_IGNORE_OWNER_TAG=1 npm run dev:electron",
     "dev:electron:prod": "cross-env CONDUIT_ENV=production tsc -p electron/tsconfig.json && cd mcp && npx tsc && cd .. && concurrently -k \"cross-env CONDUIT_ENV=production vite\" \"wait-on http://localhost:1420 && cross-env CONDUIT_ENV=production electron .\"",
     "dev:account": "node scripts/dev/dev-account.mjs",
-    "build": "tsc && vite build && tsc -p electron/tsconfig.json && cd mcp && npx tsc",
+    "build": "npm run i18n:sync && tsc && vite build && tsc -p electron/tsconfig.json && cd mcp && npx tsc",
     "build:mac": "cross-env CONDUIT_ENV=production npm run build && electron-builder --mac",
     "icons:mac": "bash scripts/build-mac-icon.sh",
     "build:win": "cross-env CONDUIT_ENV=production npm run build && electron-builder --win",
@@ -36,7 +36,8 @@
     "appwrite:setup": "cd appwrite && npm ci --no-audit --no-fund && node scripts/setup-local.ts",
     "appwrite:deploy": "node scripts/appwrite-local.mjs deploy",
     "appwrite:start": "node scripts/appwrite-local.mjs start",
-    "appwrite:stop": "node scripts/appwrite-local.mjs stop"
+    "appwrite:stop": "node scripts/appwrite-local.mjs stop",
+    "i18n:sync": "node scripts/i18n/sync.mjs"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.45",

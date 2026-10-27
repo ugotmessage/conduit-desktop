@@ -1,3 +1,4 @@
+import { t as __tr } from "./i18n";
 // Main's auto-unlock-event (electron/ipc/auto-unlock-lifecycle.ts) as toasts (docs/AUTO_UNLOCK.md 2.8).
 import { toast } from "../components/common/Toast";
 import { useStartupVaultStore } from "../stores/startupVaultStore";
@@ -14,10 +15,10 @@ function isEvent(payload: unknown): payload is AutoUnlockEvent {
 }
 
 function toastForgotten(reason: string, name: string | null): void {
-  if (reason === "sign-out") toast.info("Automatic unlock is off", "Signing out turns it off on this computer.");
+  if (reason === "sign-out") toast.info(__tr("Automatic unlock is off"), __tr("Signing out turns it off on this computer."));
   else if (reason === "account") toastAccountChanged();
-  else if (reason === "release") toast.info("Automatic unlock is off", `${name ?? "This vault"} is no longer yours to open at startup.`);
-  else if (reason === "own-copy") toast.info("Automatic unlock is off", "Your copy opens at startup. Turn automatic unlock on again from the unlock screen.");
+  else if (reason === "release") toast.info(__tr("Automatic unlock is off"), __tr("{v0} is no longer yours to open at startup.", { v0: (name ?? "This vault") }));
+  else if (reason === "own-copy") toast.info(__tr("Automatic unlock is off"), __tr("Your copy opens at startup. Turn automatic unlock on again from the unlock screen."));
 }
 
 export function handleAutoUnlockEvent(payload: unknown): void {

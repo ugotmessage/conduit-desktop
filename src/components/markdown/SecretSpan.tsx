@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { CopyIcon, EyeIcon, EyeOffIcon } from "../../lib/icons";
 import { toast } from "../common/Toast";
@@ -12,9 +13,9 @@ export default function SecretSpan({ secret }: SecretSpanProps) {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(secret);
-      toast.success("Secret copied");
+      toast.success(__tr("Secret copied"));
     } catch {
-      toast.error("Failed to copy secret");
+      toast.error(__tr("Failed to copy secret"));
     }
   };
 
@@ -33,7 +34,7 @@ export default function SecretSpan({ secret }: SecretSpanProps) {
         type="button"
         onClick={() => setRevealed((r) => !r)}
         className="inline-flex items-center p-0 border-0 bg-transparent text-ink-muted hover:text-ink cursor-pointer"
-        title={revealed ? "Hide secret" : "Reveal secret"}
+        title={revealed ? __tr("Hide secret") : __tr("Reveal secret")}
       >
         {revealed ? <EyeOffIcon size={12} /> : <EyeIcon size={12} />}
       </button>
@@ -42,7 +43,7 @@ export default function SecretSpan({ secret }: SecretSpanProps) {
           type="button"
           onClick={handleCopy}
           className="inline-flex items-center p-0 border-0 bg-transparent text-ink-muted hover:text-ink cursor-pointer"
-          title="Copy secret"
+          title={__tr("Copy secret")}
         >
           <CopyIcon size={12} />
         </button>

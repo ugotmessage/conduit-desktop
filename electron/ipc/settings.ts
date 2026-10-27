@@ -55,6 +55,7 @@ const HARDCODED_SSH_DEFAULTS: SshGlobalDefaults = {
 };
 
 export interface AppSettings {
+  ui_language?: "system" | "en" | "zh-TW";
   theme: string;
   color_scheme: string;
   // Appearance (docs/VISUAL_REDESIGN.md 6.1); the migration in readSettings() fills them for older files
@@ -115,6 +116,7 @@ export interface AppSettings {
 }
 
 const defaultSettings: AppSettings = {
+  ui_language: 'system',
   theme: 'system',
   color_scheme: 'modern',
   icon_pack: 'lucide',

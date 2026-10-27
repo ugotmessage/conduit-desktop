@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { useSyncStore } from "../../stores/syncStore";
 import SyncDialogFrame, { DialogButton } from "./SyncDialogFrame";
@@ -20,18 +21,17 @@ export default function ReleaseVaultDialog() {
     <SyncDialogFrame
       icon="key"
       tone="warn"
-      title="Release this vault?"
+      title={__tr("Release this vault?")}
       onEscape={busy ? undefined : close}
       footer={
         <>
-          <DialogButton onClick={close} disabled={busy}>Cancel</DialogButton>
+          <DialogButton onClick={close} disabled={busy}>{__tr("Cancel")}</DialogButton>
           <DialogButton variant="primary" onClick={() => void release()} loading={busy} loadingLabel="Releasing..." autoFocus>
-            Release
-          </DialogButton>
+            {__tr("Release")}</DialogButton>
         </>
       }
     >
-      <p className="text-ink">The next Conduit account that opens it becomes its owner. If you open it again first, it stays yours.</p>
+      <p className="text-ink">{__tr("The next Conduit account that opens it becomes its owner. If you open it again first, it stays yours.")}</p>
     </SyncDialogFrame>
   );
 }

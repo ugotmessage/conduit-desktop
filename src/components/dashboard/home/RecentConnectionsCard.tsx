@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useMemo } from "react";
 import type { RecentConnection } from "../../../types/dashboard";
 import { useEntryStore } from "../../../stores/entryStore";
@@ -9,10 +10,10 @@ import { useRecentConnectionsFeed } from "./homeFeeds";
 import { selectEntries } from "./storeSelectors";
 
 function RecentMeta({ item }: { item: RecentConnection }) {
-  if (item.lastOutcome === "open") return <>Open</>;
+  if (item.lastOutcome === "open") return <>{__tr("Open")}</>;
   return (
     <>
-      {item.lastOutcome === "failed" && <Badge tone="danger">Failed</Badge>}
+      {item.lastOutcome === "failed" && <Badge tone="danger">{__tr("Failed")}</Badge>}
       {formatRelativeTime(item.lastStartedAt)}
     </>
   );
@@ -34,7 +35,7 @@ export default function RecentConnectionsCard({ active = true }: { active?: bool
   if (rows.length === 0) return null;
   return (
     <Card>
-      <SectionHeader title="Recently connected" />
+      <SectionHeader title={__tr("Recently connected")} />
       <div className="space-y-px">
         {rows.map(({ item, entry }) => (
           <RecentRow key={item.entryId} item={item} entry={entry} />

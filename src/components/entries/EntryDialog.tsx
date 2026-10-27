@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useRef } from "react";
 import { useEntryStore } from "../../stores/entryStore";
 import { useSessionStore } from "../../stores/sessionStore";
@@ -289,7 +290,7 @@ export default function EntryDialog({ onClose, presetType, presetCredentialType,
 
     // SSH entries require a username (unless a linked credential provides one)
     if (entryType === 'ssh' && !username.trim() && !credentialId) {
-      setValidationError('Username is required for SSH connections');
+      setValidationError(__tr("Username is required for SSH connections"));
       setActiveTab('credentials');
       return;
     }
@@ -357,14 +358,14 @@ export default function EntryDialog({ onClose, presetType, presetCredentialType,
 
   if (isLoadingEntry) {
     return (
-      <Dialog open onClose={onClose} title="Edit Entry" width={448} hideClose closeOnEscape={false} layout="custom">
-        <p className="p-8 text-center text-ink-muted">Loading entry...</p>
+      <Dialog open onClose={onClose} title={__tr("Edit Entry")} width={448} hideClose closeOnEscape={false} layout="custom">
+        <p className="p-8 text-center text-ink-muted">{__tr("Loading entry...")}</p>
       </Dialog>
     );
   }
 
-  const typeLabel = credentialType === "ssh_key" ? "SSH Key" : entryType === "document" ? "Document" : entryType === "command" ? "Command" : entryType?.toUpperCase();
-  const title = step === "type" ? "New Entry" : `${isEditing ? "Edit" : "New"} ${typeLabel} Entry`;
+  const typeLabel = credentialType === "ssh_key" ? __tr("SSH Key") : entryType === "document" ? __tr("Document") : entryType === "command" ? __tr("Command") : entryType?.toUpperCase();
+  const title = step === "type" ? __tr("New Entry") : __tr(isEditing ? "Edit {type} Entry" : "New {type} Entry", { type: typeLabel ?? "" });
   const showForm = step === "form" && entryType != null;
 
   const renderActiveTab = () => {
@@ -530,15 +531,14 @@ export default function EntryDialog({ onClose, presetType, presetCredentialType,
           <DialogFooter className="items-center border-t border-divider">
             {!isEditing && (
               <Button onClick={() => setStep("type")} className="mr-auto">
-                Back
-              </Button>
+                {__tr("Back")}</Button>
             )}
             {validationError && (
               <p data-cv-error="" className="mr-2 text-meta text-danger">
                 {validationError}
               </p>
             )}
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>{__tr("Cancel")}</Button>
             <Button
               type="submit"
               variant="primary"
@@ -546,7 +546,7 @@ export default function EntryDialog({ onClose, presetType, presetCredentialType,
               loading={isSubmitting}
               loadingLabel={isEditing ? "Saving..." : "Creating..."}
             >
-              {isEditing ? "Save" : "Create"}
+              {isEditing ? __tr("Save") : __tr("Create")}
             </Button>
           </DialogFooter>
         )}

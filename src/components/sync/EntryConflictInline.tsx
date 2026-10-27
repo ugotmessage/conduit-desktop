@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useMemo } from "react";
 import { IconSlot } from "../ui";
 import { useSyncStore } from "../../stores/syncStore";
@@ -33,9 +34,8 @@ export default function EntryConflictInline({ entryId, mode }: EntryConflictInli
       <div className="flex items-center gap-2 border-b border-warning-border bg-warning-bg px-4 py-2 text-label text-warning">
         <IconSlot icon="alertTriangle" className="shrink-0" />
         <span className="flex-1">
-          {names ? `Other devices saved different values for: ${names}.` : "Other devices changed this item."} Fields you change here replace the other versions.
-        </span>
-        <SmallButton onClick={openReview}>Review</SmallButton>
+          {names ? __tr("Other devices saved different values for: {v0}.", { v0: (names) }) : __tr("Other devices changed this item.")} {__tr("Fields you change here replace the other versions.")}</span>
+        <SmallButton onClick={openReview}>{__tr("Review")}</SmallButton>
       </div>
     );
   }
@@ -44,13 +44,13 @@ export default function EntryConflictInline({ entryId, mode }: EntryConflictInli
     <div className="space-y-2 border-b border-stroke bg-warning-bg px-6 py-4">
       <div className="flex items-center gap-2">
         <IconSlot icon="alertTriangle" className="text-warning" />
-        <span className="flex-1 text-body font-semibold text-ink">Your devices saved different versions</span>
-        <SmallButton onClick={openReview}>Open review</SmallButton>
+        <span className="flex-1 text-body font-semibold text-ink">{__tr("Your devices saved different versions")}</span>
+        <SmallButton onClick={openReview}>{__tr("Open review")}</SmallButton>
       </div>
       {fields.map((f) => (
         <ConflictFieldRow key={`${f.key.rowId}:${f.key.reg}`} field={f} itemTitle={title} compact />
       ))}
-      {fields.length === 0 && <p className="text-label text-ink-muted">Other devices changed this item in different ways. Open the review to decide.</p>}
+      {fields.length === 0 && <p className="text-label text-ink-muted">{__tr("Other devices changed this item in different ways. Open the review to decide.")}</p>}
     </div>
   );
 }

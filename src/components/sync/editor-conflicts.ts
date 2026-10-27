@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { syncApi } from "../../lib/sync-api";
 import { useSyncStore } from "../../stores/syncStore";
 import { groupsForRow } from "../../stores/sync-reducers";
@@ -29,7 +30,7 @@ export async function announceResolvedBySave(entryId: string, before: Map<string
   try {
     const after = fieldLabels(await syncApi.listConflicts(), entryId);
     const resolved = [...before].filter(([reg]) => !after.has(reg)).map(([, label]) => label);
-    if (resolved.length > 0) toast.success("Saved. Conflict resolved.", `Your values are now used for: ${resolved.join(", ")}.`);
+    if (resolved.length > 0) toast.success(__tr("Saved. Conflict resolved."), __tr("Your values are now used for: {v0}.", { v0: (resolved.join(", ")) }));
     await useSyncStore.getState().refresh();
   } catch (err) {
     console.error("[sync] Failed to check conflicts after save:", err);

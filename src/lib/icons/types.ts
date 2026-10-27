@@ -1,3 +1,4 @@
+import { t as __tr } from "../i18n";
 import type { ComponentType, CSSProperties } from "react";
 
 export const SEMANTIC_ICON_NAMES = [
@@ -203,7 +204,7 @@ export const ICON_PACKS: ReadonlyArray<IconPackInfo> = Object.freeze([
   {
     id: "lucide",
     label: "Lucide",
-    description: "Clean line icons · ISC",
+    description: __tr("Clean line icons · ISC"),
     license: "ISC",
     packageName: "lucide-react",
     version: "1.48.0",
@@ -211,7 +212,7 @@ export const ICON_PACKS: ReadonlyArray<IconPackInfo> = Object.freeze([
   {
     id: "phosphor",
     label: "Phosphor",
-    description: "Soft, rounded icons · MIT",
+    description: __tr("Soft, rounded icons · MIT"),
     license: "MIT",
     packageName: "@phosphor-icons/react",
     version: "2.1.10",
@@ -219,7 +220,7 @@ export const ICON_PACKS: ReadonlyArray<IconPackInfo> = Object.freeze([
   {
     id: "hugeicons",
     label: "Hugeicons",
-    description: "Rounded line icons · MIT",
+    description: __tr("Rounded line icons · MIT"),
     license: "MIT",
     packageName: "@hugeicons/core-free-icons",
     version: "4.3.5",
@@ -227,7 +228,7 @@ export const ICON_PACKS: ReadonlyArray<IconPackInfo> = Object.freeze([
   {
     id: "material",
     label: "Material Symbols",
-    description: "Google Material icons · Apache 2.0",
+    description: __tr("Google Material icons · Apache 2.0"),
     license: "Apache-2.0",
     packageName: "@iconify-json/material-symbols-light",
     version: "1.2.94",
@@ -235,15 +236,15 @@ export const ICON_PACKS: ReadonlyArray<IconPackInfo> = Object.freeze([
   {
     id: "fluent",
     label: "Fluent",
-    description: "Windows 11 icons · MIT",
+    description: __tr("Windows 11 icons · MIT"),
     license: "MIT",
     packageName: "@fluentui/react-icons",
     version: "2.0.321",
   },
   {
     id: "tabler",
-    label: "Tabler (Classic)",
-    description: "The classic Conduit icons · MIT",
+    label: __tr("Tabler (Classic)"),
+    description: __tr("The classic Conduit icons · MIT"),
     license: "MIT",
     packageName: "@tabler/icons-react",
     version: "3.38.0",

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { useVaultStore } from "../../stores/vaultStore";
 import { Button, Callout, Dialog, FormField, IconButton, IconSlot, TextInput, type IconSource } from "../ui";
@@ -36,7 +37,7 @@ export default function CloudRestoreDialog({
   return (
     <Dialog
       open
-      title="Welcome Back"
+      title={__tr("Welcome Back")}
       icon="cloudDownload"
       width={384}
       hideClose
@@ -44,14 +45,13 @@ export default function CloudRestoreDialog({
       onSubmit={(e) => void handleRestore(e)}
       footer={
         <>
-          <Button onClick={onCreateNew}>Create New Vault</Button>
+          <Button onClick={onCreateNew}>{__tr("Create New Vault")}</Button>
           <Button type="submit" variant="primary" disabled={!password} loading={isLoading} loadingLabel="Restoring...">
-            Restore from Cloud
-          </Button>
+            {__tr("Restore from Cloud")}</Button>
         </>
       }
     >
-      <p className="text-ink-muted">We found your encrypted vault backup</p>
+      <p className="text-ink-muted">{__tr("We found your encrypted vault backup")}</p>
 
       <ul className="space-y-2">
         {TRUST_BADGES.map((badge) => (
@@ -62,18 +62,18 @@ export default function CloudRestoreDialog({
         ))}
       </ul>
 
-      <FormField label="Master Password">
+      <FormField label={__tr("Master Password")}>
         <TextInput
           type={showPassword ? "text" : "password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your master password"
+          placeholder={__tr("Enter your master password")}
           autoFocus
           trailing={
             <IconButton
               size="sm"
               icon={showPassword ? "eyeOff" : "eye"}
-              label={showPassword ? "Hide password" : "Show password"}
+              label={showPassword ? __tr("Hide password") : __tr("Show password")}
               onClick={() => setShowPassword(!showPassword)}
             />
           }

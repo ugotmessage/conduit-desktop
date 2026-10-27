@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import type { EntryType } from "../../types/entry";
 import type { CredentialType } from "../../types/credential";
 import type { EntryTabId } from "./entryDialogTabs";
@@ -14,10 +15,10 @@ interface EntryDialogSidebarProps {
 }
 
 const TYPE_LABELS: Record<EntryType, string> = {
-  ssh: "SSH Session",
-  rdp: "RDP Session",
-  vnc: "VNC Session",
-  web: "Web Session",
+  ssh: __tr("SSH Session"),
+  rdp: __tr("RDP Session"),
+  vnc: __tr("VNC Session"),
+  web: __tr("Web Session"),
   credential: "Credential",
   document: "Document",
   command: "Command",
@@ -27,7 +28,7 @@ export default function EntryDialogSidebar({ entryType, activeTab, onTabChange, 
   const isSshKey = entryType === "credential" && credentialType === "ssh_key";
   const TypeIcon = isSshKey ? ShieldLockIcon : getEntryIcon(entryType, false);
   const colorResult = isSshKey ? { className: "text-entry-sshkey", style: undefined } : getEntryColor(entryType);
-  const label = isSshKey ? "SSH Key" : TYPE_LABELS[entryType];
+  const label = isSshKey ? __tr("SSH Key") : TYPE_LABELS[entryType];
   const items: NavEntry[] = getTabCategories(entryType).flatMap((category) => [
     { kind: "label" as const, id: `label-${category.label}`, label: category.label },
     ...category.tabs.map(({ id, label: tabLabel, icon }) => ({ id, label: tabLabel, icon })),

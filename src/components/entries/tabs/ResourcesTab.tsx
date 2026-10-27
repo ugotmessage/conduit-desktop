@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { RdpEntryConfig, SharedFolder, RdpGlobalDefaults } from "../../../types/entry";
 import { SOUND_OPTIONS } from "../../../lib/sessionOptions";
 import { invoke } from "../../../lib/electron";
@@ -30,7 +31,7 @@ export default function ResourcesTab({ config, onChange, globalDefaults }: Resou
       update({ sharedFolders: folders });
     } catch (err) {
       console.error("Failed to pick a shared folder:", err);
-      toast.error("Could not open the folder picker");
+      toast.error(__tr("Could not open the folder picker"));
     }
   };
 
@@ -48,7 +49,7 @@ export default function ResourcesTab({ config, onChange, globalDefaults }: Resou
   return (
     <div className="space-y-4">
       {/* Sound */}
-      <Field label="Sound">
+      <Field label={__tr("Sound")}>
         <DefaultableSelect<string>
           value={config.sound}
           defaultLabel={SOUND_OPTIONS.find((o) => o.value === globalDefaults.sound)?.label ?? "Play locally"}
@@ -61,21 +62,20 @@ export default function ResourcesTab({ config, onChange, globalDefaults }: Resou
       <DefaultableCheckbox
         value={config.clipboard}
         defaultValue={globalDefaults.clipboard}
-        label="Clipboard Sharing"
+        label={__tr("Clipboard Sharing")}
         onChange={(v) => update({ clipboard: v })}
       />
 
       {/* Shared Folders: per-entry only, no "Default" option */}
       <div className="mt-3 border-t border-divider pt-3">
         <div className="mb-2 flex items-center justify-between">
-          <label className={FIELD_LABEL_TEXT}>Shared Folders</label>
+          <label className={FIELD_LABEL_TEXT}>{__tr("Shared Folders")}</label>
           <Button variant="link" size="sm" icon="plus" onClick={addSharedFolder}>
-            Add Folder
-          </Button>
+            {__tr("Add Folder")}</Button>
         </div>
 
         {sharedFolders.length === 0 ? (
-          <p className="text-meta text-ink-muted">No shared folders. Add a local folder to make it accessible in the remote session.</p>
+          <p className="text-meta text-ink-muted">{__tr("No shared folders. Add a local folder to make it accessible in the remote session.")}</p>
         ) : (
           <div className="space-y-2">
             {sharedFolders.map((folder, i) => (
@@ -85,7 +85,7 @@ export default function ResourcesTab({ config, onChange, globalDefaults }: Resou
                   <TextInput
                     value={folder.name}
                     onChange={(e) => updateSharedFolder(i, { name: e.target.value })}
-                    placeholder="Share name"
+                    placeholder={__tr("Share name")}
                   />
                 </div>
                 <span className="flex-1 truncate text-meta text-ink-muted" title={folder.path}>
@@ -95,11 +95,11 @@ export default function ResourcesTab({ config, onChange, globalDefaults }: Resou
                   size="sm"
                   tone="inherit"
                   icon={folder.readOnly ? "lock" : "lockOpen"}
-                  label={folder.readOnly ? "Read-only (click to allow writes)" : "Read/Write (click to make read-only)"}
+                  label={folder.readOnly ? __tr("Read-only (click to allow writes)") : __tr("Read/Write (click to make read-only)")}
                   onClick={() => updateSharedFolder(i, { readOnly: !folder.readOnly })}
                   className={folder.readOnly ? "text-warning" : "text-success"}
                 />
-                <IconButton size="sm" tone="danger" icon="trash" label="Remove shared folder" onClick={() => removeSharedFolder(i)} />
+                <IconButton size="sm" tone="danger" icon="trash" label={__tr("Remove shared folder")} onClick={() => removeSharedFolder(i)} />
               </div>
             ))}
           </div>

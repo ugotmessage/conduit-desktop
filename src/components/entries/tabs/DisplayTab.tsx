@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { RdpEntryConfig, RdpResolution, RdpGlobalDefaults } from "../../../types/entry";
 import { RESOLUTION_OPTIONS, COLOR_DEPTH_OPTIONS, QUALITY_OPTIONS } from "../../../lib/sessionOptions";
 import DefaultableSelect from "../DefaultableSelect";
@@ -22,7 +23,7 @@ export default function DisplayTab({ config, onChange, globalDefaults }: Display
   return (
     <div className="space-y-4">
       {/* Resolution */}
-      <Field label="Resolution">
+      <Field label={__tr("Resolution")}>
         <DefaultableSelect<RdpResolution>
           value={config.resolution}
           defaultLabel={RESOLUTION_OPTIONS.find((o) => o.value === globalDefaults.resolution)?.label ?? "Match Window"}
@@ -33,7 +34,7 @@ export default function DisplayTab({ config, onChange, globalDefaults }: Display
 
       {config.resolution === "custom" && (
         <div className="flex gap-2">
-          <Field label="Width" className="flex-1">
+          <Field label={__tr("Width")} className="flex-1">
             <TextInput
               type="number"
               value={config.customWidth ?? 1920}
@@ -42,7 +43,7 @@ export default function DisplayTab({ config, onChange, globalDefaults }: Display
               max={7680}
             />
           </Field>
-          <Field label="Height" className="flex-1">
+          <Field label={__tr("Height")} className="flex-1">
             <TextInput
               type="number"
               value={config.customHeight ?? 1080}
@@ -57,12 +58,11 @@ export default function DisplayTab({ config, onChange, globalDefaults }: Display
       {/* Show custom dimension fields if the effective resolution is custom (from default or explicit) */}
       {effectiveResolution === "custom" && config.resolution !== "custom" && (
         <p className="text-meta text-ink-muted">
-          Custom dimensions are configured per-entry. Set Resolution to "Custom" to specify.
-        </p>
+          {__tr("Custom dimensions are configured per-entry. Set Resolution to \"Custom\" to specify.")}</p>
       )}
 
       {/* Color Depth */}
-      <Field label="Color Depth">
+      <Field label={__tr("Color Depth")}>
         <DefaultableSelect<number>
           value={config.colorDepth}
           defaultLabel={COLOR_DEPTH_OPTIONS.find((o) => o.value === globalDefaults.colorDepth)?.label ?? "32-bit"}
@@ -72,7 +72,7 @@ export default function DisplayTab({ config, onChange, globalDefaults }: Display
       </Field>
 
       {/* Quality */}
-      <Field label="Quality">
+      <Field label={__tr("Quality")}>
         <DefaultableSelect<string>
           value={config.quality}
           defaultLabel={QUALITY_OPTIONS.find((o) => o.value === globalDefaults.quality)?.label ?? "Good"}
@@ -85,7 +85,7 @@ export default function DisplayTab({ config, onChange, globalDefaults }: Display
       <DefaultableCheckbox
         value={config.enableHighDpi}
         defaultValue={globalDefaults.enableHighDpi}
-        label="High DPI (Retina)"
+        label={__tr("High DPI (Retina)")}
         onChange={(v) => update({ enableHighDpi: v })}
       />
     </div>

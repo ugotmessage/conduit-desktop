@@ -1,13 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import CredentialPickerApp from "./components/picker/CredentialPickerApp";
-import { bootIconPack } from "./lib/icons";
+import { initializeLanguage } from "./lib/i18n";
 import "./index.css";
 
-void bootIconPack();
-
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <CredentialPickerApp />
-  </React.StrictMode>
-);
+void initializeLanguage().then(async () => {
+  const [{ default: CredentialPickerApp }, { bootIconPack }] = await Promise.all([import("./components/picker/CredentialPickerApp"), import("./lib/icons")]);
+  void bootIconPack();
+  ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+    <React.StrictMode><CredentialPickerApp /></React.StrictMode>
+  );
+});

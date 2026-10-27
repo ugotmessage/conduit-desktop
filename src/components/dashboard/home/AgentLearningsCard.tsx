@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useMemo } from "react";
 import { openKnowledgeView } from "../../../lib/openDashboard";
 import { hasUnseenAgentEdit, readKb } from "../../../lib/kb";
@@ -28,11 +29,11 @@ export default function AgentLearningsCard({ className }: { className?: string }
     <Card className={className}>
       <div className="flex items-start justify-between gap-2">
         <SectionHeader
-          title="Agent learnings"
-          description={unseen ? `${unseen} ${unseen === 1 ? "edit" : "edits"} waiting for your review` : "Recent knowledge written by AI agents"}
+          title={__tr("Agent learnings")}
+          description={unseen ? __tr("{v0} {v1} waiting for your review", { v0: (unseen), v1: (unseen === 1 ? "edit" : "edits") }) : __tr("Recent knowledge written by AI agents")}
         />
         <Button size="sm" onClick={openKnowledgeView}>
-          {unseen ? "Review" : "All knowledge"}
+          {unseen ? __tr("Review") : __tr("All knowledge")}
         </Button>
       </div>
       {recent.map((a) => (

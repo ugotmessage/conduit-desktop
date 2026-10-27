@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, type ReactNode } from "react";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -27,7 +28,7 @@ async function runResolve(request: ResolveRequest, success: string): Promise<voi
     await useSyncStore.getState().resolve(request);
     toast.success(success);
   } catch (err) {
-    toast.error("Could not save your choice", errorText(err, "Try again."));
+    toast.error(__tr("Could not save your choice"), errorText(err, __tr("Try again.")));
   }
 }
 
@@ -47,17 +48,17 @@ function AppearanceView({ item }: { item: Item<"appearance"> }) {
     setBusy(true);
     try {
       await useSyncStore.getState().resolveGroup(appearanceRequest(item, selections));
-      toast.success("Appearance resolved.");
+      toast.success(__tr("Appearance resolved."));
     } catch (err) {
-      toast.error("Could not save your choice", errorText(err, "Try again."));
+      toast.error(__tr("Could not save your choice"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
   };
-  const later = () => void useSyncStore.getState().snooze(item.snoozeKey).catch((err) => toast.error("Could not snooze", errorText(err, "Try again.")));
+  const later = () => void useSyncStore.getState().snooze(item.snoozeKey).catch((err) => toast.error(__tr("Could not snooze"), errorText(err, __tr("Try again."))));
   return (
-    <ItemBox title="Appearance">
-      <p className="text-label text-ink-muted">Keep newest is selected. Change any choice, then Apply.</p>
+    <ItemBox title={__tr("Appearance")}>
+      <p className="text-label text-ink-muted">{__tr("Keep newest is selected. Change any choice, then Apply.")}</p>
       {item.fields.map((f) => (
         <div key={f.key.reg} className="space-y-1">
           <p className="text-label font-semibold text-ink-secondary">{f.label}</p>
@@ -77,8 +78,8 @@ function AppearanceView({ item }: { item: Item<"appearance"> }) {
         </div>
       ))}
       <div className="flex gap-2 pt-1">
-        <SmallButton primary disabled={busy} onClick={() => void apply()}>Apply</SmallButton>
-        <SmallButton disabled={busy} onClick={later}>Decide later</SmallButton>
+        <SmallButton primary disabled={busy} onClick={() => void apply()}>{__tr("Apply")}</SmallButton>
+        <SmallButton disabled={busy} onClick={later}>{__tr("Decide later")}</SmallButton>
       </div>
     </ItemBox>
   );
@@ -86,11 +87,11 @@ function AppearanceView({ item }: { item: Item<"appearance"> }) {
 
 function EditDeleteView({ item }: { item: Item<"edit-delete"> }) {
   return (
-    <ItemBox title="Deleted and edited">
+    <ItemBox title={__tr("Deleted and edited")}>
       <p className="text-label text-ink-secondary">{editDeleteText(item)}</p>
       <div className="flex gap-2">
-        <SmallButton primary onClick={() => void runResolve({ kind: "edit-delete", row: item.row, choice: "keep" }, "Item kept.")}>Keep item</SmallButton>
-        <SmallButton onClick={() => void runResolve({ kind: "edit-delete", row: item.row, choice: "delete" }, "Item deleted.")}>Delete item</SmallButton>
+        <SmallButton primary onClick={() => void runResolve({ kind: "edit-delete", row: item.row, choice: "keep" }, "Item kept.")}>{__tr("Keep item")}</SmallButton>
+        <SmallButton onClick={() => void runResolve({ kind: "edit-delete", row: item.row, choice: "delete" }, "Item deleted.")}>{__tr("Delete item")}</SmallButton>
       </div>
     </ItemBox>
   );
@@ -100,12 +101,12 @@ function FolderDeleteView({ item, title }: { item: Item<"folder-delete">; title:
   const choose = (choice: "keep-with-changed" | "delete-all" | "restore-all", done: string) =>
     void runResolve({ kind: "folder-delete", folder: item.folder, choice }, done);
   return (
-    <ItemBox title="Folder deleted">
+    <ItemBox title={__tr("Folder deleted")}>
       <p className="text-label text-ink-secondary">{folderDeleteText(item, title)}</p>
       <div className="flex flex-wrap gap-2">
-        <SmallButton primary onClick={() => choose("keep-with-changed", "Folder kept with changed items.")}>Keep folder with changed items</SmallButton>
-        <SmallButton onClick={() => choose("delete-all", "Folder deleted.")}>Delete folder and items</SmallButton>
-        <SmallButton onClick={() => choose("restore-all", "Folder restored.")}>Restore everything in folder</SmallButton>
+        <SmallButton primary onClick={() => choose("keep-with-changed", "Folder kept with changed items.")}>{__tr("Keep folder with changed items")}</SmallButton>
+        <SmallButton onClick={() => choose("delete-all", "Folder deleted.")}>{__tr("Delete folder and items")}</SmallButton>
+        <SmallButton onClick={() => choose("restore-all", "Folder restored.")}>{__tr("Restore everything in folder")}</SmallButton>
       </div>
     </ItemBox>
   );
@@ -122,16 +123,16 @@ function CycleView({ item }: { item: Item<"cycle"> }) {
   const [a, b] = item.rowIds;
   const request = (choice: Extract<ResolveRequest, { kind: "cycle" }>["choice"]): ResolveRequest => ({ kind: "cycle", tbl: item.tbl, rowIds: item.rowIds, choice });
   return (
-    <ItemBox title="Moved into each other">
+    <ItemBox title={__tr("Moved into each other")}>
       <p className="text-label text-ink-secondary">{cycleText(item, names)}</p>
       <div className="flex flex-wrap gap-2">
         {a && b && item.rowIds.length === 2 && (
           <>
-            <SmallButton onClick={() => void runResolve(request({ kind: "put-under", child: a, parent: b }), "Moved.")}>Put {names[0]} in {names[1]}</SmallButton>
-            <SmallButton onClick={() => void runResolve(request({ kind: "put-under", child: b, parent: a }), "Moved.")}>Put {names[1]} in {names[0]}</SmallButton>
+            <SmallButton onClick={() => void runResolve(request({ kind: "put-under", child: a, parent: b }), "Moved.")}>{__tr("Put")} {names[0]} {__tr("in")} {names[1]}</SmallButton>
+            <SmallButton onClick={() => void runResolve(request({ kind: "put-under", child: b, parent: a }), "Moved.")}>{__tr("Put")} {names[1]} {__tr("in")} {names[0]}</SmallButton>
           </>
         )}
-        <SmallButton primary onClick={() => void runResolve(request({ kind: "all-root" }), "Moved to the top level.")}>All at top level</SmallButton>
+        <SmallButton primary onClick={() => void runResolve(request({ kind: "all-root" }), "Moved to the top level.")}>{__tr("All at top level")}</SmallButton>
       </div>
     </ItemBox>
   );
@@ -149,19 +150,19 @@ function UndecryptableView({ item }: { item: Item<"undecryptable"> }) {
     try {
       const res = await syncApi.recoverUndecryptable(field.key, locked.id, oldPassword);
       if (!res.ok) {
-        setError("That password didn't work.");
+        setError(__tr("That password didn't work."));
         return;
       }
-      toast.success(`${field.label} recovered.`);
+      toast.success(__tr("{v0} recovered.", { v0: (field.label) }));
       await useSyncStore.getState().loadConflicts();
     } catch (err) {
-      setError(errorText(err, "Could not recover the value."));
+      setError(errorText(err, __tr("Could not recover the value.")));
     }
   };
   const who = locked ? versionCaption(locked) : "another device";
   return (
     <ItemBox title={field.label}>
-      <p className="text-label text-ink-secondary">A value saved on {who} used your old master password.</p>
+      <p className="text-label text-ink-secondary">{__tr("A value saved on")} {who} {__tr("used your old master password.")}</p>
       {asking && (
         <TextInput
           type="password"
@@ -170,18 +171,18 @@ function UndecryptableView({ item }: { item: Item<"undecryptable"> }) {
           onKeyDown={(e) => {
             if (e.key === "Enter" && oldPassword.length > 0) void recover();
           }}
-          placeholder="Old master password"
+          placeholder={__tr("Old master password")}
           autoFocus
         />
       )}
       <InlineError message={error} />
       <div className="flex gap-2">
         {asking ? (
-          <SmallButton primary disabled={oldPassword.length === 0} onClick={() => void recover()}>Recover</SmallButton>
+          <SmallButton primary disabled={oldPassword.length === 0} onClick={() => void recover()}>{__tr("Recover")}</SmallButton>
         ) : (
-          <SmallButton primary onClick={() => setAsking(true)}>Enter old password</SmallButton>
+          <SmallButton primary onClick={() => setAsking(true)}>{__tr("Enter old password")}</SmallButton>
         )}
-        <SmallButton onClick={() => void runResolve({ kind: "undecryptable-discard", key: field.key }, "Value discarded.")}>Discard</SmallButton>
+        <SmallButton onClick={() => void runResolve({ kind: "undecryptable-discard", key: field.key }, "Value discarded.")}>{__tr("Discard")}</SmallButton>
       </div>
     </ItemBox>
   );
@@ -204,8 +205,8 @@ export default function ConflictItemView({ item, title }: { item: ConflictItem; 
       return <UndecryptableView item={item} />;
     case "epoch":
       return (
-        <ItemBox title="Master password">
-          <p className="text-label text-ink-secondary">The master password was changed on two devices. Conduit asks you to choose when syncing.</p>
+        <ItemBox title={__tr("Master password")}>
+          <p className="text-label text-ink-secondary">{__tr("The master password was changed on two devices. Conduit asks you to choose when syncing.")}</p>
         </ItemBox>
       );
   }

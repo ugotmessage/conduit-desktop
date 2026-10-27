@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { CheckIcon } from "../../lib/icons";
 import { Button, Dialog, DialogHeader } from "../ui";
 
@@ -41,7 +42,7 @@ export default function ProVaultLockDialog({
   return (
     <Dialog
       open
-      title="Team Vault In Use"
+      title={__tr("Team Vault In Use")}
       icon="lock"
       tone="warn"
       width={600}
@@ -55,31 +56,29 @@ export default function ProVaultLockDialog({
           <DialogHeader />
           <div className="px-4 space-y-4 text-body">
             <p className="text-ink-secondary">
-              Another person has this team vault open. Without the Teams plan, one person can use it at a time.
-            </p>
+              {__tr("Another person has this team vault open. Without the Teams plan, one person can use it at a time.")}</p>
 
             <div className="p-3 rounded-md bg-well border border-card-border space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-ink-muted">In use by:</span>
+                <span className="text-ink-muted">{__tr("In use by:")}</span>
                 <span className="text-ink font-medium">{lockedByEmail}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-ink-muted">Since:</span>
+                <span className="text-ink-muted">{__tr("Since:")}</span>
                 <span className="text-ink">{formatLockTime(lockedAt)}</span>
               </div>
             </div>
 
             <div className="flex gap-2">
-              <Button onClick={onCancel}>Cancel</Button>
+              <Button onClick={onCancel}>{__tr("Cancel")}</Button>
               <Button icon="refresh" onClick={onRetry}>
-                Try Again
-              </Button>
+                {__tr("Try Again")}</Button>
             </div>
           </div>
         </div>
 
         <div className="w-[220px] bg-well border-l border-divider p-6 flex flex-col justify-center">
-          <span className="text-meta font-semibold text-ink-muted mb-4">Teams Plan</span>
+          <span className="text-meta font-semibold text-ink-muted mb-4">{__tr("Teams Plan")}</span>
 
           <ul className="space-y-2.5 mb-5">
             {["Everyone on the team at once", "Shared team vaults", "Audit log"].map((benefit) => (
@@ -91,8 +90,7 @@ export default function ProVaultLockDialog({
           </ul>
 
           <Button variant="primary" icon="users" fullWidth onClick={onUpgrade}>
-            Upgrade to Teams
-          </Button>
+            {__tr("Upgrade to Teams")}</Button>
         </div>
       </div>
     </Dialog>

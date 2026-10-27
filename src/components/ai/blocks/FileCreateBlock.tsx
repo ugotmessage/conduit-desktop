@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState } from "react";
 import { FilePlusIcon } from "../../../lib/icons";
 import { BlockBody, BlockChevron, BlockFrame, BlockHeader, BlockLabel } from "./BlockParts";
@@ -18,7 +19,7 @@ export default function FileCreateBlock({ path, content }: FileCreateBlockProps)
         <span className="truncate font-mono text-ink-muted" title={path}>
           {filename}
         </span>
-        <BlockLabel className="ml-auto mr-1 text-success">Created</BlockLabel>
+        <BlockLabel className="ml-auto mr-1 text-success">{__tr("Created")}</BlockLabel>
         {content && <BlockChevron expanded={expanded} />}
       </BlockHeader>
 

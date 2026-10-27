@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -28,7 +29,7 @@ export default function DifferentCopiesDialog({ prompt }: { prompt: DifferentCop
     try {
       await action();
     } catch (err) {
-      toast.error(failTitle, errorText(err, "Try again."));
+      toast.error(failTitle, errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -55,19 +56,19 @@ export default function DifferentCopiesDialog({ prompt }: { prompt: DifferentCop
     <SyncDialogFrame
       icon="devices"
       tone="warn"
-      title="Two copies of this vault"
+      title={__tr("Two copies of this vault")}
       width={500}
       onEscape={() => void later()}
       footer={
         <>
-          <DialogButton onClick={() => void later()} disabled={busy}>Remind me later</DialogButton>
-          <DialogButton onClick={() => void keepSeparate()} disabled={busy}>Keep separate</DialogButton>
-          <DialogButton variant="primary" onClick={() => void merge()} disabled={busy}>Merge them...</DialogButton>
+          <DialogButton onClick={() => void later()} disabled={busy}>{__tr("Remind me later")}</DialogButton>
+          <DialogButton onClick={() => void keepSeparate()} disabled={busy}>{__tr("Keep separate")}</DialogButton>
+          <DialogButton variant="primary" onClick={() => void merge()} disabled={busy}>{__tr("Merge them...")}</DialogButton>
         </>
       }
     >
       <p className="text-ink">{differentCopiesText(prompt)}</p>
-      <p>Merge them to keep one vault, or keep them as two separate vaults.</p>
+      <p>{__tr("Merge them to keep one vault, or keep them as two separate vaults.")}</p>
     </SyncDialogFrame>
   );
 }

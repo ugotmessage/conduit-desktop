@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { lineDiff } from "./lineDiff";
 
 const STYLE = {
@@ -10,7 +11,7 @@ const MARK = { same: " ", added: "+", removed: "−" } as const;
 
 export default function DiffView({ before, after }: { before: string; after: string }) {
   const lines = lineDiff(before, after);
-  if (lines.every((l) => l.kind === "same")) return <p className="text-body text-ink-faint italic">No changes in the text.</p>;
+  if (lines.every((l) => l.kind === "same")) return <p className="text-body text-ink-faint italic">{__tr("No changes in the text.")}</p>;
   return (
     <pre className="max-h-[50vh] overflow-auto rounded border border-card-border bg-well p-2 font-mono text-label leading-5 allow-select">
       {lines.map((l, i) => (

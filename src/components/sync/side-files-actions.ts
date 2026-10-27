@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
 import { useSyncStore } from "../../stores/syncStore";
@@ -15,23 +16,23 @@ export async function reviewSideFileWal(): Promise<void> {
     const { candidateId } = await syncApi.reviewSideFileWal();
     useSyncStore.getState().openView({ kind: "candidate", candidateId, confirmSideFilesAfter: true });
   } catch (err) {
-    toast.error("Could not open the unsaved changes", errorText(err, "Try again."));
+    toast.error(__tr("Could not open the unsaved changes"), errorText(err, __tr("Try again.")));
   }
 }
 
 async function handleResult(result: ConfirmSideFilesResult): Promise<void> {
   switch (result.kind) {
     case "confirmed":
-      toast.success("Syncing resumed.");
+      toast.success(__tr("Syncing resumed."));
       break;
     case "held-open":
-      toast.info("Syncing resumed. Review the changes the older Conduit made.");
+      toast.info(__tr("Syncing resumed. Review the changes the older Conduit made."));
       break;
     case "review-first":
       await reviewSideFileWal();
       break;
     case "changed":
-      toast.warning("The older Conduit's files changed. Check that it is closed, then try again.");
+      toast.warning(__tr("The older Conduit's files changed. Check that it is closed, then try again."));
       break;
   }
   await useSyncStore.getState().refresh();
@@ -42,7 +43,7 @@ export async function confirmSideFiles(): Promise<void> {
   try {
     await handleResult(await confirm(false));
   } catch (err) {
-    toast.error("Could not resume syncing", errorText(err, "Try again."));
+    toast.error(__tr("Could not resume syncing"), errorText(err, __tr("Try again.")));
   }
 }
 
@@ -51,6 +52,6 @@ export async function confirmSideFilesAfterReview(): Promise<void> {
   try {
     await handleResult(await confirm(true));
   } catch (err) {
-    toast.error("Could not resume syncing", errorText(err, "Try again."));
+    toast.error(__tr("Could not resume syncing"), errorText(err, __tr("Try again.")));
   }
 }

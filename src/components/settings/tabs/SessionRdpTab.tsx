@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useRef } from "react";
 import type { TabProps } from "../SettingsHelpers";
 import type { Settings } from "../SettingsHelpers";
@@ -60,10 +61,9 @@ export default function SessionRdpTab({ settings, setSettings, onApplyDisplaySca
   return (
     <div className="space-y-4">
       <p className={HINT}>
-        Default settings for all RDP connections. Individual entries can override these.
-      </p>
+        {__tr("Default settings for all RDP connections. Individual entries can override these.")}</p>
 
-      <FormField label="Resolution">
+      <FormField label={__tr("Resolution")}>
         <Select value={defaults.resolution} onChange={(e) => update({ resolution: e.target.value as RdpGlobalResolution })}>
           {GLOBAL_RESOLUTION_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -73,7 +73,7 @@ export default function SessionRdpTab({ settings, setSettings, onApplyDisplaySca
 
       <div>
         <div className="mb-1 flex items-center justify-between">
-          <label htmlFor="rdp-display-scale" className={SECTION_LABEL}>Display Scale</label>
+          <label htmlFor="rdp-display-scale" className={SECTION_LABEL}>{__tr("Display Scale")}</label>
           <span className={CAPTION}>{scalePercent}%</span>
         </div>
         <Slider
@@ -88,11 +88,10 @@ export default function SessionRdpTab({ settings, setSettings, onApplyDisplaySca
           marks={["50% (smaller)", "100%", "200% (larger)"]}
         />
         <p className={`mt-2 ${HINT}`}>
-          Adjusts the effective resolution. Higher values make objects appear larger. Active sessions will reconnect on change.
-        </p>
+          {__tr("Adjusts the effective resolution. Higher values make objects appear larger. Active sessions will reconnect on change.")}</p>
       </div>
 
-      <FormField label="Color Depth">
+      <FormField label={__tr("Color Depth")}>
         <Select value={defaults.colorDepth} onChange={(e) => update({ colorDepth: parseInt(e.target.value) as 32 | 24 | 16 | 15 })}>
           {COLOR_DEPTH_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -100,7 +99,7 @@ export default function SessionRdpTab({ settings, setSettings, onApplyDisplaySca
         </Select>
       </FormField>
 
-      <FormField label="Quality">
+      <FormField label={__tr("Quality")}>
         <Select value={defaults.quality} onChange={(e) => update({ quality: e.target.value as "best" | "good" | "low" })}>
           {QUALITY_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -108,7 +107,7 @@ export default function SessionRdpTab({ settings, setSettings, onApplyDisplaySca
         </Select>
       </FormField>
 
-      <FormField label="Sound">
+      <FormField label={__tr("Sound")}>
         <Select value={defaults.sound} onChange={(e) => update({ sound: e.target.value as "local" | "remote" | "none" })}>
           {SOUND_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -118,14 +117,11 @@ export default function SessionRdpTab({ settings, setSettings, onApplyDisplaySca
 
       <div className="flex flex-col gap-3">
         <Checkbox checked={defaults.enableHighDpi} onChange={(enableHighDpi) => update({ enableHighDpi })}>
-          High DPI (Retina)
-        </Checkbox>
+          {__tr("High DPI (Retina)")}</Checkbox>
         <Checkbox checked={defaults.clipboard} onChange={(clipboard) => update({ clipboard })}>
-          Clipboard Sharing
-        </Checkbox>
+          {__tr("Clipboard Sharing")}</Checkbox>
         <Checkbox checked={defaults.enableNla} onChange={(enableNla) => update({ enableNla })}>
-          NLA (Network Level Auth)
-        </Checkbox>
+          {__tr("NLA (Network Level Auth)")}</Checkbox>
       </div>
     </div>
   );

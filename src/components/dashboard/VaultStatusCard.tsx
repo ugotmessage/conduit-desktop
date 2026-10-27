@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import type { CloudSyncState, LocalBackupState, TeamSyncState } from "../../stores/vaultStore";
 import { CircleFilledIcon } from "../../lib/icons";
 import { Card, cx, ListRow, SectionHeader } from "../ui";
@@ -29,25 +30,25 @@ function StatusRow({ label, status, detail }: { label: string; status: Dashboard
 }
 
 function cloudStatus(state: CloudSyncState | null): { status: DashboardRowStatus; detail: string } {
-  if (!state?.enabled) return { status: "disabled", detail: "Disabled" };
+  if (!state?.enabled) return { status: "disabled", detail: __tr("Disabled") };
   if (state.status === "error") return { status: "error", detail: state.error ?? "Error" };
-  if (state.status === "synced") return { status: "ok", detail: "Synced" };
-  if (state.status === "syncing") return { status: "syncing", detail: "Syncing..." };
-  return { status: "idle", detail: "Idle" };
+  if (state.status === "synced") return { status: "ok", detail: __tr("Synced") };
+  if (state.status === "syncing") return { status: "syncing", detail: __tr("Syncing...") };
+  return { status: "idle", detail: __tr("Idle") };
 }
 
 function localStatus(state: LocalBackupState | null): { status: DashboardRowStatus; detail: string } {
-  if (!state?.enabled) return { status: "disabled", detail: "Disabled" };
+  if (!state?.enabled) return { status: "disabled", detail: __tr("Disabled") };
   if (state.status === "error") return { status: "error", detail: state.error ?? "Error" };
   const status = state.status === "backed-up" ? "ok" : "idle";
-  return { status, detail: state.lastBackedUpAt ? `Last: ${formatRelativeTime(state.lastBackedUpAt)}` : "No backups yet" };
+  return { status, detail: state.lastBackedUpAt ? __tr("Last: {v0}", { v0: (formatRelativeTime(state.lastBackedUpAt)) }) : __tr("No backups yet") };
 }
 
 function teamStatus(state: TeamSyncState): { status: DashboardRowStatus; detail: string } {
   const status = state.status === "error" ? "error" : state.status === "synced" ? "ok" : state.status === "syncing" ? "syncing" : "idle";
   if (state.status === "error") return { status, detail: state.error ?? "Error" };
-  if (state.pendingChanges > 0) return { status, detail: `${state.pendingChanges} pending` };
-  return { status, detail: state.status === "synced" ? "Synced" : "Idle" };
+  if (state.pendingChanges > 0) return { status, detail: __tr("{v0} pending", { v0: (state.pendingChanges) }) };
+  return { status, detail: state.status === "synced" ? __tr("Synced") : __tr("Idle") };
 }
 
 function usageColor(used: number, max: number): string {
@@ -84,19 +85,19 @@ export default function VaultStatusCard({
   const deviceSync = useDeviceSyncRow();
   return (
     <Card>
-      <SectionHeader title="Vault status" />
+      <SectionHeader title={__tr("Vault status")} />
       <div className="space-y-px">
-        {deviceSync && <StatusRow label="Device sync" status={deviceSync.status} detail={deviceSync.detail} />}
+        {deviceSync && <StatusRow label={__tr("Device sync")} status={deviceSync.status} detail={deviceSync.detail} />}
 
-        {authMode !== "local" && <StatusRow label="Cloud backup" {...cloudStatus(cloudSyncState)} />}
+        {authMode !== "local" && <StatusRow label={__tr("Cloud backup")} {...cloudStatus(cloudSyncState)} />}
 
-        <StatusRow label="Local backup" {...localStatus(localBackupState)} />
+        <StatusRow label={__tr("Local backup")} {...localStatus(localBackupState)} />
 
-        {authMode !== "local" && teamSyncState && <StatusRow label="Team sync" {...teamStatus(teamSyncState)} />}
+        {authMode !== "local" && teamSyncState && <StatusRow label={__tr("Team sync")} {...teamStatus(teamSyncState)} />}
 
         {maxConnections > 0 && (
           <div>
-            <ListRow meta={`${connectionCount}/${maxConnections}`}>Plan usage</ListRow>
+            <ListRow meta={`${connectionCount}/${maxConnections}`}>{__tr("Plan usage")}</ListRow>
             <div className="mx-2 mb-1 h-1.5 overflow-hidden rounded-full bg-divider">
               <div
                 className={`h-full rounded-full transition-all ${usageColor(connectionCount, maxConnections)}`}
@@ -110,12 +111,10 @@ export default function VaultStatusCard({
           <ListRow
             meta={
               <span className={`font-medium ${trialColor(trialDaysRemaining)}`}>
-                {trialDaysRemaining} {trialDaysRemaining === 1 ? "day" : "days"} remaining
-              </span>
+                {trialDaysRemaining} {trialDaysRemaining === 1 ? __tr("day") : __tr("days")} {__tr("remaining")}</span>
             }
           >
-            Trial
-          </ListRow>
+            {__tr("Trial")}</ListRow>
         )}
       </div>
     </Card>

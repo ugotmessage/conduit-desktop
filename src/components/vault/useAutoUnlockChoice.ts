@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import { useStartupVaultStore } from "../../stores/startupVaultStore";
 import { useVaultStore } from "../../stores/vaultStore";
@@ -32,7 +33,7 @@ async function reseal(): Promise<void> {
     await useStartupVaultStore.getState().enable({ kind: "recent-unlock" });
     toastResealed();
   } catch (err) {
-    toast.warning("Couldn't update the saved unlock", errorText(err, "Conduit will ask for the password at the next start."));
+    toast.warning(__tr("Couldn't update the saved unlock"), errorText(err, __tr("Conduit will ask for the password at the next start.")));
   }
 }
 
@@ -41,7 +42,7 @@ async function keepOff(name: string, unreadable: boolean): Promise<void> {
     if (unreadable) await useStartupVaultStore.getState().disable();
     toastAutoUnlockOff(name);
   } catch (err) {
-    toast.error("Couldn't turn off automatic unlock", errorText(err, "Try again in Settings > Security."));
+    toast.error(__tr("Couldn't turn off automatic unlock"), errorText(err, __tr("Try again in Settings > Security.")));
   }
 }
 

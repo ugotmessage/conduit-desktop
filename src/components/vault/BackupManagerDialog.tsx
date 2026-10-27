@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useMemo, useState } from "react";
 import { useVaultStore, type CloudBackupEntry } from "../../stores/vaultStore";
 import { useAuthStore } from "../../stores/authStore";
@@ -20,8 +21,8 @@ function getDateLabel(dateStr: string): string {
   yesterday.setDate(yesterday.getDate() - 1);
   const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
-  if (target.getTime() === today.getTime()) return "Today";
-  if (target.getTime() === yesterday.getTime()) return "Yesterday";
+  if (target.getTime() === today.getTime()) return __tr("Today");
+  if (target.getTime() === yesterday.getTime()) return __tr("Yesterday");
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
@@ -146,9 +147,9 @@ export default function BackupManagerDialog({ onClose }: Props) {
   const tierName = profile?.is_team_member ? "Team" : (profile?.tier?.display_name ?? "Free");
   const retentionLabel =
     cloudBackupRetentionDays === -1
-      ? `Retain backups indefinitely (${tierName})`
+      ? __tr("Retain backups indefinitely ({v0})", { v0: (tierName) })
       : cloudBackupRetentionDays !== null && cloudBackupRetentionDays > 0
-      ? `Retain backups for ${cloudBackupRetentionDays} day${cloudBackupRetentionDays !== 1 ? "s" : ""} (${tierName})`
+      ? __tr("Retain backups for {v0} day{v1} ({v2})", { v0: (cloudBackupRetentionDays), v1: (cloudBackupRetentionDays !== 1 ? "s" : ""), v2: (tierName) })
       : null;
 
   const handleRestore = async () => {
@@ -161,7 +162,7 @@ export default function BackupManagerDialog({ onClose }: Props) {
       setRestoreVaultName(null);
       setRestorePassword("");
     } catch (err) {
-      const msg = errorText(err, "Restore failed");
+      const msg = errorText(err, __tr("Restore failed"));
       setRestoreError(msg);
     } finally {
       setRestoring(false);
@@ -178,7 +179,7 @@ export default function BackupManagerDialog({ onClose }: Props) {
   return (
     <Dialog
       open
-      title="Backup Manager"
+      title={__tr("Backup Manager")}
       width={672}
       layer="sync"
       onClose={onClose}
@@ -194,7 +195,7 @@ export default function BackupManagerDialog({ onClose }: Props) {
           ) : vaultGroups.length === 0 ? (
             <div className="flex flex-col items-center gap-2 p-4 text-center">
               <CloudOffIcon size={20} className="text-ink-faint" />
-              <span className="text-label text-ink-muted">No backups found</span>
+              <span className="text-label text-ink-muted">{__tr("No backups found")}</span>
             </div>
           ) : (
             <div className="space-y-0.5">
@@ -206,7 +207,7 @@ export default function BackupManagerDialog({ onClose }: Props) {
                     key={group.vaultId}
                     selected={group.vaultId === selectedVaultId}
                     leading="database"
-                    description={isCurrent ? `(current) ${count}` : count}
+                    description={isCurrent ? __tr("(current) {v0}", { v0: (count) }) : count}
                     onClick={() => {
                       setSelectedVaultId(group.vaultId);
                       cancelRestore();
@@ -223,13 +224,13 @@ export default function BackupManagerDialog({ onClose }: Props) {
         <div className="flex-1 min-w-0 overflow-y-auto p-4 flex flex-col">
           {!selectedGroup ? (
             <div className="flex-1 flex items-center justify-center">
-              <span className="text-label text-ink-muted">Select a vault to view backups</span>
+              <span className="text-label text-ink-muted">{__tr("Select a vault to view backups")}</span>
             </div>
           ) : (
             <>
               <div className="flex items-center gap-2 mb-4">
                 <h3 className="text-body font-semibold text-ink">{selectedGroup.vaultName}</h3>
-                {selectedGroup.vaultName === currentVaultName && <Badge>(current)</Badge>}
+                {selectedGroup.vaultName === currentVaultName && <Badge>{__tr("(current)")}</Badge>}
               </div>
 
               <div className="space-y-4 flex-1">
@@ -252,17 +253,16 @@ export default function BackupManagerDialog({ onClose }: Props) {
                                     value={restorePassword}
                                     onChange={(e) => setRestorePassword(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && handleRestore()}
-                                    placeholder="Master password"
+                                    placeholder={__tr("Master password")}
                                     autoFocus
                                     leading={<LockIcon size={12} />}
                                   />
                                 </div>
                                 <Button variant="primary" size="sm" onClick={handleRestore} disabled={restoring || !restorePassword}>
-                                  {restoring ? "..." : "Confirm"}
+                                  {restoring ? "..." : __tr("Confirm")}
                                 </Button>
                                 <Button variant="ghost" size="sm" onClick={cancelRestore}>
-                                  Cancel
-                                </Button>
+                                  {__tr("Cancel")}</Button>
                               </div>
                               {restoreError && (
                                 <p data-cv-error="" className="text-meta text-danger">
@@ -287,8 +287,7 @@ export default function BackupManagerDialog({ onClose }: Props) {
                                   setRestoreError(null);
                                 }}
                               >
-                                Restore
-                              </Button>
+                                {__tr("Restore")}</Button>
                             </div>
                           )}
                         </div>
@@ -309,7 +308,7 @@ export default function BackupManagerDialog({ onClose }: Props) {
       </div>
 
       <DialogFooter divided>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{__tr("Close")}</Button>
       </DialogFooter>
     </Dialog>
   );

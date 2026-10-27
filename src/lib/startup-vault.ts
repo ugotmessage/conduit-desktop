@@ -1,3 +1,4 @@
+import { t as __tr } from "./i18n";
 /**
  * The renderer part of the startup sequence (docs/AUTO_UNLOCK.md 4.2): runs once sign-in has
  * settled, asks main for the plan (main owns the one-shot) and shows the Vault Hub, the last or
@@ -48,7 +49,7 @@ async function stopOpeningAtStartup(name: string): Promise<void> {
     const { forgot } = await useStartupVaultStore.getState().setStartup({ kind: "hub" });
     toastStartupCleared(name, forgot);
   } catch (err) {
-    toast.error("Couldn't change the startup vault", errorText(err, "Try again in Settings > General."));
+    toast.error(__tr("Couldn't change the startup vault"), errorText(err, __tr("Try again in Settings > General.")));
   }
 }
 
@@ -57,17 +58,17 @@ export async function turnOffAutoUnlock(name: string): Promise<void> {
     await useStartupVaultStore.getState().disable();
     toastAutoUnlockOff(name);
   } catch (err) {
-    toast.error("Couldn't turn off automatic unlock", errorText(err, "Try again in Settings > Security."));
+    toast.error(__tr("Couldn't turn off automatic unlock"), errorText(err, __tr("Try again in Settings > Security.")));
   }
 }
 
 function toastMissing(fileName: string, name: string): void {
-  toast.warning(`Couldn't find ${fileName}`, {
-    message: "It may have been moved or renamed. Conduit opened the Vault Hub.",
+  toast.warning(__tr("Couldn't find {v0}", { v0: (fileName) }), {
+    message: __tr("It may have been moved or renamed. Conduit opened the Vault Hub."),
     duration: 10_000,
     actions: [
-      { label: "Open Vault File...", onClick: () => document.dispatchEvent(new CustomEvent("conduit:open-vault")) },
-      { label: "Stop Opening at Startup", onClick: () => void stopOpeningAtStartup(name) },
+      { label: __tr("Open Vault File..."), onClick: () => document.dispatchEvent(new CustomEvent("conduit:open-vault")) },
+      { label: __tr("Stop Opening at Startup"), onClick: () => void stopOpeningAtStartup(name) },
     ],
   });
 }
@@ -75,10 +76,10 @@ function toastMissing(fileName: string, name: string): void {
 /** Cancel on a fallback dialog of an automatic attempt: the Hub, and a way to stop it for good. */
 export function toastStartupOpenCancelled(name: string, kind: StartupFallback["kind"]): void {
   void invoke("vault_startup_done").catch(() => undefined);
-  toast.info(`${name} didn't open`, {
+  toast.info(__tr("{v0} didn't open", { v0: (name) }), {
     // A stale saved password was already forgotten, so the next start asks instead of trying again.
-    message: kind === "stale" ? "Automatic unlock is off. Conduit will ask for the master password at the next start." : "It will try again at the next start.",
-    actions: [{ label: "Stop Opening at Startup", onClick: () => void stopOpeningAtStartup(name) }],
+    message: kind === "stale" ? __tr("Automatic unlock is off. Conduit will ask for the master password at the next start.") : __tr("It will try again at the next start."),
+    actions: [{ label: __tr("Stop Opening at Startup"), onClick: () => void stopOpeningAtStartup(name) }],
   });
 }
 
@@ -131,7 +132,7 @@ async function openAutomatically(path: string, name: string): Promise<void> {
       unlockSucceeded((partial) => useVaultStore.setState(partial));
       await finishUnlocked();
       void startup.refresh();
-      toast.info(`${name} unlocked automatically`, { actions: [{ label: "Turn Off", onClick: () => void turnOffAutoUnlock(name) }] });
+      toast.info(__tr("{v0} unlocked automatically", { v0: (name) }), { actions: [{ label: __tr("Turn Off"), onClick: () => void turnOffAutoUnlock(name) }] });
     } else {
       await followFallback(res.fallback, path, name);
     }
@@ -171,7 +172,7 @@ async function connectLastTeamVault(settings: StartupSettings): Promise<void> {
     vault.setShowVaultHub(false);
   } catch (err) {
     vault.setAutoConnectInProgress(false);
-    vault.setAutoConnectError(errorText(err, "Failed to auto-connect to team vault"));
+    vault.setAutoConnectError(errorText(err, __tr("Failed to auto-connect to team vault")));
     vault.setShowVaultHub(true);
   }
 }
@@ -207,7 +208,7 @@ export async function connectChosenTeamVault(teamVaultId: string): Promise<void>
     vault.setShowVaultHub(false);
   } catch (err) {
     if (cancelled) return;
-    vault.setAutoConnectError(errorText(err, "Failed to connect to the team vault"));
+    vault.setAutoConnectError(errorText(err, __tr("Failed to connect to the team vault")));
     showHub();
   } finally {
     cancelOpening = null;

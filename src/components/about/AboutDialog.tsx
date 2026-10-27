@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { useAppIcon } from "../../hooks/useAppIcon";
 import { invoke } from "../../lib/electron";
@@ -19,9 +20,9 @@ export default function AboutDialog({ onClose }: AboutDialogProps) {
   }, []);
 
   return (
-    <Dialog open title="About Conduit" onClose={onClose} closeOnScrim width={384} layout="custom">
+    <Dialog open title={__tr("About Conduit")} onClose={onClose} closeOnScrim width={384} layout="custom">
       <div className="flex items-center justify-end px-4 pt-3">
-        <IconButton icon="close" label="Close" onClick={onClose} />
+        <IconButton icon="close" label={__tr("Close")} onClick={onClose} />
       </div>
 
       <div className="flex flex-col items-center gap-4 px-6 pb-6">
@@ -30,12 +31,12 @@ export default function AboutDialog({ onClose }: AboutDialogProps) {
           <h1 className="text-display text-ink">Conduit</h1>
           {version && (
             <p className="mt-1 flex items-center justify-center gap-2 text-body text-ink-muted">
-              Version {version}
+              {__tr("Version")} {version}
               <BetaPill version={version} />
             </p>
           )}
         </div>
-        <p className="text-center text-body text-ink-muted">AI-Powered Remote Connection Manager</p>
+        <p className="text-center text-body text-ink-muted">{__tr("AI-Powered Remote Connection Manager")}</p>
         <Button variant="link" size="lg" onClick={() => invoke("auth_open_website")}>
           conduitdesktop.com
         </Button>

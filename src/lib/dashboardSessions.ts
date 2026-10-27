@@ -1,12 +1,13 @@
+import { t as __tr } from "./i18n";
 import type { Session } from "../stores/sessionStore";
 
 /** The pinned Home tab. The id predates the pinned tab; keep it so old code paths still find it. */
 export const HOME_SESSION_ID = "__home__";
-export const HOME_TITLE = "Home";
+export const HOME_TITLE = __tr("Home");
 
 /** The vault Knowledge view (docs/KNOWLEDGE_BASE.md). */
 export const KNOWLEDGE_SESSION_ID = "knowledge::vault";
-export const KNOWLEDGE_TITLE = "Knowledge";
+export const KNOWLEDGE_TITLE = __tr("Knowledge");
 
 const ENTRY_INFO_PREFIX = "dashboard::";
 const FOLDER_VIEW_PREFIX = "folder::";

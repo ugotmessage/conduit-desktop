@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
 import { useRemoteClipboard, type ClipboardFileInfo, type ClipboardFileProgress } from "../../hooks/useRemoteClipboard";
@@ -86,14 +87,14 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
       (files.length > 3 ? ` +${files.length - 3} more` : "");
 
     fileToastIdRef.current = toast.info(
-      `${files.length} file${files.length > 1 ? "s" : ""} from remote clipboard`,
+      __tr("{v0} file{v1} from remote clipboard", { v0: (files.length), v1: (files.length > 1 ? "s" : "") }),
       {
         message: `${fileList} (${formatFileSize(totalSize)})`,
         persistent: true,
         dismissOnAction: true,
         actions: [
           {
-            label: "Download",
+            label: __tr("Download"),
             variant: "primary",
             onClick: () => {
               // Reset speed tracking
@@ -101,12 +102,12 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
               lastProgressTimeRef.current = 0;
               lastSpeedRef.current = undefined;
               invoke("rdp_clipboard_files_request", { sessionId }).catch((err) => {
-                toast.error("Download failed", String(err));
+                toast.error(__tr("Download failed"), String(err));
               });
             },
           },
           {
-            label: "Dismiss",
+            label: __tr("Dismiss"),
             onClick: () => {
               invoke("rdp_clipboard_files_dismiss", { sessionId }).catch(() => {});
             },
@@ -129,8 +130,8 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
     }
 
     toast.success(
-      "Files downloaded",
-      `${filePaths.length} file${filePaths.length > 1 ? "s" : ""} copied to clipboard`
+      __tr("Files downloaded"),
+      __tr("{v0} file{v1} copied to clipboard", { v0: (filePaths.length), v1: (filePaths.length > 1 ? "s" : "") })
     );
   }, []);
 
@@ -169,8 +170,8 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
         progressToastIdRef.current = null;
       }
       toast.success(
-        "Sent to remote",
-        `${progress.totalFiles} file${progress.totalFiles > 1 ? "s" : ""} copied to remote clipboard`
+        __tr("Sent to remote"),
+        __tr("{v0} file{v1} copied to remote clipboard", { v0: (progress.totalFiles), v1: (progress.totalFiles > 1 ? "s" : "") })
       );
       // Reset speed tracking
       lastProgressBytesRef.current = 0;
@@ -196,15 +197,15 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
     }
     const speedStr = lastSpeedRef.current;
 
-    const dirLabel = progress.direction === "download" ? "Downloading" : "Uploading";
+    const dirLabel = progress.direction === "download" ? __tr("Downloading") : __tr("Uploading");
     const fileLabel = progress.totalFiles > 1
-      ? `File ${progress.fileIndex + 1}/${progress.totalFiles}`
+      ? __tr("File {v0}/{v1}", { v0: (progress.fileIndex + 1), v1: (progress.totalFiles) })
       : undefined;
     const leftLabel = fileLabel ? `${fileLabel} — ${dirLabel}` : dirLabel;
 
     const title = progress.direction === "download"
-      ? "Downloading from remote"
-      : "Sending to remote";
+      ? __tr("Downloading from remote")
+      : __tr("Sending to remote");
 
     if (progressToastIdRef.current) {
       toast.update(progressToastIdRef.current, {
@@ -362,7 +363,7 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
         }
       } catch (err) {
         console.error("Failed to set up RDP frame listener:", err);
-        setError(errorText(err, "Failed to connect"));
+        setError(errorText(err, __tr("Failed to connect")));
       }
     };
 
@@ -819,13 +820,12 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
   if (rdpMode === "xfreerdp") {
     return (
       <SessionStatePanel className="h-full w-full">
-        <div className="mb-2 text-title">RDP Session Active</div>
-        <div className="mb-1 text-body text-ink-faint">Connected via FreeRDP (external window)</div>
-        <div className="text-label text-ink-faint">Server requires NLA — using xfreerdp subprocess</div>
+        <div className="mb-2 text-title">{__tr("RDP Session Active")}</div>
+        <div className="mb-1 text-body text-ink-faint">{__tr("Connected via FreeRDP (external window)")}</div>
+        <div className="text-label text-ink-faint">{__tr("Server requires NLA — using xfreerdp subprocess")}</div>
         {onClose && (
           <Button className="mt-4" onClick={onClose}>
-            Disconnect
-          </Button>
+            {__tr("Disconnect")}</Button>
         )}
       </SessionStatePanel>
     );
@@ -835,7 +835,7 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
     return (
       <SessionConnecting
         text={reconnecting ? "Reconnecting..." : "Connecting to RDP session..."}
-        detail={reconnecting ? "Waiting for server to release previous session" : undefined}
+        detail={reconnecting ? __tr("Waiting for server to release previous session") : undefined}
       />
     );
   }
@@ -846,7 +846,7 @@ export default function RdpView({ sessionId, entryId: _entryId, isActive = true,
       <SessionError
         message={friendly}
         raw={error && friendly !== error ? error : null}
-        actions={onClose && <Button onClick={onClose}>Close</Button>}
+        actions={onClose && <Button onClick={onClose}>{__tr("Close")}</Button>}
       />
     );
   }

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { invoke } from "../../lib/electron";
 import { KeyIcon } from "../../lib/icons";
@@ -25,7 +26,7 @@ const typeOptions: ReadonlyArray<SegmentOption<ConnectionType>> = [
   { value: "ssh", icon: "terminal", label: "SSH" },
   { value: "rdp", icon: "desktop", label: "RDP" },
   { value: "vnc", icon: "serverAlt", label: "VNC" },
-  { value: "web", icon: "globe", label: "Web" },
+  { value: "web", icon: "globe", label: __tr("Web") },
 ];
 
 export default function QuickConnect({ onClose }: QuickConnectProps) {
@@ -112,7 +113,7 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
               },
             });
           }).catch((err) => {
-            const msg = errorText(err, "Connection failed");
+            const msg = errorText(err, __tr("Connection failed"));
             useSessionStore.getState().updateSessionStatus(sessionId, "disconnected", msg);
           });
           return;
@@ -139,7 +140,7 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
       onClose();
     } catch (err) {
       setError(
-        errorText(err, "Connection failed")
+        errorText(err, __tr("Connection failed"))
       );
     } finally {
       setIsLoading(false);
@@ -149,19 +150,18 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
   const credentialLabel = (
     <span className="flex items-center gap-1.5">
       <KeyIcon size={16} />
-      Stored Credential
-    </span>
+      {__tr("Stored Credential")}</span>
   );
 
   return (
     <Dialog
       open
-      title="Quick Connect"
+      title={__tr("Quick Connect")}
       onClose={onClose}
       width={448}
       footer={
         <>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>{__tr("Cancel")}</Button>
           <Button
             variant="primary"
             onClick={handleConnect}
@@ -169,8 +169,7 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
             loading={isLoading}
             loadingLabel="Connecting..."
           >
-            Connect
-          </Button>
+            {__tr("Connect")}</Button>
         </>
       }
     >
@@ -183,10 +182,10 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
       ) : (
         <>
           <div className="grid grid-cols-3 gap-4">
-            <FormField label="Host" className="col-span-2">
-              <TextInput value={host} onChange={(e) => setHost(e.target.value)} placeholder="hostname or IP" autoFocus />
+            <FormField label={__tr("Host")} className="col-span-2">
+              <TextInput value={host} onChange={(e) => setHost(e.target.value)} placeholder={__tr("hostname or IP")} autoFocus />
             </FormField>
-            <FormField label="Port">
+            <FormField label={__tr("Port")}>
               <TextInput type="number" value={port} onChange={(e) => setPort(e.target.value)} placeholder={String(defaultPorts[type])} />
             </FormField>
           </div>
@@ -203,7 +202,7 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
                   }
                 }}
               >
-                <option value="">None (enter manually)</option>
+                <option value="">{__tr("None (enter manually)")}</option>
                 {credentials.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}{c.username ? ` (${c.username})` : ""}
@@ -215,17 +214,17 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
 
           {!selectedCredentialId && (
             <>
-              <FormField label="Username">
-                <TextInput value={username} onChange={(e) => setUsername(e.target.value)} placeholder="username" />
+              <FormField label={__tr("Username")}>
+                <TextInput value={username} onChange={(e) => setUsername(e.target.value)} placeholder={__tr("username")} />
               </FormField>
 
-              <FormField label="Password">
+              <FormField label={__tr("Password")}>
                 <span className="relative block">
                   <TextInput
                     type={showPasswordField ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="password"
+                    placeholder={__tr("password")}
                     className="pr-14"
                   />
                   <span className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-1">
@@ -233,7 +232,7 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
                     <IconButton
                       size="sm"
                       icon={showPasswordField ? "eyeOff" : "eye"}
-                      label={showPasswordField ? "Hide password" : "Show password"}
+                      label={showPasswordField ? __tr("Hide password") : __tr("Show password")}
                       onClick={() => setShowPasswordField(!showPasswordField)}
                     />
                   </span>

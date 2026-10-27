@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { AlertTriangleIcon, CloudOffIcon, DevicesIcon, LoaderIcon, WifiOffIcon } from "../../lib/icons";
 import type { IconComponent } from "../../lib/icons";
 import { useSyncStore } from "../../stores/syncStore";
@@ -47,7 +48,7 @@ export default function PersonalSyncIndicator() {
         onClick={openSyncSettings}
         className={`inline-flex size-toolbar shrink-0 items-center justify-center rounded hover:bg-toolbar-hover ${TONE_CLASS[statusTone(status, killSwitch)]}`}
         title={detail ? `${label}. ${detail}` : label}
-        aria-label={`Sync: ${label}`}
+        aria-label={__tr("Sync: {v0}", { v0: (label) })}
       >
         <Icon size={16} className={spinning ? "animate-spin" : undefined} />
       </button>
@@ -57,10 +58,9 @@ export default function PersonalSyncIndicator() {
           onClick={() => useSyncStore.getState().openView({ kind: "review", row: null })}
           data-cv-review-button
           className="h-5 shrink-0 rounded px-1.5 text-badge font-semibold text-warning bg-warning-bg hover:underline"
-          title="Review changes from your other devices"
+          title={__tr("Review changes from your other devices")}
         >
-          {review} to review
-        </button>
+          {review} {__tr("to review")}</button>
       )}
     </div>
   );

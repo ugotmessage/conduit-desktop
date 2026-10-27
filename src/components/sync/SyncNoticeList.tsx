@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { errorText } from "../../lib/errorText";
 import { useSyncStore } from "../../stores/syncStore";
 import { useEntryStore } from "../../stores/entryStore";
@@ -23,7 +24,7 @@ export default function SyncNoticeList() {
     return null;
   };
   const dismiss = (id: string) =>
-    void useSyncStore.getState().dismissNotice(id).catch((err) => toast.error("Could not dismiss", errorText(err, "Try again.")));
+    void useSyncStore.getState().dismissNotice(id).catch((err) => toast.error(__tr("Could not dismiss"), errorText(err, __tr("Try again."))));
   return (
     <div className="space-y-2">
       {notices.map((n) => (
@@ -32,10 +33,9 @@ export default function SyncNoticeList() {
           <p data-cv-sync-notice-text="" className="flex-1 text-label text-ink-secondary">{noticeText(n, itemName(n))}</p>
           {n.kind === "mass-change" && (
             <SmallButton primary onClick={() => useSyncStore.getState().openView({ kind: "mass-change", noticeId: n.id })}>
-              Review
-            </SmallButton>
+              {__tr("Review")}</SmallButton>
           )}
-          <SmallButton onClick={() => dismiss(n.id)}>OK</SmallButton>
+          <SmallButton onClick={() => dismiss(n.id)}>{__tr("OK")}</SmallButton>
         </div>
       ))}
     </div>

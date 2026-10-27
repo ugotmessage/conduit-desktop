@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useMemo, useState } from "react";
 import { hasUnseenAgentEdit, isStale, readKb, type KbKind } from "../../lib/kb";
 import { useEntryStore } from "../../stores/entryStore";
@@ -62,57 +63,55 @@ export default function VaultKnowledgeView() {
       <div className="border-b border-divider py-6">
         <div className={`${CONTENT_WIDTH} flex items-center gap-3 px-6`}>
           <div className="min-w-0 flex-1">
-            <h2 className="text-title font-semibold text-ink">Knowledge</h2>
+            <h2 className="text-title font-semibold text-ink">{__tr("Knowledge")}</h2>
             <p className="text-body text-ink-muted">
-              {articles.length} {articles.length === 1 ? "article" : "articles"} that agents and you keep about this vault
-            </p>
+              {articles.length} {articles.length === 1 ? __tr("article") : __tr("articles")} {__tr("that agents and you keep about this vault")}</p>
           </div>
           <Button icon="plus" onClick={() => setCreating(true)}>
-            Vault playbook
-          </Button>
+            {__tr("Vault playbook")}</Button>
         </div>
       </div>
 
       <div className={`${CONTENT_WIDTH} ${splitGrid(showReview ? "sidebar" : null)} px-6 py-4`}>
         <div className="min-w-0">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <SearchInput value={query} onChange={setQuery} placeholder="Search knowledge..." aria-label="Search knowledge" wrapperClassName="max-w-xs flex-1" />
+            <SearchInput value={query} onChange={setQuery} placeholder={__tr("Search knowledge...")} aria-label={__tr("Search knowledge")} wrapperClassName="max-w-xs flex-1" />
             <span className="w-40 shrink-0">
-              <Select value={kind} onChange={(e) => setKind(e.target.value as KbKind | "all")} aria-label="Kind">
-                <option value="all">All kinds</option>
+              <Select value={kind} onChange={(e) => setKind(e.target.value as KbKind | "all")} aria-label={__tr("Kind")}>
+                <option value="all">{__tr("All kinds")}</option>
                 {(Object.keys(KIND_META) as KbKind[]).map((k) => (
                   <option key={k} value={k}>{KIND_META[k].label}</option>
                 ))}
               </Select>
             </span>
             <span className="w-36 shrink-0">
-              <Select value={scope} onChange={(e) => setScope(e.target.value as ScopeFilter)} aria-label="Where">
-                <option value="all">Everywhere</option>
-                <option value="asset">Assets</option>
-                <option value="folder">Folders</option>
-                <option value="vault">Vault</option>
+              <Select value={scope} onChange={(e) => setScope(e.target.value as ScopeFilter)} aria-label={__tr("Where")}>
+                <option value="all">{__tr("Everywhere")}</option>
+                <option value="asset">{__tr("Assets")}</option>
+                <option value="folder">{__tr("Folders")}</option>
+                <option value="vault">{__tr("Vault")}</option>
               </Select>
             </span>
             <span className="w-36 shrink-0">
-              <Select value={author} onChange={(e) => setAuthor(e.target.value as AuthorFilter)} aria-label="Edited by">
-                <option value="all">Anyone</option>
-                <option value="agent">Agents</option>
-                <option value="user">You</option>
+              <Select value={author} onChange={(e) => setAuthor(e.target.value as AuthorFilter)} aria-label={__tr("Edited by")}>
+                <option value="all">{__tr("Anyone")}</option>
+                <option value="agent">{__tr("Agents")}</option>
+                <option value="user">{__tr("You")}</option>
               </Select>
             </span>
             <span className="w-48 shrink-0">
-              <Select value={state} onChange={(e) => setState(e.target.value as StateFilter)} aria-label="State">
-                <option value="all">Active</option>
-                <option value="review">Needs review</option>
-                <option value="stale">Not checked in 90 days</option>
-                <option value="archived">Archived</option>
+              <Select value={state} onChange={(e) => setState(e.target.value as StateFilter)} aria-label={__tr("State")}>
+                <option value="all">{__tr("Active")}</option>
+                <option value="review">{__tr("Needs review")}</option>
+                <option value="stale">{__tr("Not checked in 90 days")}</option>
+                <option value="archived">{__tr("Archived")}</option>
               </Select>
             </span>
           </div>
 
           {listed.length === 0 ? (
             <p className="py-8 text-center text-body text-ink-muted">
-              {articles.length === 0 ? "No knowledge yet. Agents add articles as they work on your assets." : "No articles match."}
+              {articles.length === 0 ? __tr("No knowledge yet. Agents add articles as they work on your assets.") : __tr("No articles match.")}
             </p>
           ) : (
             listed.map((a) => <ArticleRow key={a.entry.id} entry={a.entry} kb={a.kb} context={contextOf(a)} host={KNOWLEDGE_SESSION_ID} />)
@@ -121,14 +120,14 @@ export default function VaultKnowledgeView() {
 
         {showReview && (
           <section className="mt-5 self-start rounded border border-card-border bg-card p-3 @5xl:mt-0">
-            <h3 className="mb-1 text-body font-semibold text-ink">Needs review ({needsReview.length})</h3>
-            <p className="mb-2 text-label text-ink-muted">Agent edits you have not looked at, and articles flagged as out of date.</p>
+            <h3 className="mb-1 text-body font-semibold text-ink">{__tr("Needs review (")}{needsReview.length})</h3>
+            <p className="mb-2 text-label text-ink-muted">{__tr("Agent edits you have not looked at, and articles flagged as out of date.")}</p>
             {needsReview.slice(0, 8).map((a) => (
               <ArticleRow key={a.entry.id} entry={a.entry} kb={a.kb} context={contextOf(a)} host={KNOWLEDGE_SESSION_ID} />
             ))}
             {needsReview.length > 8 && (
               <Button variant="link" onClick={() => setState("review")}>
-                Show all {needsReview.length}
+                {__tr("Show all")} {needsReview.length}
               </Button>
             )}
           </section>

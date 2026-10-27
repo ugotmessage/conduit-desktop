@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useCallback, useEffect } from 'react';
 import { useReleaseNotes } from './useReleaseNotes';
 import { WifiOffIcon } from "../../lib/icons";
@@ -62,14 +63,14 @@ export default function WhatsNewDialog({ onClose, initialVersion }: WhatsNewDial
   const release = releases[currentStep];
 
   return (
-    <Dialog open title="What's New" onClose={onClose} closeOnScrim width={896} layout="custom">
+    <Dialog open title={__tr("What's New")} onClose={onClose} closeOnScrim width={896} layout="custom">
       {/* Header: version nav arrows + close button */}
       <div className="flex items-center justify-between px-4 pt-3">
         {!loading && !error && releases.length > 1 ? (
           <div className="flex items-center gap-1">
             <IconButton
               icon="chevronLeft"
-              label="Previous version"
+              label={__tr("Previous version")}
               onClick={() => canGoPrev && goTo(currentStep - 1)}
               disabled={!canGoPrev || isAnimating}
             />
@@ -78,7 +79,7 @@ export default function WhatsNewDialog({ onClose, initialVersion }: WhatsNewDial
             </span>
             <IconButton
               icon="chevronRight"
-              label="Next version"
+              label={__tr("Next version")}
               onClick={() => canGoNext && goTo(currentStep + 1)}
               disabled={!canGoNext || isAnimating}
             />
@@ -86,14 +87,14 @@ export default function WhatsNewDialog({ onClose, initialVersion }: WhatsNewDial
         ) : (
           <div />
         )}
-        <IconButton icon="close" label="Close" onClick={onClose} />
+        <IconButton icon="close" label={__tr("Close")} onClick={onClose} />
       </div>
 
       {loading && (
         <div className="flex h-[480px] items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <Spinner size={24} className="text-link" />
-            <span className="text-body text-ink-muted">Loading release notes...</span>
+            <span className="text-body text-ink-muted">{__tr("Loading release notes...")}</span>
           </div>
         </div>
       )}
@@ -105,12 +106,11 @@ export default function WhatsNewDialog({ onClose, initialVersion }: WhatsNewDial
               <WifiOffIcon size={24} className="text-ink-faint" />
             </div>
             <div>
-              <h3 className="text-title text-ink">Release notes unavailable</h3>
-              <p className="mt-1 text-body text-ink-muted">{error || 'No release notes found.'}</p>
+              <h3 className="text-title text-ink">{__tr("Release notes unavailable")}</h3>
+              <p className="mt-1 text-body text-ink-muted">{error || __tr("No release notes found.")}</p>
             </div>
             <Button variant="primary" icon="refresh" onClick={retry}>
-              Retry
-            </Button>
+              {__tr("Retry")}</Button>
           </div>
         </div>
       )}

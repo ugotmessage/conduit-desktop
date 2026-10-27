@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useRef, useEffect } from "react";
 import { UserIcon, PencilIcon, TerminalIcon } from "../../lib/icons";
 import { useAiStore, ENGINE_SLASH_COMMANDS } from "../../stores/aiStore";
@@ -142,14 +143,12 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
                 <EngineLogo type={activeEngineType} size={48} className="text-ink-faint" />
               </div>
               <p className="mb-2 text-body text-ink-secondary">
-                {getHarness(activeEngineType).name} Agent
-              </p>
+                {getHarness(activeEngineType).name} {__tr("Agent")}</p>
               {currentEngineModel && (
                 <p className="mb-2 text-label text-link">{currentEngineModel}</p>
               )}
               <p className="mb-4 text-label text-ink-muted">
-                Send a message to start an agent session with MCP tool access
-              </p>
+                {__tr("Send a message to start an agent session with MCP tool access")}</p>
             </div>
           </div>
         )}
@@ -206,7 +205,7 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
                       <IconButton
                         size="sm"
                         icon="pencil"
-                        label="Edit message"
+                        label={__tr("Edit message")}
                         onClick={() => {
                           setEngineEditingIndex(index);
                           const textContent = msg.blocks
@@ -218,7 +217,7 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
                       />
                     )}
                     {canRetry && (
-                      <IconButton size="sm" icon="refresh" label="Regenerate response" onClick={() => retryEngineMessage(index)} />
+                      <IconButton size="sm" icon="refresh" label={__tr("Regenerate response")} onClick={() => retryEngineMessage(index)} />
                     )}
                   </div>
                 )}
@@ -255,7 +254,7 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
               <Spinner size={16} />
             </div>
             <div className={cx("rounded-lg px-4 py-2", ASSISTANT_BUBBLE)}>
-              <p className="text-body text-ink-muted">{getHarness(activeEngineType).name} is thinking...</p>
+              <p className="text-body text-ink-muted">{getHarness(activeEngineType).name} {__tr("is thinking...")}</p>
             </div>
           </div>
         )}
@@ -276,9 +275,9 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
           <div className="mb-2 flex items-center gap-2 text-label text-warning">
             <PencilIcon size={12} />
             <span>
-              Editing message{activeEngineType === 'claude-code'
-                ? ' \u2014 session context will reset from here'
-                : ' \u2014 conversation will restart from here'}
+              {__tr("Editing message")}{activeEngineType === 'claude-code'
+                ? __tr(" — session context will reset from here")
+                : __tr(" — conversation will restart from here")}
             </span>
             <Button
               variant="link"
@@ -288,8 +287,7 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
                 setInput('');
               }}
             >
-              Cancel
-            </Button>
+              {__tr("Cancel")}</Button>
           </div>
         )}
         {/* Slash command autocomplete popup */}
@@ -371,7 +369,7 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
                 setInput('');
               }
             }}
-            placeholder={engineEditingIndex !== null ? "Edit your message..." : `Message ${getHarness(activeEngineType).name}... (type / then Enter for commands)`}
+            placeholder={engineEditingIndex !== null ? __tr("Edit your message...") : __tr("Message {v0}... (type / then Enter for commands)", { v0: (getHarness(activeEngineType).name) })}
             className="min-h-[56px] flex-1 resize-none overflow-y-auto rounded border border-input-border bg-input px-2 py-1.5 text-body text-(--c-input-fg) placeholder:text-(--c-input-placeholder) disabled:opacity-40"
             disabled={engineLoading}
           />
@@ -381,8 +379,8 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
               variant="danger"
               icon="playerStopFilled"
               onClick={handleCancel}
-              aria-label="Stop generating"
-              title="Stop generating"
+              aria-label={__tr("Stop generating")}
+              title={__tr("Stop generating")}
             />
           ) : (
             <Button
@@ -391,8 +389,8 @@ export default function EngineChatView({ showPicker, onPicked, currentEngineMode
               icon="send"
               onClick={handleSend}
               disabled={!input.trim()}
-              aria-label="Send message"
-              title="Send message"
+              aria-label={__tr("Send message")}
+              title={__tr("Send message")}
             />
           )}
         </div>

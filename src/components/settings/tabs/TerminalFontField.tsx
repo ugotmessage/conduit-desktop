@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useId, useMemo, useState } from "react";
 import { Button, FormField, TextInput } from "../../ui";
 import { HINT } from "../settings-styles";
@@ -69,8 +70,8 @@ export default function TerminalFontField({ value, onChange }: TerminalFontField
   return (
     <div className="space-y-2">
       <FormField
-        label="Font Family"
-        description="Any installed font, such as a Nerd Font. Leave empty for the built-in fonts, which are also used for anything the font lacks."
+        label={__tr("Font Family")}
+        description={__tr("Any installed font, such as a Nerd Font. Leave empty for the built-in fonts, which are also used for anything the font lacks.")}
         error={fieldError(value, safe, found)}
       >
         <TextInput
@@ -91,13 +92,12 @@ export default function TerminalFontField({ value, onChange }: TerminalFontField
       )}
       <div className="flex items-center gap-3">
         <Button size="sm" onClick={browse} loading={browsing} loadingLabel="Listing Fonts...">
-          Browse Installed Fonts
-        </Button>
+          {__tr("Browse Installed Fonts")}</Button>
         {browseMessage && <span className={HINT}>{browseMessage}</span>}
       </div>
       <div
         data-cv-terminal-font-preview=""
-        aria-label="Font preview"
+        aria-label={__tr("Font preview")}
         className="overflow-hidden whitespace-pre rounded-md border border-card-border bg-well px-3 py-2 text-body text-ink"
         style={{ fontFamily: buildTerminalFontStack(safe) }}
       >

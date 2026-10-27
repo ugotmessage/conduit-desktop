@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { TabProps } from "../SettingsHelpers";
 import type { WebGlobalDefaults, WebEngineType } from "../../../types/entry";
 import { HARDCODED_WEB_DEFAULTS } from "../../../types/entry";
@@ -22,32 +23,27 @@ export default function SessionWebTab({ settings, setSettings }: TabProps) {
   return (
     <div className="space-y-4">
       <p className={HINT}>
-        Default settings for all web sessions. Individual entries can override these.
-      </p>
+        {__tr("Default settings for all web sessions. Individual entries can override these.")}</p>
 
       <div>
         <Checkbox checked={defaults.autofillEnabled} onChange={(autofillEnabled) => update({ autofillEnabled })}>
-          Enable Autofill
-        </Checkbox>
+          {__tr("Enable Autofill")}</Checkbox>
         <p className={`ml-[26px] mt-0.5 ${HINT}`}>
-          Show an autofill button in web sessions to fill login forms with entry credentials.
-        </p>
+          {__tr("Show an autofill button in web sessions to fill login forms with entry credentials.")}</p>
       </div>
 
       <div>
         <Checkbox checked={defaults.ignoreCertErrors} onChange={(ignoreCertErrors) => update({ ignoreCertErrors })}>
-          Ignore Certificate Errors
-        </Checkbox>
+          {__tr("Ignore Certificate Errors")}</Checkbox>
         <p className={`ml-[26px] mt-0.5 ${HINT}`}>
-          Trust self-signed or expired SSL certificates for all web sessions by default.
-        </p>
+          {__tr("Trust self-signed or expired SSL certificates for all web sessions by default.")}</p>
       </div>
 
       {/* Browser Engine: Windows only */}
       {isWindows && (
         <FormField
-          label="Browser Engine"
-          description="Edge engine enables Windows integrated authentication for Microsoft 365 and domain SSO. Individual connections can override this in their Security settings."
+          label={__tr("Browser Engine")}
+          description={__tr("Edge engine enables Windows integrated authentication for Microsoft 365 and domain SSO. Individual connections can override this in their Security settings.")}
         >
           <Select value={defaults.engine} onChange={(e) => update({ engine: e.target.value as WebEngineType })}>
             {WEB_ENGINE_OPTIONS.map((opt) => (

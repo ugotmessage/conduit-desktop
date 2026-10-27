@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { TabProps } from "../SettingsHelpers";
 import type { TerminalGlobalDefaults } from "../../../types/entry";
 import { HARDCODED_TERMINAL_DEFAULTS } from "../../../types/entry";
@@ -17,9 +18,9 @@ export default function SessionTerminalTab({ settings, setSettings }: TabProps) 
 
   return (
     <div className="space-y-4">
-      <FormField label="Default Shell" description="Shell used when opening new local terminal sessions.">
+      <FormField label={__tr("Default Shell")} description={__tr("Shell used when opening new local terminal sessions.")}>
         <Select value={settings.default_shell} onChange={(e) => setSettings({ ...settings, default_shell: e.target.value })}>
-          <option value="default">System Default</option>
+          <option value="default">{__tr("System Default")}</option>
           <option value="bash">Bash</option>
           <option value="zsh">Zsh</option>
           <option value="powershell">PowerShell</option>
@@ -28,14 +29,13 @@ export default function SessionTerminalTab({ settings, setSettings }: TabProps) 
 
       <div className="space-y-4 border-t border-divider pt-4">
         <p className={HINT}>
-          Default settings for all terminal sessions. SSH sessions inherit these values.
-        </p>
+          {__tr("Default settings for all terminal sessions. SSH sessions inherit these values.")}</p>
 
         <TerminalFontField value={defaults.fontFamily} onChange={(fontFamily) => updateTerminal({ fontFamily })} />
 
         <div>
           <label htmlFor="terminal-font-size" className={`${SECTION_LABEL} mb-1`}>
-            Font Size <span className="font-normal text-ink-muted">({defaults.fontSize}px)</span>
+            {__tr("Font Size")} <span className="font-normal text-ink-muted">({defaults.fontSize}px)</span>
           </label>
           <Slider
             id="terminal-font-size"
@@ -48,7 +48,7 @@ export default function SessionTerminalTab({ settings, setSettings }: TabProps) 
           />
         </div>
 
-        <FormField label="Scrollback Buffer" description="Number of lines to keep in the scroll history (100 – 100,000).">
+        <FormField label={__tr("Scrollback Buffer")} description={__tr("Number of lines to keep in the scroll history (100 – 100,000).")}>
           <TextInput
             type="number"
             min={100}
@@ -65,8 +65,7 @@ export default function SessionTerminalTab({ settings, setSettings }: TabProps) 
         </FormField>
 
         <Checkbox checked={defaults.cursorBlink} onChange={(cursorBlink) => updateTerminal({ cursorBlink })}>
-          Cursor Blink
-        </Checkbox>
+          {__tr("Cursor Blink")}</Checkbox>
       </div>
     </div>
   );

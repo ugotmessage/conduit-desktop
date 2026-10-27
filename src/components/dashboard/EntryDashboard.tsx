@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState, useCallback } from "react";
 import { generateTotpCode, type TotpResult } from "../../lib/totp";
 import { useEntryStore } from "../../stores/entryStore";
@@ -116,7 +117,7 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
   if (!entry) {
     return (
       <div className="flex-1 flex items-center justify-center bg-editor">
-        <p className="text-body text-ink-faint">Entry not found</p>
+        <p className="text-body text-ink-faint">{__tr("Entry not found")}</p>
       </div>
     );
   }
@@ -127,9 +128,9 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success(`${label} copied`);
+      toast.success(__tr("{v0} copied", { v0: (label) }));
     } catch {
-      toast.error(`Failed to copy ${label}`);
+      toast.error(__tr("Failed to copy {v0}", { v0: (label) }));
     }
   };
 
@@ -152,9 +153,9 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
   const handleOpenExternal = async () => {
     try {
       await invoke("entry_open_external", { id: entryId });
-      toast.success("Opened in external app");
+      toast.success(__tr("Opened in external app"));
     } catch (err) {
-      toast.error(errorText(err, "Failed to open externally"));
+      toast.error(errorText(err, __tr("Failed to open externally")));
     }
   };
 
@@ -184,19 +185,19 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
           <div className="flex items-center gap-0.5">
             <IconButton
               icon={entry.is_favorite ? "starFilled" : "star"}
-              label={entry.is_favorite ? "Remove from favorites" : "Add to favorites"}
+              label={entry.is_favorite ? __tr("Remove from favorites") : __tr("Add to favorites")}
               onClick={handleToggleFavorite}
               tone={entry.is_favorite ? "inherit" : "default"}
               className={entry.is_favorite ? "text-favorite" : undefined}
             />
-            <IconButton icon="pencil" label="Edit entry" onClick={handleEdit} />
+            <IconButton icon="pencil" label={__tr("Edit entry")} onClick={handleEdit} />
             {isConnectionType && (
-              <IconButton icon="externalLink" label="Open in external app" onClick={handleOpenExternal} />
+              <IconButton icon="externalLink" label={__tr("Open in external app")} onClick={handleOpenExternal} />
             )}
           </div>
           {entry.entry_type !== "credential" && (
             <Button variant="primary" onClick={handleOpen}>
-              {entry.entry_type === "document" ? "Open Document" : "Open Session"}
+              {entry.entry_type === "document" ? __tr("Open Document") : __tr("Open Session")}
             </Button>
           )}
         </div>
@@ -225,7 +226,7 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
                     </div>
                   );
                 }
-                return <p className="text-body text-ink-faint italic">Empty document</p>;
+                return <p className="text-body text-ink-faint italic">{__tr("Empty document")}</p>;
               })()}
             </div>
           )}
@@ -234,28 +235,28 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
           <div className="space-y-0">
             {entry.entry_type !== "document" && entry.host && (
               <DetailRow
-                label="Host"
+                label={__tr("Host")}
                 icon={<ServerIcon size={16} />}
                 value={`${entry.host}${entry.port ? `:${entry.port}` : ""}`}
                 actions={
-                  <IconButton size="sm" icon="copy" label="Copy host" onClick={() => copyToClipboard(entry.host!, "Host")} />
+                  <IconButton size="sm" icon="copy" label={__tr("Copy host")} onClick={() => copyToClipboard(entry.host!, "Host")} />
                 }
               />
             )}
             {isCheckable(entry) && <ReachabilityRow entry={entry} />}
             {entry.entry_type !== "document" && displayUsername && (
               <DetailRow
-                label="Username"
+                label={__tr("Username")}
                 icon={<UserIcon size={16} />}
                 value={displayUsername}
                 actions={
-                  <IconButton size="sm" icon="copy" label="Copy username" onClick={() => copyToClipboard(displayUsername, "Username")} />
+                  <IconButton size="sm" icon="copy" label={__tr("Copy username")} onClick={() => copyToClipboard(displayUsername, "Username")} />
                 }
               />
             )}
             {entry.entry_type !== "document" && displayPassword && (
               <DetailRow
-                label="Password"
+                label={__tr("Password")}
                 icon={<LockIcon size={16} />}
                 value={
                   <span className="font-mono">
@@ -267,14 +268,14 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
                     <IconButton
                       size="sm"
                       icon={showPassword ? "eyeOff" : "eye"}
-                      label={showPassword ? "Hide password" : "Reveal password"}
+                      label={showPassword ? __tr("Hide password") : __tr("Reveal password")}
                       onClick={() => setShowPassword(!showPassword)}
                     />
-                    <IconButton size="sm" icon="copy" label="Copy password" onClick={() => copyToClipboard(displayPassword, "Password")} />
+                    <IconButton size="sm" icon="copy" label={__tr("Copy password")} onClick={() => copyToClipboard(displayPassword, "Password")} />
                     <IconButton
                       size="sm"
                       icon="history"
-                      label="Password history"
+                      label={__tr("Password history")}
                       onClick={() => setShowPasswordHistory(true)}
                     />
                   </div>
@@ -283,7 +284,7 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
             )}
             {totpResult && (
               <DetailRow
-                label="One-Time Password"
+                label={__tr("One-Time Password")}
                 icon={<ShieldLockIcon size={16} />}
                 value={
                   <div className="flex items-center gap-2">
@@ -301,23 +302,23 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
                   </div>
                 }
                 actions={
-                  <IconButton size="sm" icon="copy" label="Copy code" onClick={() => copyToClipboard(totpResult.code, "TOTP code")} />
+                  <IconButton size="sm" icon="copy" label={__tr("Copy code")} onClick={() => copyToClipboard(totpResult.code, "TOTP code")} />
                 }
               />
             )}
             {entry.entry_type !== "document" && entry.domain && (
-              <DetailRow label="Domain" icon={<GlobeIcon size={16} />} value={entry.domain} />
+              <DetailRow label={__tr("Domain")} icon={<GlobeIcon size={16} />} value={entry.domain} />
             )}
             {entry.entry_type !== "document" && credential && credential.source !== "inline" && (
               <DetailRow
-                label="Credential"
+                label={__tr("Credential")}
                 icon={<KeyIcon size={16} />}
                 value={`${credential.source}${credential.source_entry_id ? " (entry)" : credential.source_folder_id ? " (folder)" : ""}`}
               />
             )}
             {entry.tags.length > 0 && (
               <div className="py-3 border-b border-divider">
-                <DetailLabel>Tags</DetailLabel>
+                <DetailLabel>{__tr("Tags")}</DetailLabel>
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
                   {entry.tags.map((tag) => (
                     <span
@@ -331,8 +332,8 @@ export default function EntryDashboard({ entryId }: EntryDashboardProps) {
                 </div>
               </div>
             )}
-            <DetailRow label="Created" icon={<CalendarIcon size={16} />} value={formatRelativeDate(entry.created_at)} />
-            <DetailRow label="Modified" icon={<ClockIcon size={16} />} value={formatRelativeDate(entry.updated_at)} last />
+            <DetailRow label={__tr("Created")} icon={<CalendarIcon size={16} />} value={formatRelativeDate(entry.created_at)} />
+            <DetailRow label={__tr("Modified")} icon={<ClockIcon size={16} />} value={formatRelativeDate(entry.updated_at)} last />
           </div>
 
           {HISTORY_TYPES.has(entry.entry_type) && <ConnectionHistorySection entryId={entryId} />}

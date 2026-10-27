@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
 import {
@@ -148,16 +149,16 @@ export default function VncView({
 
             // Show a specific error based on what's missing
             if (missing.includes("username") && missing.includes("password")) {
-              setError("Server requires username and password");
+              setError(__tr("Server requires username and password"));
             } else if (missing.includes("username")) {
               setError(
                 "This VNC server requires a username (macOS Screen Sharing). " +
                 "Update the entry's credential to include both username and password."
               );
             } else if (missing.includes("password")) {
-              setError("Server requires a password");
+              setError(__tr("Server requires a password"));
             } else {
-              setError(`Server requires: ${missing.join(", ")}`);
+              setError(__tr("Server requires: {v0}", { v0: (missing.join(", ")) }));
             }
             rfb?.disconnect();
           }
@@ -177,7 +178,7 @@ export default function VncView({
       } catch (err) {
         if (!destroyed) {
           const msg =
-            errorText(err, "Failed to connect");
+            errorText(err, __tr("Failed to connect"));
           setError(msg);
         }
       }
@@ -386,7 +387,7 @@ export default function VncView({
       <SessionError
         className="h-full w-full"
         message={error}
-        actions={onClose && <Button onClick={onClose}>Close</Button>}
+        actions={onClose && <Button onClick={onClose}>{__tr("Close")}</Button>}
       />
     );
   }

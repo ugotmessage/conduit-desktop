@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect, useState, type ReactNode } from "react";
 import { useStartupVaultStore, type StartupStatus } from "../../../stores/startupVaultStore";
 import { useVaultStore } from "../../../stores/vaultStore";
@@ -39,7 +40,7 @@ export default function AutoUnlockSetting({ notice }: AutoUnlockSettingProps) {
       await useStartupVaultStore.getState().disable();
       toastAutoUnlockOff(name);
     } catch (err) {
-      setError(errorText(err, "Couldn't turn off automatic unlock"));
+      setError(errorText(err, __tr("Couldn't turn off automatic unlock")));
     } finally {
       setBusy(false);
     }
@@ -53,13 +54,12 @@ export default function AutoUnlockSetting({ notice }: AutoUnlockSettingProps) {
     if (vaultType === "team") {
       return notice(
         <div>
-          <p className="text-body text-ink-muted">Automatic unlock is for personal vaults. Team vaults already open without a password on this computer.</p>
+          <p className="text-body text-ink-muted">{__tr("Automatic unlock is for personal vaults. Team vaults already open without a password on this computer.")}</p>
           {savedName && (
             <p className={`mt-1 ${HINT}`}>
-              {savedName} unlocks automatically on this computer.{" "}
+              {savedName} {__tr("unlocks automatically on this computer.")}{" "}
               <Button variant="link" size="sm" onClick={() => void turnOff(savedName)} disabled={busy}>
-                Turn Off
-              </Button>
+                {__tr("Turn Off")}</Button>
             </p>
           )}
         </div>,
@@ -73,13 +73,13 @@ export default function AutoUnlockSetting({ notice }: AutoUnlockSettingProps) {
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <IconSlot icon="lockOpen" size={20} className={cx("shrink-0", on ? "text-(--c-accent)" : "text-ink-faint")} />
             <div className="min-w-0">
-              <p className="text-body font-semibold text-ink">Unlock automatically at startup</p>
+              <p className="text-body font-semibold text-ink">{__tr("Unlock automatically at startup")}</p>
               <p className={`mt-0.5 ${HINT}`}>
-                {on ? `${name} opens without the master password when Conduit starts` : `Open ${name} without the master password when Conduit starts`}
+                {on ? __tr("{v0} opens without the master password when Conduit starts", { v0: (name) }) : __tr("Open {v0} without the master password when Conduit starts", { v0: (name) })}
               </p>
               {!on && savedName && (
                 <p className={`mt-0.5 ${HINT}`}>
-                  {savedName} unlocks automatically now. Turning this on moves it to {name}.
+                  {savedName} {__tr("unlocks automatically now. Turning this on moves it to")} {name}.
                 </p>
               )}
             </div>
@@ -88,14 +88,14 @@ export default function AutoUnlockSetting({ notice }: AutoUnlockSettingProps) {
             checked={on}
             onChange={(next) => (next ? setShowWarning(true) : void turnOff(name))}
             disabled={busy}
-            label="Unlock automatically at startup"
+            label={__tr("Unlock automatically at startup")}
           />
         </Card>
         {error && <Callout tone="danger">{error}</Callout>}
         {on && (
           <>
             <Callout tone="warning">{AUTO_UNLOCK_SHORT_WARNING}</Callout>
-            <p className={HINT}>Your master password is kept in the {status.store.storeName} on this computer.</p>
+            <p className={HINT}>{__tr("Your master password is kept in the")} {status.store.storeName} {__tr("on this computer.")}</p>
           </>
         )}
       </div>
@@ -104,7 +104,7 @@ export default function AutoUnlockSetting({ notice }: AutoUnlockSettingProps) {
 
   return (
     <div>
-      <SectionHeader title="Automatic Unlock" />
+      <SectionHeader title={__tr("Automatic Unlock")} />
       {body}
       {showWarning && <AutoUnlockWarningDialog mode="settings" layer="stacked" onClose={() => setShowWarning(false)} />}
     </div>

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { CheckIcon, CloseIcon, ShieldCheckIcon } from "../../../lib/icons";
 import { cx } from "../../ui";
 
@@ -37,13 +38,11 @@ export default function ApprovalCard({ id, description, command, status, onRespo
         <div className="flex border-t border-warning-border">
           <button type="button" onClick={() => onRespond(id, true)} className={cx(CHOICE, "text-success")}>
             <CheckIcon size={12} compact />
-            Approve
-          </button>
+            {__tr("Approve")}</button>
           <div className="w-px bg-warning-border" />
           <button type="button" onClick={() => onRespond(id, false)} className={cx(CHOICE, "text-danger")}>
             <CloseIcon size={12} compact />
-            Deny
-          </button>
+            {__tr("Deny")}</button>
         </div>
       )}
 

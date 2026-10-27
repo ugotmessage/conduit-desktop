@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEntryStore } from "../../stores/entryStore";
 import { useVaultStore } from "../../stores/vaultStore";
 import { useTierStore } from "../../stores/tierStore";
@@ -44,7 +45,7 @@ export default function DashboardOverview({ active = true }: { active?: boolean 
           folderCount={folders.length}
           onHistoryCleared={bumpHistoryVersion}
         />
-        {loaded && allHidden && <p className="text-label text-ink-faint">All sections are hidden. Use Customize to show them.</p>}
+        {loaded && allHidden && <p className="text-label text-ink-faint">{__tr("All sections are hidden. Use Customize to show them.")}</p>}
         {shown("quick") && <QuickBar />}
         <div className="grid grid-cols-1 items-start gap-4 @2xl:grid-cols-2">
           {shown("recent") && <RecentConnectionsCard active={active} />}
@@ -76,11 +77,11 @@ function HomeHeader({
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="text-title font-semibold text-ink">Welcome back{displayName ? `, ${displayName}` : ""}</h1>
+        <h1 className="text-title font-semibold text-ink">{__tr("Welcome back")}{displayName ? `, ${displayName}` : ""}</h1>
         <p className="text-body text-ink-muted mt-1">
-          {entryCount} {entryCount === 1 ? "entry" : "entries"} &middot;{" "}
-          {credentialCount} {credentialCount === 1 ? "credential" : "credentials"} &middot;{" "}
-          {folderCount} {folderCount === 1 ? "folder" : "folders"}
+          {entryCount} {entryCount === 1 ? __tr("entry") : __tr("entries")} &middot;{" "}
+          {credentialCount} {credentialCount === 1 ? __tr("credential") : __tr("credentials")} &middot;{" "}
+          {folderCount} {folderCount === 1 ? __tr("folder") : __tr("folders")}
         </p>
       </div>
       <CustomizeMenu onHistoryCleared={onHistoryCleared} />

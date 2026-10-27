@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 /**
  * A select that adds a "Default (current value)" first option.
  * When "Default" is selected, the value is set to undefined (inherit from global defaults).
@@ -37,7 +38,7 @@ export default function DefaultableSelect<T extends string | number>({
 
   return (
     <Select value={selectValue} onChange={handleChange} className={className} aria-label={ariaLabel}>
-      <option value={SENTINEL}>Default ({defaultLabel})</option>
+      <option value={SENTINEL}>{__tr("Default (")}{defaultLabel})</option>
       {options.map((opt) => (
         <option key={String(opt.value)} value={String(opt.value)}>
           {opt.label}

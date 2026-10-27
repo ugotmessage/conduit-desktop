@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -24,7 +25,7 @@ async function run(action: () => Promise<void>, failTitle: string): Promise<void
   try {
     await action();
   } catch (err) {
-    toast.error(failTitle, errorText(err, "Try again."));
+    toast.error(failTitle, errorText(err, __tr("Try again.")));
   }
 }
 
@@ -36,7 +37,7 @@ interface WaitActionsProps {
 /** [Open now] / [Continue anyway] and [Stop waiting for X] (only while the vault is open). */
 export function WaitActions({ waiting, duringUnlock }: WaitActionsProps) {
   const [busy, setBusy] = useState(false);
-  const openLabel = waiting.purpose === "first-genesis" ? "Continue anyway" : "Open now";
+  const openLabel = waiting.purpose === "first-genesis" ? __tr("Continue anyway") : __tr("Open now");
   const openNow = async () => {
     setBusy(true);
     await run(() => syncApi.sessionOpenNow(), "Could not continue");
@@ -48,7 +49,7 @@ export function WaitActions({ waiting, duringUnlock }: WaitActionsProps) {
       {waiting.stopOffered && !duringUnlock &&
         waiting.devices.map((d) => (
           <DialogButton key={d.deviceId} onClick={() => void stopFor(d)}>
-            Stop waiting for {deviceLabel(d)}
+            {__tr("Stop waiting for")} {deviceLabel(d)}
           </DialogButton>
         ))}
       <DialogButton variant="primary" onClick={() => void openNow()} disabled={busy}>
@@ -63,14 +64,14 @@ export default function WaitingForDriveDialog({ waiting, duringUnlock }: WaitAct
   return (
     <SyncDialogFrame
       icon="cloudDownload"
-      title="Getting the latest changes"
+      title={__tr("Getting the latest changes")}
       footer={<WaitActions waiting={waiting} duringUnlock={duringUnlock} />}
     >
       <div className="flex items-center gap-2 text-ink">
         <Spinner className="shrink-0 text-link" />
         <span>{waitingText(waiting)}</span>
       </div>
-      <p>Conduit continues on its own when the file arrives. Opening now is safe: changes merge when they arrive.</p>
+      <p>{__tr("Conduit continues on its own when the file arrives. Opening now is safe: changes merge when they arrive.")}</p>
     </SyncDialogFrame>
   );
 }

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect, useState } from "react";
 import { ShieldLockIcon, TrashIcon } from "../../../lib/icons";
 import { Button, Card, TextInput } from "../../ui";
@@ -71,9 +72,9 @@ export default function TotpSection(props: TotpSectionProps) {
       props.setTotpDigits?.(result.digits);
       props.setTotpPeriod?.(result.period);
       setShowManual(false);
-      toast.success("QR code imported successfully");
+      toast.success(__tr("QR code imported successfully"));
     } catch (err) {
-      toast.error(errorText(err, "Failed to decode QR code"));
+      toast.error(errorText(err, __tr("Failed to decode QR code")));
     }
   };
 
@@ -92,7 +93,7 @@ export default function TotpSection(props: TotpSectionProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <ShieldLockIcon size={16} className="text-ink-muted" />
-          <p className="text-meta font-semibold text-ink-muted">One-Time Password (TOTP)</p>
+          <p className="text-meta font-semibold text-ink-muted">{__tr("One-Time Password (TOTP)")}</p>
         </div>
         {totpSecret && (
           <button
@@ -101,8 +102,7 @@ export default function TotpSection(props: TotpSectionProps) {
             className="flex h-control-sm items-center gap-1 rounded px-1.5 text-meta text-danger hover:bg-hover"
           >
             <TrashIcon size={12} />
-            Remove
-          </button>
+            {__tr("Remove")}</button>
         )}
       </div>
 
@@ -110,15 +110,13 @@ export default function TotpSection(props: TotpSectionProps) {
         <>
           <div className="flex gap-2">
             <Button icon="qrcode" onClick={handleImportQr} className="flex-1">
-              Import QR Code
-            </Button>
+              {__tr("Import QR Code")}</Button>
             <Button icon="keyboard" onClick={() => setShowManual(!showManual)} className="flex-1">
-              Enter Secret Key
-            </Button>
+              {__tr("Enter Secret Key")}</Button>
           </div>
           {showManual && (
             <div className="space-y-2">
-              <Field label="Secret Key (Base32)">
+              <Field label={__tr("Secret Key (Base32)")}>
                 <TextInput
                   value={totpSecret ?? ""}
                   onChange={(e) => props.setTotpSecret?.(e.target.value.toUpperCase().replace(/\s/g, ""))}
@@ -126,10 +124,10 @@ export default function TotpSection(props: TotpSectionProps) {
                 />
               </Field>
               <div className="flex gap-2">
-                <Field label="Issuer" className="flex-1">
+                <Field label={__tr("Issuer")} className="flex-1">
                   <TextInput value={totpIssuer ?? ""} onChange={(e) => props.setTotpIssuer?.(e.target.value)} />
                 </Field>
-                <Field label="Account" className="flex-1">
+                <Field label={__tr("Account")} className="flex-1">
                   <TextInput value={totpLabel ?? ""} onChange={(e) => props.setTotpLabel?.(e.target.value)} />
                 </Field>
               </div>
@@ -140,19 +138,18 @@ export default function TotpSection(props: TotpSectionProps) {
         <>
           {totpIssuer && (
             <div className="text-meta text-ink-secondary">
-              <span className="text-ink-muted">Issuer:</span> {totpIssuer}
-              {totpLabel && <> &middot; <span className="text-ink-muted">Account:</span> {totpLabel}</>}
+              <span className="text-ink-muted">{__tr("Issuer:")}</span> {totpIssuer}
+              {totpLabel && <> &middot; <span className="text-ink-muted">{__tr("Account:")}</span> {totpLabel}</>}
             </div>
           )}
           <div className="text-meta text-ink-muted">
-            {totpAlgorithm ?? "SHA1"} &middot; {totpDigits ?? 6} digits &middot; {totpPeriod ?? 30}s period
-          </div>
+            {totpAlgorithm ?? "SHA1"} &middot; {totpDigits ?? 6} {__tr("digits ·")} {totpPeriod ?? 30}{__tr("s period")}</div>
           {preview && (
             <div className="flex items-center gap-2">
               <span className="font-mono text-title text-link">
                 {preview.slice(0, Math.ceil(preview.length / 2))} {preview.slice(Math.ceil(preview.length / 2))}
               </span>
-              <span className="text-meta text-success">Preview</span>
+              <span className="text-meta text-success">{__tr("Preview")}</span>
             </div>
           )}
         </>

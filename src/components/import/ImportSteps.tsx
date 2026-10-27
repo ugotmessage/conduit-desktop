@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import {
   AlertTriangleIcon, BanIcon, CheckIcon, CopyIcon, FileImportIcon, FileTextIcon, FolderIcon, GlobeWwwIcon, KeyIcon, ServerAltIcon, ServerIcon, TerminalIcon
 } from "../../lib/icons";
@@ -48,12 +49,10 @@ export function SelectStep({
   return (
     <div className="space-y-4">
       <p className="text-ink-muted">
-        Select a <code className="rounded bg-code px-1 py-0.5 text-label">.rdm</code> export file
-        from Devolutions Remote Desktop Manager. Credentials will be decrypted automatically.
-      </p>
+        {__tr("Select a")} <code className="rounded bg-code px-1 py-0.5 text-label">.rdm</code> {__tr("export file from Devolutions Remote Desktop Manager. Credentials will be decrypted automatically.")}</p>
 
       <div>
-        <label className="mb-1.5 block text-label font-semibold text-ink-secondary">Export File</label>
+        <label className="mb-1.5 block text-label font-semibold text-ink-secondary">{__tr("Export File")}</label>
         <button
           type="button"
           onClick={onPickFile}
@@ -62,7 +61,7 @@ export function SelectStep({
         >
           <FileImportIcon size={16} className="shrink-0 text-ink-muted" />
           <span className={filePath ? "text-ink" : "text-ink-muted"}>
-            {loading ? "Parsing..." : filePath ? filePath.split(/[/\\]/).pop() : "Choose file..."}
+            {loading ? __tr("Parsing...") : filePath ? filePath.split(/[/\\]/).pop() : __tr("Choose file...")}
           </span>
         </button>
       </div>
@@ -98,31 +97,27 @@ export function PreviewStep({
       <div className="flex flex-wrap gap-3">
         <span className="flex items-center gap-1 text-success">
           <CheckIcon size={16} />
-          {readyCount} ready
-        </span>
+          {readyCount} {__tr("ready")}</span>
         {decryptFailedCount > 0 && (
           <span className="flex items-center gap-1 text-warning">
             <AlertTriangleIcon size={16} />
-            {decryptFailedCount} credential{decryptFailedCount !== 1 ? "s" : ""} could not be decrypted
-          </span>
+            {decryptFailedCount} {__tr("credential")}{decryptFailedCount !== 1 ? "s" : ""} {__tr("could not be decrypted")}</span>
         )}
         {duplicateCount > 0 && (
           <span className="flex items-center gap-1 text-warning">
             <CopyIcon size={16} />
-            {duplicateCount} duplicate{duplicateCount !== 1 ? "s" : ""}
+            {duplicateCount} {__tr("duplicate")}{duplicateCount !== 1 ? "s" : ""}
           </span>
         )}
         {unsupportedCount > 0 && (
           <span className="flex items-center gap-1 text-ink-muted">
             <BanIcon size={16} />
-            {unsupportedCount} unsupported
-          </span>
+            {unsupportedCount} {__tr("unsupported")}</span>
         )}
         {tierLimitCount > 0 && (
           <span className="flex items-center gap-1 text-danger">
             <BanIcon size={16} />
-            {tierLimitCount} tier limit
-          </span>
+            {tierLimitCount} {__tr("tier limit")}</span>
         )}
       </div>
 
@@ -134,16 +129,13 @@ export function PreviewStep({
           actions={
             <>
               <Button size="sm" variant="primary" onClick={() => onDuplicateStrategy("overwrite")}>
-                Overwrite All
-              </Button>
+                {__tr("Overwrite All")}</Button>
               <Button size="sm" onClick={() => onDuplicateStrategy("skip")}>
-                Skip All
-              </Button>
+                {__tr("Skip All")}</Button>
             </>
           }
         >
-          {duplicateCount} {duplicateCount === 1 ? "entry already exists" : "entries already exist"} in your vault.
-        </Callout>
+          {duplicateCount} {duplicateCount === 1 ? __tr("entry already exists") : __tr("entries already exist")} {__tr("in your vault.")}</Callout>
       )}
 
       <div className="max-h-[40vh] space-y-3 overflow-y-auto">
@@ -151,7 +143,7 @@ export function PreviewStep({
           <div key={folder}>
             <div className="mb-1 flex items-center gap-1.5 font-medium text-ink-muted">
               <FolderIcon size={16} />
-              {folder || "Root"}
+              {folder || __tr("Root")}
             </div>
             <div className="ml-4 space-y-0.5">
               {entries.map((entry) => (
@@ -188,25 +180,25 @@ function StatusBadge({ status }: { status: ImportPreviewEntry["status"] }) {
       );
     case "duplicate":
       return (
-        <span className="flex items-center gap-0.5 text-warning" title="Duplicate entry">
+        <span className="flex items-center gap-0.5 text-warning" title={__tr("Duplicate entry")}>
           <CopyIcon size={12} />
         </span>
       );
     case "decrypt-failed":
       return (
-        <span className="flex items-center gap-0.5 text-warning" title="Password decryption failed">
+        <span className="flex items-center gap-0.5 text-warning" title={__tr("Password decryption failed")}>
           <AlertTriangleIcon size={12} />
         </span>
       );
     case "unsupported":
       return (
-        <span className="flex items-center gap-0.5 text-ink-muted" title="Unsupported type">
+        <span className="flex items-center gap-0.5 text-ink-muted" title={__tr("Unsupported type")}>
           <BanIcon size={12} />
         </span>
       );
     case "tier-limit":
       return (
-        <span className="flex items-center gap-0.5 text-danger" title="Tier limit">
+        <span className="flex items-center gap-0.5 text-danger" title={__tr("Tier limit")}>
           <BanIcon size={12} />
         </span>
       );
@@ -214,9 +206,9 @@ function StatusBadge({ status }: { status: ImportPreviewEntry["status"] }) {
 }
 
 const RESULT_TILES = [
-  { key: "imported", label: "Imported", tile: "bg-success-bg", number: "text-success" },
-  { key: "skipped", label: "Skipped", tile: "bg-warning-bg", number: "text-warning" },
-  { key: "errors", label: "Errors", tile: "bg-danger-bg", number: "text-danger" },
+  { key: "imported", label: __tr("Imported"), tile: "bg-success-bg", number: "text-success" },
+  { key: "skipped", label: __tr("Skipped"), tile: "bg-warning-bg", number: "text-warning" },
+  { key: "errors", label: __tr("Errors"), tile: "bg-danger-bg", number: "text-danger" },
 ] as const;
 
 export function ResultsStep({ result }: { result: ImportResult }) {

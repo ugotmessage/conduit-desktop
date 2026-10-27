@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { invoke } from "../../lib/electron";
 import { CheckIcon, CloseIcon } from "../../lib/icons";
@@ -31,7 +32,7 @@ export default function DeviceAuthApprovalDialog({
       setResult("approved");
       setTimeout(onClose, 2000);
     } catch (err) {
-      setError(errorText(err, "Failed to approve request"));
+      setError(errorText(err, __tr("Failed to approve request")));
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,7 @@ export default function DeviceAuthApprovalDialog({
       setResult("denied");
       setTimeout(onClose, 1500);
     } catch (err) {
-      setError(errorText(err, "Failed to deny request"));
+      setError(errorText(err, __tr("Failed to deny request")));
     } finally {
       setLoading(false);
     }
@@ -54,18 +55,16 @@ export default function DeviceAuthApprovalDialog({
   const footer = result ? undefined : (
     <>
       <Button icon="close" onClick={handleDeny} disabled={loading}>
-        Deny
-      </Button>
+        {__tr("Deny")}</Button>
       <Button variant="primary" icon="check" onClick={handleApprove} loading={loading}>
-        Approve
-      </Button>
+        {__tr("Approve")}</Button>
     </>
   );
 
   return (
     <Dialog
       open
-      title="Device Authorization Request"
+      title={__tr("Device Authorization Request")}
       icon="desktop"
       width={400}
       hideClose
@@ -78,7 +77,7 @@ export default function DeviceAuthApprovalDialog({
           <div className="flex size-12 items-center justify-center rounded-full bg-success-bg">
             <CheckIcon size={24} className="text-success" />
           </div>
-          <p className="text-body text-success">Device authorized successfully</p>
+          <p className="text-body text-success">{__tr("Device authorized successfully")}</p>
         </div>
       )}
 
@@ -87,19 +86,17 @@ export default function DeviceAuthApprovalDialog({
           <div className="flex size-12 items-center justify-center rounded-full bg-danger-bg">
             <CloseIcon size={24} className="text-danger" />
           </div>
-          <p className="text-body text-danger">Request denied</p>
+          <p className="text-body text-danger">{__tr("Request denied")}</p>
         </div>
       )}
 
       {!result && (
         <>
           <p className="text-body text-ink-secondary">
-            A new device is requesting access to your team vault keys. Only
-            approve if you initiated this from another device.
-          </p>
+            {__tr("A new device is requesting access to your team vault keys. Only approve if you initiated this from another device.")}</p>
 
           <Card className="flex items-center gap-2 text-body">
-            <span className="text-ink-muted">Device:</span>
+            <span className="text-ink-muted">{__tr("Device:")}</span>
             <span className="font-medium text-ink">{deviceName}</span>
           </Card>
 

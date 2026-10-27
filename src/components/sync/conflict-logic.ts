@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 /**
  * Pure helpers for the conflict review UI (spec 7.2, 7.3): value display, choices and the
  * requests sent to sync_resolve / sync_resolve_group.
@@ -39,14 +40,14 @@ export function canUseVersion(v: ConflictVersion): boolean {
 
 /** What to show for a version's value (secrets stay masked until revealed). */
 export function displayValue(v: ConflictVersion, revealed?: string | null): string {
-  if (v.redacted) return "Erased";
-  if (v.undecryptable) return "Needs your old password";
+  if (v.redacted) return __tr("Erased");
+  if (v.undecryptable) return __tr("Needs your old password");
   if (v.masked) return revealed ?? MASKED_VALUE;
   return formatValue(v.value);
 }
 
 export function formatValue(value: SyncValueDto, full = false): string {
-  if (value === null || value === "") return "(empty)";
+  if (value === null || value === "") return __tr("(empty)");
   const text = String(value);
   return !full && text.length > MAX_INLINE_VALUE ? `${text.slice(0, MAX_INLINE_VALUE)}...` : text;
 }
@@ -77,12 +78,12 @@ export function isLongTextField(field: FieldConflict): boolean {
 }
 
 function containerText(value: SyncValueDto, names?: NameLookup): string {
-  if (value === null || value === CONTAINER_ROOT) return "Top level";
+  if (value === null || value === CONTAINER_ROOT) return __tr("Top level");
   const [kind, id] = String(value).split(":", 2);
-  if (!id) return "Another place";
+  if (!id) return __tr("Another place");
   const name = names?.(kind === "f" ? "folder" : "entry", id);
-  if (name === undefined) return kind === "f" ? "Another folder" : "Inside another item";
-  return kind === "f" ? `Folder '${name}'` : `Inside '${name}'`;
+  if (name === undefined) return kind === "f" ? __tr("Another folder") : __tr("Inside another item");
+  return kind === "f" ? __tr("Folder '{v0}'", { v0: (name) }) : __tr("Inside '{v0}'", { v0: (name) });
 }
 
 function valueText(field: FieldConflict, value: SyncValueDto, names?: NameLookup): string {
@@ -93,11 +94,11 @@ function valueText(field: FieldConflict, value: SyncValueDto, names?: NameLookup
     case "container":
       return containerText(value, names);
     case "ref":
-      return value === null || value === "" ? "(none)" : (names?.("entry", String(value)) ?? "Another item");
+      return value === null || value === "" ? __tr("(none)") : (names?.("entry", String(value)) ?? "Another item");
     case "flag":
-      return value === 1 ? "Tagged" : "Not tagged";
+      return value === 1 ? __tr("Tagged") : __tr("Not tagged");
     case "favorite":
-      return value === 1 ? "Yes" : "No";
+      return value === 1 ? __tr("Yes") : __tr("No");
     default:
       return formatValue(value, full);
   }
@@ -184,7 +185,7 @@ export function appearanceRequest(item: AppearanceItem, selections: Readonly<Rec
 
 function deviceOf(versions: readonly ConflictVersion[]): string {
   const v = versions[0];
-  if (!v) return "another device";
+  if (!v) return __tr("another device");
   return v.source.kind === "device" ? deviceNameOr(v.source.deviceName) : versionSourceLabel(v.source);
 }
 
@@ -195,14 +196,14 @@ function whenOf(versions: readonly ConflictVersion[]): string {
 
 /** "Deleted on MacBook (Sep 24); edited on iPhone (Sep 24)." */
 export function editDeleteText(item: EditDeleteItem): string {
-  return `Deleted on ${deviceOf(item.deleted)}${whenOf(item.deleted)}; edited on ${deviceOf(item.edited)}${whenOf(item.edited)}.`;
+  return __tr("Deleted on {v0}{v1}; edited on {v2}{v3}.", { v0: (deviceOf(item.deleted)), v1: (whenOf(item.deleted)), v2: (deviceOf(item.edited)), v3: (whenOf(item.edited)) });
 }
 
 /** "Folder 'Servers' was deleted on MacBook; 2 items in it were changed." */
 export function folderDeleteText(item: FolderDeleteItem, folderName: string): string {
   const n = item.changedItems.length;
   const changed = n === 1 ? "1 item in it was changed" : `${n} items in it were changed`;
-  return `Folder '${folderName}' was deleted on ${deviceOf(item.deleted)}; ${changed} on another device.`;
+  return __tr("Folder '{v0}' was deleted on {v1}; {v2} on another device.", { v0: (folderName), v1: (deviceOf(item.deleted)), v2: (changed) });
 }
 
 /** "Folders 'X' and 'Y' were moved into each other on different devices." */
@@ -210,5 +211,5 @@ export function cycleText(item: CycleItem, names: readonly string[]): string {
   const noun = item.tbl === 2 ? "Folders" : "Items";
   const quoted = names.map((n) => `'${n}'`);
   const list = quoted.length <= 2 ? quoted.join(" and ") : `${quoted.slice(0, -1).join(", ")} and ${quoted[quoted.length - 1]}`;
-  return `${noun} ${list} were moved into each other on different devices.`;
+  return __tr("{v0} {v1} were moved into each other on different devices.", { v0: (noun), v1: (list) });
 }

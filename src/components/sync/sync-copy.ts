@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import type {
   DeviceLimit,
   LocalNotice,
@@ -14,15 +15,15 @@ const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
 
 export function plural(n: number, one: string, many = `${one}s`): string {
-  return `${n} ${n === 1 ? one : many}`;
+  return `${n} ${__tr(n === 1 ? one : many)}`;
 }
 
 /** "20 seconds ago", "5 minutes ago", "3 hours ago", else a short date. */
 export function formatAgo(ms: number, nowMs: number = Date.now()): string {
   const diff = Math.max(0, nowMs - ms);
-  if (diff < MINUTE_MS) return `${plural(Math.max(1, Math.round(diff / SECOND_MS)), "second")} ago`;
-  if (diff < HOUR_MS) return `${plural(Math.floor(diff / MINUTE_MS), "minute")} ago`;
-  if (diff < DAY_MS) return `${plural(Math.floor(diff / HOUR_MS), "hour")} ago`;
+  if (diff < MINUTE_MS) return __tr("{v0} ago", { v0: (plural(Math.max(1, Math.round(diff / SECOND_MS)), "second")) });
+  if (diff < HOUR_MS) return __tr("{v0} ago", { v0: (plural(Math.floor(diff / MINUTE_MS), "minute")) });
+  if (diff < DAY_MS) return __tr("{v0} ago", { v0: (plural(Math.floor(diff / HOUR_MS), "hour")) });
   return formatShortDate(ms);
 }
 
@@ -60,15 +61,15 @@ function kindOf(location: string | null | undefined): string {
 
 /** Provider part of a file-hint location (`<kind>:<folder>`), as plain words. */
 export function providerName(location: string | null | undefined): string {
-  return PROVIDER_NAMES[kindOf(location)] ?? "another folder";
+  return __tr(PROVIDER_NAMES[kindOf(location)] ?? "another folder");
 }
 
 /** "in iCloud Drive", "on an external or network drive": where a device syncs its file. */
 export function providerPlace(location: string | null | undefined): string {
-  return `${DRIVE_KINDS.has(kindOf(location)) ? "on" : "in"} ${providerName(location)}`;
+  return __tr("{prep} {provider}", { prep: DRIVE_KINDS.has(kindOf(location)) ? "on" : "in", provider: providerName(location) });
 }
 
-export function deviceNameOr(name: string | null | undefined, fallback = "another device"): string {
+export function deviceNameOr(name: string | null | undefined, fallback = __tr("another device")): string {
   return name && name.trim() ? name : fallback;
 }
 
@@ -76,11 +77,11 @@ export function deviceNameOr(name: string | null | undefined, fallback = "anothe
 export function versionSourceLabel(source: VersionSource): string {
   switch (source.kind) {
     case "device":
-      return deviceNameOr(source.deviceName, "Unknown device");
+      return deviceNameOr(source.deviceName, __tr("Unknown device"));
     case "older-app":
-      return "Older Conduit app";
+      return __tr("Older Conduit app");
     case "genesis":
-      return "Original vault";
+      return __tr("Original vault");
     case "candidate":
       return source.label;
   }
@@ -101,29 +102,29 @@ const PAUSE_REASONS: Readonly<Record<SyncPauseReason, string>> = {
 };
 
 export function pauseReasonText(reason: SyncPauseReason | null): string {
-  return reason === null ? "paused" : PAUSE_REASONS[reason];
+  return reason === null ? __tr("paused") : PAUSE_REASONS[reason];
 }
 
 /** Short status for the sidebar indicator and the dashboard row. */
 export function statusLabel(status: SyncStatus, killSwitch: boolean): string {
-  if (killSwitch) return "Paused (paused by Conduit)";
+  if (killSwitch) return __tr("Paused (paused by Conduit)");
   switch (status.kind) {
     case "up-to-date":
-      return "Up to date";
+      return __tr("Up to date");
     case "syncing":
-      return "Syncing";
+      return __tr("Syncing");
     case "waiting":
-      return `Waiting for ${deviceNameOr(status.waiting?.devices[0]?.deviceName)}`;
+      return __tr("Waiting for {v0}", { v0: (deviceNameOr(status.waiting?.devices[0]?.deviceName)) });
     case "paused":
-      return `Paused (${pauseReasonText(status.pauseReason)})`;
+      return __tr("Paused ({v0})", { v0: (pauseReasonText(status.pauseReason)) });
     case "file-not-found":
-      return "File not found";
+      return __tr("File not found");
     case "offline":
-      return "Offline";
+      return __tr("Offline");
     case "pending":
-      return `${plural(Math.max(1, status.unsyncedOps), "change")} not yet synced`;
+      return __tr("{v0} not yet synced", { v0: (plural(Math.max(1, status.unsyncedOps), "change")) });
     case "error":
-      return "Sync problem. Will retry.";
+      return __tr("Sync problem. Will retry.");
   }
 }
 
@@ -146,17 +147,17 @@ export function statusTone(status: SyncStatus, killSwitch: boolean): StatusTone 
 
 /** One line under the status, or null. */
 export function statusDetail(status: SyncStatus, nowMs: number = Date.now()): string | null {
-  if (status.sessionBadge === "offline-device-check") return "Offline: device check paused";
-  if (status.lastSyncedMs !== null) return `Last synced ${formatAgo(status.lastSyncedMs, nowMs)}`;
+  if (status.sessionBadge === "offline-device-check") return __tr("Offline: device check paused");
+  if (status.lastSyncedMs !== null) return __tr("Last synced {v0}", { v0: (formatAgo(status.lastSyncedMs, nowMs)) });
   return null;
 }
 
 /** "one device at a time" or "any number of devices". */
 export function deviceLimitText(limit: DeviceLimit | null | number): string {
   const n = typeof limit === "number" ? limit : limit?.limit ?? 1;
-  if (n === -1) return "on any number of devices at once";
-  if (n === 1) return "on one device at a time";
-  return `on up to ${n} devices at once`;
+  if (n === -1) return __tr("on any number of devices at once");
+  if (n === 1) return __tr("on one device at a time");
+  return __tr("on up to {v0} devices at once", { v0: (n) });
 }
 
 /** "3 open connections and an AI task running" for the take-over dialog and the devices list. */
@@ -164,14 +165,14 @@ export function busyText(sessions: number, jobs: number): string | null {
   const parts: string[] = [];
   if (sessions > 0) parts.push(plural(sessions, "open connection"));
   if (jobs > 0) parts.push(jobs === 1 ? "an AI task running" : `${jobs} AI tasks running`);
-  return parts.length === 0 ? null : parts.join(" and ");
+  return parts.length === 0 ? null : parts.join(__tr(" and "));
 }
 
 /** Take-over (6.5): "MacBook has 3 open connections. They keep running; only the vault locks." */
 export function holderBusyText(name: string, sessions: number, jobs: number): string | null {
   const busy = busyText(sessions, jobs);
   if (busy === null) return null;
-  return `${name} has ${busy}. ${sessions + jobs === 1 ? "It keeps" : "They keep"} running; only the vault locks.`;
+  return __tr("{v0} has {v1}. {v2} running; only the vault locks.", { v0: (name), v1: (busy), v2: (sessions + jobs === 1 ? "It keeps" : "They keep") });
 }
 
 /** Displaced (6.6 step 5): "Your 3 open connections and 1 AI task are still running." */
@@ -180,12 +181,12 @@ export function stillRunningText(sessions: number, jobs: number): string | null 
   if (sessions > 0) parts.push(plural(sessions, "open connection"));
   if (jobs > 0) parts.push(plural(jobs, "AI task"));
   if (parts.length === 0) return null;
-  return `Your ${parts.join(" and ")} ${sessions + jobs === 1 ? "is" : "are"} still running.`;
+  return __tr("Your {v0} {v1} still running.", { v0: (parts.join(__tr(" and "))), v1: (sessions + jobs === 1 ? "is" : "are") });
 }
 
 export function holderActivity(holder: TakeoverHolder, nowMs: number = Date.now()): string {
   const name = deviceNameOr(holder.deviceName);
-  return holder.lastActiveMs === null ? name : `${name} (active ${formatAgo(holder.lastActiveMs, nowMs)})`;
+  return holder.lastActiveMs === null ? name : __tr("{v0} (active {v1})", { v0: (name), v1: (formatAgo(holder.lastActiveMs, nowMs)) });
 }
 
 /** Text of a persisted notice; `itemName` names the item its key points at, when known. */
@@ -193,17 +194,17 @@ export function noticeText(notice: LocalNotice, itemName: string | null = null):
   const item = itemName === null ? "an item" : `'${itemName}'`;
   switch (notice.kind) {
     case "dropped-setting":
-      return `An older Conduit app doesn't support some settings of ${item}. They were kept.`;
+      return __tr("An older Conduit app doesn't support some settings of {v0}. They were kept.", { v0: (item) });
     case "value-unrecoverable":
-      return `${plural(Math.max(1, notice.count), "value")} of ${item} changed by an older Conduit app could not be read. The last known value was kept.`;
+      return __tr("{v0} of {v1} changed by an older Conduit app could not be read. The last known value was kept.", { v0: (plural(Math.max(1, notice.count), "value")), v1: (item) });
     case "undecryptable-secrets":
-      return `${plural(Math.max(1, notice.count), "saved secret")} used an old master password. Review them to recover.`;
+      return __tr("{v0} used an old master password. Review them to recover.", { v0: (plural(Math.max(1, notice.count), "saved secret")) });
     case "invariant-repair":
-      return `Conduit repaired a sync problem and kept two versions of a field of ${item} for review.`;
+      return __tr("Conduit repaired a sync problem and kept two versions of a field of {v0} for review.", { v0: (item) });
     case "mass-change":
-      return `A sync from another device deleted or changed ${plural(Math.max(1, notice.count), "item")}.`;
+      return __tr("A sync from another device deleted or changed {v0}.", { v0: (plural(Math.max(1, notice.count), "item")) });
     case "candidate-dropped":
-      return `${plural(Math.max(1, notice.count), "copy", "copies")} waiting for review ${notice.count > 1 ? "were" : "was"} removed. ${notice.count > 1 ? "They were" : "It was"} locked with a master password this device no longer has.`;
+      return __tr("{v0} waiting for review {v1} removed. {v2} locked with a master password this device no longer has.", { v0: (plural(Math.max(1, notice.count), "copy", "copies")), v1: (notice.count > 1 ? "were" : "was"), v2: (notice.count > 1 ? "They were" : "It was") });
   }
 }
 
@@ -213,7 +214,7 @@ export const DEFAULT_DEVICE_CAP = 5;
 /** Sync settings plan line (plan enforcement 4.7); null when there is no cap. */
 export function deviceCapText(n: number | null): string | null {
   if (n === null || n === -1) return null;
-  return `Up to ${n} devices at once across your vaults.`;
+  return __tr("Up to {v0} devices at once across your vaults.", { v0: (n) });
 }
 
 /**
@@ -224,19 +225,19 @@ export function ownerLineText(ownership: VaultOwnership | null, signedIn: boolea
   if (ownership === null || (ownership.kind === "unknown" && signedIn)) return null;
   switch (ownership.kind) {
     case "owner":
-      return "Owner: this account.";
+      return __tr("Owner: this account.");
     case "grace":
-      return `Owner: another account. You can use it until ${formatShortDate(ownership.untilMs)}.`;
+      return __tr("Owner: another account. You can use it until {v0}.", { v0: (formatShortDate(ownership.untilMs)) });
     case "unowned":
-      return "Owner: not set yet.";
+      return __tr("Owner: not set yet.");
     case "unknown":
-      return "Owner: sign in to check.";
+      return __tr("Owner: sign in to check.");
   }
 }
 
 /** S13, and the disabled release button's hint. */
 export function releaseAfterText(releaseAfterMs: number): string {
-  return `You can release this vault on ${formatShortDate(releaseAfterMs)}.`;
+  return __tr("You can release this vault on {v0}.", { v0: (formatShortDate(releaseAfterMs)) });
 }
 
 /** Device-cap take-over line: "MacBook: 2 vaults open, active 5 minutes ago". */

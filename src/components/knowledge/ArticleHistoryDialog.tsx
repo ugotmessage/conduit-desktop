@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { readHistory, type KbRevision } from "../../lib/kb";
 import type { EntryMeta } from "../../types/entry";
@@ -23,7 +24,7 @@ export default function ArticleHistoryDialog({ entry, onClose }: { entry: EntryM
     const ok = await kbCall("kb_restore", { id: entry.id, at: selected.at }, "Couldn't restore that version");
     setBusy(false);
     if (ok) {
-      toast.success("Version restored");
+      toast.success(__tr("Version restored"));
       onClose();
     }
   };
@@ -31,16 +32,15 @@ export default function ArticleHistoryDialog({ entry, onClose }: { entry: EntryM
   return (
     <Dialog
       open
-      title={`History of ${entry.name}`}
+      title={__tr("History of {v0}", { v0: (entry.name) })}
       icon="history"
       size="xl"
       onClose={onClose}
       footer={
         <>
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onClose}>{__tr("Close")}</Button>
           <Button variant="primary" onClick={() => void restore()} disabled={!selected || selected.content === current} loading={busy}>
-            Restore this version
-          </Button>
+            {__tr("Restore this version")}</Button>
         </>
       }
     >
@@ -53,7 +53,7 @@ export default function ArticleHistoryDialog({ entry, onClose }: { entry: EntryM
                 onClick={() => setSelected(r)}
                 className={`w-full rounded px-2 py-1.5 text-left ${selected?.at === r.at ? "bg-selected" : "hover:bg-hover"}`}
               >
-                <span className="block text-body text-ink">{who(r)}{i === 0 ? " · current" : ""}</span>
+                <span className="block text-body text-ink">{who(r)}{i === 0 ? __tr(" · current") : ""}</span>
                 <span className="block text-meta text-ink-faint">{formatRelativeTime(r.at)}</span>
                 {r.reason && <span className="block truncate text-label text-ink-muted">{r.reason}</span>}
               </button>
@@ -63,11 +63,11 @@ export default function ArticleHistoryDialog({ entry, onClose }: { entry: EntryM
         <div className="min-w-0 flex-1">
           {selected ? (
             <>
-              <p className="mb-2 text-label text-ink-faint">Changes from this version to the current text</p>
+              <p className="mb-2 text-label text-ink-faint">{__tr("Changes from this version to the current text")}</p>
               <DiffView before={selected.content} after={current} />
             </>
           ) : (
-            <p className="text-body text-ink-muted">No history yet.</p>
+            <p className="text-body text-ink-muted">{__tr("No history yet.")}</p>
           )}
         </div>
       </div>

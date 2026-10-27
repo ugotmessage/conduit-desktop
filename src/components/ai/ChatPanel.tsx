@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useRef, useEffect, type KeyboardEvent } from "react";
 import { ChevronDownIcon } from "../../lib/icons";
 import { useAiStore, initEngineStreamListener, initEngineModelRefreshListener } from "../../stores/aiStore";
@@ -103,7 +104,7 @@ export default function ChatPanel() {
                 aria-haspopup="menu"
                 aria-expanded={engineSwitcherOpen}
                 className="flex h-6 items-center gap-1.5 rounded px-1.5 text-label font-semibold text-ink-secondary hover:bg-hover hover:text-ink"
-                title="Switch engine for this session"
+                title={__tr("Switch engine for this session")}
               >
                 <EngineLogo type={activeEngineType} size={16} />
                 <span>{getHarness(activeEngineType).name}</span>
@@ -123,7 +124,7 @@ export default function ChatPanel() {
                 variant="secondary"
                 onClick={() => useAiStore.getState().fetchEngineModels()}
                 className="min-w-0 max-w-[160px]"
-                title={`Model: ${currentEngineModel} (click to change)`}
+                title={__tr("Model: {v0} (click to change)", { v0: (currentEngineModel) })}
               >
                 <span className="truncate">{currentEngineModel}</span>
               </Button>
@@ -134,13 +135,13 @@ export default function ChatPanel() {
           {terminalMode ? (
             <IconButton
               icon="plus"
-              label="New agent"
+              label={__tr("New agent")}
               onClick={handleNewAgent}
               disabled={atPaneLimit}
               disabledReason={`Up to ${MAX_AGENT_PANES} agents can run at once`}
             />
           ) : (
-            <IconButton icon="plus" label="New conversation" onClick={() => createEngineSession()} />
+            <IconButton icon="plus" label={__tr("New conversation")} onClick={() => createEngineSession()} />
           )}
         </div>
       </div>

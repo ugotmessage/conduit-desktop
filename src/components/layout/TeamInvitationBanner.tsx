@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 /**
  * Amber banner shown in the sidebar when the user has pending team invitations.
  * Polls every 5 minutes for new invitations.
@@ -30,11 +31,11 @@ export function TeamInvitationBanner() {
           <UsersIcon size={16} className="text-warning shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-label text-ink truncate">
-              Team invite: <span className="font-semibold">{invitation.team_name ?? 'Unknown'}</span>
+              {__tr("Team invite:")} <span className="font-semibold">{invitation.team_name ?? __tr("Unknown")}</span>
             </p>
           </div>
-          <IconButton size="sm" icon="check" label="Accept" onClick={() => acceptInvitation(invitation.id)} />
-          <IconButton size="sm" icon="close" label="Decline" onClick={() => declineInvitation(invitation.id)} />
+          <IconButton size="sm" icon="check" label={__tr("Accept")} onClick={() => acceptInvitation(invitation.id)} />
+          <IconButton size="sm" icon="close" label={__tr("Decline")} onClick={() => declineInvitation(invitation.id)} />
         </div>
       ))}
     </div>

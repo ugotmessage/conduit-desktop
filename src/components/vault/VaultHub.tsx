@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback } from "react";
 import { useVaultStore } from "../../stores/vaultStore";
 import { useTeamStore, type TeamVaultSummary } from "../../stores/teamStore";
@@ -120,7 +121,7 @@ export default function VaultHub() {
         vaultState.setShowVaultHub(false);
       }
     } catch (err) {
-      const msg = errorText(err, "Failed to connect");
+      const msg = errorText(err, __tr("Failed to connect"));
       vaultState.setAutoConnectInProgress(false);
       vaultState.setAutoConnectError(msg);
       vaultState.setShowVaultHub(true);
@@ -144,8 +145,7 @@ export default function VaultHub() {
             <AlertCircleIcon size={16} className="text-danger flex-shrink-0" />
             <p className="text-body text-danger flex-1">{autoConnectError}</p>
             <Button size="sm" icon="refresh" onClick={handleRetryAutoConnect}>
-              Retry
-            </Button>
+              {__tr("Retry")}</Button>
           </div>
         )}
 
@@ -165,16 +165,13 @@ export default function VaultHub() {
             />
             <h1 className="text-display text-ink mb-1">Conduit</h1>
             <p className="text-body text-ink-muted mb-8 text-center">
-              Select a vault to get started
-            </p>
+              {__tr("Select a vault to get started")}</p>
 
             <div className="w-full space-y-2">
               <Button size="lg" variant="primary" icon="plus" fullWidth onClick={handleNewVault} disabled={isLoading}>
-                New Vault
-              </Button>
+                {__tr("New Vault")}</Button>
               <Button size="lg" variant="secondary" icon="folderOpen" fullWidth onClick={handleOpenVault} disabled={isLoading}>
-                Open Vault File
-              </Button>
+                {__tr("Open Vault File")}</Button>
             </div>
           </div>
 
@@ -185,7 +182,7 @@ export default function VaultHub() {
               <div className="flex-1 min-w-0 py-5 px-5 overflow-y-auto flex flex-col justify-center gap-5">
                 {showTeamSection && (
                   <div>
-                    <SectionTitle icon="users" iconClassName="text-info">Team Vaults</SectionTitle>
+                    <SectionTitle icon="users" iconClassName="text-info">{__tr("Team Vaults")}</SectionTitle>
                     <div className="flex flex-col gap-1 rounded-md border border-card-border p-1">
                       {teamLoading ? (
                         <div className="flex items-center justify-center py-6 text-body text-ink-muted">
@@ -204,12 +201,11 @@ export default function VaultHub() {
                               <>
                                 {isOffline && (
                                   <Badge tone="warning" icon="wifiOff">
-                                    Offline
-                                  </Badge>
+                                    {__tr("Offline")}</Badge>
                                 )}
                                 {startupVault?.kind === "team" && startupVault.teamVaultId === vault.id && <StartupBadge />}
                                 <span>
-                                  {vault.member_count} {vault.member_count === 1 ? "member" : "members"}
+                                  {vault.member_count} {vault.member_count === 1 ? __tr("member") : __tr("members")}
                                 </span>
                               </>
                             }
@@ -220,8 +216,7 @@ export default function VaultHub() {
                         ))
                       ) : (
                         <div className="px-4 py-5 text-center text-body text-ink-muted">
-                          No team vaults available
-                        </div>
+                          {__tr("No team vaults available")}</div>
                       )}
                     </div>
                   </div>
@@ -229,7 +224,7 @@ export default function VaultHub() {
 
                 {showTeamUpgrade && (
                   <div>
-                    <SectionTitle icon="users" iconClassName="text-info">Team Vaults</SectionTitle>
+                    <SectionTitle icon="users" iconClassName="text-info">{__tr("Team Vaults")}</SectionTitle>
                     <div className="flex rounded-md border border-card-border overflow-hidden">
                       <div className="flex-1 bg-well px-4 py-4">
                         <ul className="space-y-2">
@@ -243,11 +238,9 @@ export default function VaultHub() {
                       </div>
                       <div className="flex-1 px-4 py-4 flex flex-col items-center justify-center">
                         <span className="text-meta font-semibold text-ink-muted mb-3">
-                          Teams Plan
-                        </span>
+                          {__tr("Teams Plan")}</span>
                         <Button variant="primary" onClick={() => invoke('auth_open_account')}>
-                          Upgrade to Teams &rarr;
-                        </Button>
+                          {__tr("Upgrade to Teams →")}</Button>
                       </div>
                     </div>
                   </div>
@@ -256,10 +249,9 @@ export default function VaultHub() {
                 {hasRecentVaults && (
                   <div>
                     <div className="flex items-center justify-between mb-2 px-1">
-                      <SectionTitle icon="lock" className="">Recent Vaults</SectionTitle>
+                      <SectionTitle icon="lock" className="">{__tr("Recent Vaults")}</SectionTitle>
                       <Button variant="link" size="sm" onClick={() => void clearRecentVaultsWithConfirm()}>
-                        Clear All
-                      </Button>
+                        {__tr("Clear All")}</Button>
                     </div>
                     <div className="flex flex-col gap-1 rounded-md border border-card-border p-1">
                       {recentVaults.slice(0, 5).map((vaultPath) => {
@@ -344,9 +336,8 @@ function RowTile({ icon, className }: { icon: IconSource; className: string }) {
 /** The startup vault's row mark; the row's context menu (right-click, or Shift+F10 on the row) changes it. */
 function StartupBadge() {
   return (
-    <Badge tone="neutral" title="Opens when Conduit starts. Right-click the row to change it.">
-      Startup
-    </Badge>
+    <Badge tone="neutral" title={__tr("Opens when Conduit starts. Right-click the row to change it.")}>
+      {__tr("Startup")}</Badge>
   );
 }
 

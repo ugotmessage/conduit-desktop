@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useCallback, useEffect, useState } from "react";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -22,7 +23,7 @@ function ItemRow({ item, checked, onToggle }: { item: RecentlyDeletedItem; check
       className="w-full border-b border-stroke-dim py-2 last:border-b-0"
       description={
         <span data-cv-row-detail="">
-          {item.redacted ? "Erased permanently" : `Deleted ${formatAgo(item.diedMs)}${by}`}
+          {item.redacted ? __tr("Erased permanently") : __tr("Deleted {v0}{v1}", { v0: (formatAgo(item.diedMs)), v1: (by) })}
           {item.entryType ? ` · ${item.entryType}` : ""}
         </span>
       }
@@ -38,8 +39,8 @@ function ItemRow({ item, checked, onToggle }: { item: RecentlyDeletedItem; check
 export function LoadFailed({ what, onRetry }: { what: string; onRetry: () => void }) {
   return (
     <div className="flex items-center gap-3">
-      <p className="flex-1">Could not load {what}.</p>
-      <DialogButton onClick={onRetry}>Try again</DialogButton>
+      <p className="flex-1">{__tr("Could not load")} {what}.</p>
+      <DialogButton onClick={onRetry}>{__tr("Try again")}</DialogButton>
     </div>
   );
 }
@@ -61,7 +62,7 @@ export default function RecentlyDeletedPanel() {
       setSelected(new Set());
     } catch (err) {
       console.error("[sync] Failed to list deleted items:", err);
-      toast.error("Could not list deleted items", errorText(err, "Try again."));
+      toast.error(__tr("Could not list deleted items"), errorText(err, __tr("Try again.")));
       setItems([]);
       setLoadFailed(true);
     }
@@ -87,7 +88,7 @@ export default function RecentlyDeletedPanel() {
       toast.success(await action());
       await load();
     } catch (err) {
-      toast.error(failTitle, errorText(err, "Try again."));
+      toast.error(failTitle, errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -105,27 +106,26 @@ export default function RecentlyDeletedPanel() {
     <>
       <SyncDialogFrame
         icon="trash"
-        title="Recently deleted"
+        title={__tr("Recently deleted")}
         width={560}
         onEscape={close}
         footer={
           <>
-            <DialogButton variant="danger" disabled={busy || selectedRows.length === 0} onClick={() => setPendingDelete({ rows: selectedRows })}>Delete permanently</DialogButton>
-            <DialogButton disabled={busy || !erasable} onClick={() => setPendingDelete({ all: true })}>Delete all permanently</DialogButton>
-            <DialogButton variant="primary" disabled={busy || selectedRows.length === 0} onClick={() => void restore()}>Restore</DialogButton>
-            <DialogButton onClick={close}>Done</DialogButton>
+            <DialogButton variant="danger" disabled={busy || selectedRows.length === 0} onClick={() => setPendingDelete({ rows: selectedRows })}>{__tr("Delete permanently")}</DialogButton>
+            <DialogButton disabled={busy || !erasable} onClick={() => setPendingDelete({ all: true })}>{__tr("Delete all permanently")}</DialogButton>
+            <DialogButton variant="primary" disabled={busy || selectedRows.length === 0} onClick={() => void restore()}>{__tr("Restore")}</DialogButton>
+            <DialogButton onClick={close}>{__tr("Done")}</DialogButton>
           </>
         }
       >
         <Checkbox checked={showAll} onChange={setShowAll}>
-          Show items deleted more than 30 days ago
-        </Checkbox>
+          {__tr("Show items deleted more than 30 days ago")}</Checkbox>
         {items === null ? (
           <Spinner text="Loading..." />
         ) : loadFailed ? (
           <LoadFailed what="the deleted items" onRetry={() => void load()} />
         ) : items.length === 0 ? (
-          <p>Nothing was deleted recently.</p>
+          <p>{__tr("Nothing was deleted recently.")}</p>
         ) : (
           <div data-cv-deleted-list="" className="max-h-80 overflow-y-auto">
             {items.map((i) => <ItemRow key={rowKeyString(i.row)} item={i} checked={selected.has(rowKeyString(i.row))} onToggle={() => toggle(rowKeyString(i.row))} />)}
@@ -134,9 +134,9 @@ export default function RecentlyDeletedPanel() {
       </SyncDialogFrame>
       {pendingDelete && (
         <ConfirmDialog
-          title="Delete permanently?"
-          message="This erases the items on every device that syncs this vault. It can't be undone."
-          confirmLabel="Delete permanently"
+          title={__tr("Delete permanently?")}
+          message={__tr("This erases the items on every device that syncs this vault. It can't be undone.")}
+          confirmLabel={__tr("Delete permanently")}
           variant="danger"
           layer="stacked"
           closeOnEscape

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import type { EntryType } from "../../types/entry";
 import {
   DesktopIcon, DevicesIcon, InfoCircleIcon, KeyIcon, PlayerPlayIcon, RobotIcon, SettingsIcon, ShieldLockIcon
@@ -22,39 +23,39 @@ export function getTabCategories(entryType: EntryType): EntryTabCategory[] {
 
   // Common category
   const commonTabs: EntryTab[] = [
-    { id: "general", label: "General", icon: SettingsIcon },
+    { id: "general", label: __tr("General"), icon: SettingsIcon },
   ];
 
   if (entryType !== "document") {
-    commonTabs.push({ id: "credentials", label: "Credentials", icon: KeyIcon });
+    commonTabs.push({ id: "credentials", label: __tr("Credentials"), icon: KeyIcon });
   }
 
-  commonTabs.push({ id: "information", label: "Information", icon: InfoCircleIcon });
-  categories.push({ label: "Common", tabs: commonTabs });
+  commonTabs.push({ id: "information", label: __tr("Information"), icon: InfoCircleIcon });
+  categories.push({ label: __tr("Common"), tabs: commonTabs });
 
   // Connection category
   if (entryType === "rdp") {
     categories.push({
-      label: "Connection",
+      label: __tr("Connection"),
       tabs: [
-        { id: "display", label: "Display", icon: DesktopIcon },
-        { id: "resources", label: "Resources", icon: DevicesIcon },
-        { id: "security", label: "Security", icon: ShieldLockIcon },
+        { id: "display", label: __tr("Display"), icon: DesktopIcon },
+        { id: "resources", label: __tr("Resources"), icon: DevicesIcon },
+        { id: "security", label: __tr("Security"), icon: ShieldLockIcon },
       ],
     });
   } else if (entryType === "web") {
     categories.push({
-      label: "Connection",
+      label: __tr("Connection"),
       tabs: [
-        { id: "autofill", label: "Autofill", icon: RobotIcon },
-        { id: "security", label: "Security", icon: ShieldLockIcon },
+        { id: "autofill", label: __tr("Autofill"), icon: RobotIcon },
+        { id: "security", label: __tr("Security"), icon: ShieldLockIcon },
       ],
     });
   } else if (entryType === "command") {
     categories.push({
-      label: "Execution",
+      label: __tr("Execution"),
       tabs: [
-        { id: "command", label: "Command", icon: PlayerPlayIcon },
+        { id: "command", label: __tr("Command"), icon: PlayerPlayIcon },
       ],
     });
   }

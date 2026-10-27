@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import type { EntryType, RdpEntryConfig, WebEntryConfig, WebEngineType, RdpGlobalDefaults, WebGlobalDefaults } from "../../../types/entry";
 import { WEB_ENGINE_OPTIONS } from "../../../lib/sessionOptions";
 import DefaultableCheckbox from "../DefaultableCheckbox";
@@ -39,25 +40,24 @@ export default function SecurityTab({
         <DefaultableCheckbox
           value={rdpConfig.enableNla}
           defaultValue={rdpGlobalDefaults.enableNla}
-          label="NLA (Network Level Auth)"
+          label={__tr("NLA (Network Level Auth)")}
           onChange={(v) => update({ enableNla: v })}
         />
 
         {/* Hostname — per-entry only */}
         <Field
-          label="Hostname (optional)"
+          label={__tr("Hostname (optional)")}
           description={
             <>
-              To avoid 6-second connection delays with NLA, add this IP to <code className={CODE}>/etc/hosts</code> with a hostname.
-              <br />
-              Example: <code className={CODE}>{host || "192.0.2.10"} windows-server.local</code>
+              {__tr("To avoid 6-second connection delays with NLA, add this IP to")} <code className={CODE}>/etc/hosts</code> {__tr("with a hostname.")}<br />
+              {__tr("Example:")} <code className={CODE}>{host || "192.0.2.10"} windows-server.local</code>
             </>
           }
         >
           <TextInput
             value={rdpConfig.hostname || ""}
             onChange={(e) => update({ hostname: e.target.value })}
-            placeholder="e.g., windows-server.local"
+            placeholder={__tr("e.g., windows-server.local")}
           />
         </Field>
 
@@ -66,10 +66,9 @@ export default function SecurityTab({
           host &&
           /^\d+\.\d+\.\d+\.\d+$/.test(host) &&
           !rdpConfig.hostname && (
-          <Callout tone="warning" title="NLA with IP address causes 6-second delays">
-            <strong>To fix:</strong> Add <code className={CODE}>{host} my-server.local</code> to{" "}
-            <code className={CODE}>/etc/hosts</code> and enter the hostname above.
-          </Callout>
+          <Callout tone="warning" title={__tr("NLA with IP address causes 6-second delays")}>
+            <strong>{__tr("To fix:")}</strong> {__tr("Add")} <code className={CODE}>{host} my-server.local</code> {__tr("to")}{" "}
+            <code className={CODE}>/etc/hosts</code> {__tr("and enter the hostname above.")}</Callout>
         )}
       </div>
     );
@@ -83,19 +82,18 @@ export default function SecurityTab({
           <DefaultableCheckbox
             value={webConfig.ignoreCertErrors}
             defaultValue={webGlobalDefaults.ignoreCertErrors}
-            label="Ignore certificate errors"
+            label={__tr("Ignore certificate errors")}
             onChange={(v) => onWebConfigChange({ ...webConfig, ignoreCertErrors: v })}
           />
           <p className="text-meta text-ink-muted">
-            Trust self-signed or expired SSL certificates. Use for internal services on trusted networks.
-          </p>
+            {__tr("Trust self-signed or expired SSL certificates. Use for internal services on trusted networks.")}</p>
         </div>
 
         {/* Browser Engine — Windows only */}
         {isWindows && (
           <Field
-            label="Browser Engine"
-            description="Edge engine enables Windows integrated authentication for Microsoft 365 and domain SSO."
+            label={__tr("Browser Engine")}
+            description={__tr("Edge engine enables Windows integrated authentication for Microsoft 365 and domain SSO.")}
           >
             <DefaultableSelect<string>
               value={webConfig.engine}

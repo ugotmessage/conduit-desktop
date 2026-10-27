@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 import { create } from "zustand";
 import { invoke, listen, type UnlistenFn } from "../lib/electron";
 import { type EngineType, getHarness } from "../lib/ai-harnesses";
@@ -116,10 +117,10 @@ export interface SlashCommandDef {
 }
 
 export const ENGINE_SLASH_COMMANDS: SlashCommandDef[] = [
-  { command: 'model', label: '/model', description: 'Switch to a different model', engines: ['claude-code', 'codex'], hasArgs: true },
-  { command: 'clear', label: '/clear', description: 'Start a new session', engines: ['claude-code', 'codex'] },
-  { command: 'cost', label: '/cost', description: 'Show token usage for this session', engines: ['claude-code', 'codex'] },
-  { command: 'help', label: '/help', description: 'Show available commands', engines: ['claude-code', 'codex'] },
+  { command: 'model', label: '/model', description: __tr("Switch to a different model"), engines: ['claude-code', 'codex'], hasArgs: true },
+  { command: 'clear', label: '/clear', description: __tr("Start a new session"), engines: ['claude-code', 'codex'] },
+  { command: 'cost', label: '/cost', description: __tr("Show token usage for this session"), engines: ['claude-code', 'codex'] },
+  { command: 'help', label: '/help', description: __tr("Show available commands"), engines: ['claude-code', 'codex'] },
 ];
 
 function addEngineSystemMessage(content: string) {

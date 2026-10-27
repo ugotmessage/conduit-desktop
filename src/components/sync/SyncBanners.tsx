@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
 import { useSyncStore } from "../../stores/syncStore";
@@ -24,8 +25,8 @@ function SoftLockBanner() {
       tone="lock"
       text="This vault is open on another device. Your open connections keep running."
       actions={[
-        { label: "Use here instead", primary: true, onClick: useHere },
-        { label: "Close vault", onClick: () => document.dispatchEvent(new CustomEvent("conduit:lock-vault")) },
+        { label: __tr("Use here instead"), primary: true, onClick: useHere },
+        { label: __tr("Close vault"), onClick: () => document.dispatchEvent(new CustomEvent("conduit:lock-vault")) },
       ]}
     />
   );
@@ -35,14 +36,14 @@ async function waitAction(action: () => Promise<void>): Promise<void> {
   try {
     await action();
   } catch (err) {
-    toast.error("Could not update the wait", errorText(err, "Try again."));
+    toast.error(__tr("Could not update the wait"), errorText(err, __tr("Try again.")));
   }
 }
 
 function WaitingBanner({ waiting }: { waiting: WaitingForDriveState }) {
   const stops = waiting.stopOffered
     ? waiting.devices.map((d) => ({
-        label: `Stop waiting for ${deviceNameOr(d.deviceName)}`,
+        label: __tr("Stop waiting for {v0}", { v0: (deviceNameOr(d.deviceName)) }),
         onClick: () => void waitAction(() => syncApi.sessionStopWaiting(d.deviceId)),
       }))
     : [];
@@ -50,7 +51,7 @@ function WaitingBanner({ waiting }: { waiting: WaitingForDriveState }) {
     <SyncBanner
       tone="info"
       text={waitingText(waiting)}
-      actions={[...stops, { label: "Open now", primary: true, onClick: () => void waitAction(() => syncApi.sessionOpenNow()) }]}
+      actions={[...stops, { label: __tr("Open now"), primary: true, onClick: () => void waitAction(() => syncApi.sessionOpenNow()) }]}
     />
   );
 }
@@ -61,20 +62,20 @@ function DeferredPasswordBanner({ promptId }: { promptId: string }) {
     <SyncBanner
       tone="warn"
       text="Syncing is paused until you enter the master password set on another device."
-      actions={[{ label: "Enter password", primary: true, onClick: () => useSyncStore.getState().undeferPrompt(promptId) }]}
+      actions={[{ label: __tr("Enter password"), primary: true, onClick: () => useSyncStore.getState().undeferPrompt(promptId) }]}
     />
   );
 }
 
 function ReviewBanner({ count }: { count: number }) {
-  const text = count === 1 ? "1 change from your other devices needs review." : `${plural(count, "change")} from your other devices need review.`;
+  const text = count === 1 ? __tr("1 change from your other devices needs review.") : __tr("{v0} from your other devices need review.", { v0: (plural(count, "change")) });
   return (
     <SyncBanner
       tone="warn"
       text={text}
       actions={[
-        { label: "Review", primary: true, onClick: () => useSyncStore.getState().openView({ kind: "review", row: null }) },
-        { label: "Later", onClick: () => useSyncStore.getState().closeReviewBanner() },
+        { label: __tr("Review"), primary: true, onClick: () => useSyncStore.getState().openView({ kind: "review", row: null }) },
+        { label: __tr("Later"), onClick: () => useSyncStore.getState().closeReviewBanner() },
       ]}
     />
   );

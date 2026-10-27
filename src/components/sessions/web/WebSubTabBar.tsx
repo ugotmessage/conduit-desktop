@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState } from "react";
 import { invoke } from "../../../lib/electron";
 import { useSessionStore } from "../../../stores/sessionStore";
@@ -135,7 +136,7 @@ export default function WebSubTabBar({ sessionId, tabs, activeTabId }: WebSubTab
             <IconButton
               size="sm"
               icon={CloseIcon}
-              label="Close tab"
+              label={__tr("Close tab")}
               onClick={(e) => handleCloseTab(e, tab.id)}
               className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
             />
@@ -144,7 +145,7 @@ export default function WebSubTabBar({ sessionId, tabs, activeTabId }: WebSubTab
       })}
 
       {/* New tab button */}
-      <IconButton icon={PlusIcon} label="New Tab" onClick={handleNewTab} />
+      <IconButton icon={PlusIcon} label={__tr("New Tab")} onClick={handleNewTab} />
     </div>
   );
 }

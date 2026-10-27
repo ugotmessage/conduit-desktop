@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { CheckIcon, CloseIcon, FloppyIcon, PlayerSkipForwardIcon } from "../../../lib/icons";
 import { Button, IconButton, cx } from "../../ui";
 export type PickerStep = "username" | "password" | "submit" | "review";
@@ -25,9 +26,9 @@ interface WebAutofillBarProps {
 }
 
 const SELECTOR_LABELS: ReadonlyArray<{ key: keyof PickedSelectors; label: string }> = [
-  { key: "usernameSelector", label: "User:" },
-  { key: "passwordSelector", label: "Pass:" },
-  { key: "submitSelector", label: "Submit:" },
+  { key: "usernameSelector", label: __tr("User:") },
+  { key: "passwordSelector", label: __tr("Pass:") },
+  { key: "submitSelector", label: __tr("Submit:") },
 ];
 
 export default function WebAutofillBar({
@@ -55,7 +56,7 @@ export default function WebAutofillBar({
               </span>
             ) : null,
           )}
-          {!hasAny && <span className="text-ink-faint">No selectors picked — skip all to cancel</span>}
+          {!hasAny && <span className="text-ink-faint">{__tr("No selectors picked — skip all to cancel")}</span>}
         </span>
         <Button
           size="sm"
@@ -63,11 +64,11 @@ export default function WebAutofillBar({
           icon={FloppyIcon}
           onClick={onSave}
           disabled={!hasAny || pickerSaving}
-          title="Save selectors to entry"
+          title={__tr("Save selectors to entry")}
         >
-          {pickerSaving ? "Saving..." : "Save"}
+          {pickerSaving ? __tr("Saving...") : __tr("Save")}
         </Button>
-        <IconButton size="sm" icon={CloseIcon} label="Cancel" onClick={onCancel} />
+        <IconButton size="sm" icon={CloseIcon} label={__tr("Cancel")} onClick={onCancel} />
       </div>
     );
   }
@@ -85,14 +86,12 @@ export default function WebAutofillBar({
         {PICKER_STEP_LABELS[pickerStep as Exclude<PickerStep, "review">]}
       </span>
       {hasPicked && (
-        <Button size="sm" variant="secondary" icon={CheckIcon} onClick={onFinish} title="Skip remaining steps and review">
-          Done
-        </Button>
+        <Button size="sm" variant="secondary" icon={CheckIcon} onClick={onFinish} title={__tr("Skip remaining steps and review")}>
+          {__tr("Done")}</Button>
       )}
-      <Button size="sm" variant="ghost" icon={PlayerSkipForwardIcon} onClick={onSkip} title="Skip this step">
-        Skip
-      </Button>
-      <IconButton size="sm" icon={CloseIcon} label="Cancel picker" onClick={onCancel} />
+      <Button size="sm" variant="ghost" icon={PlayerSkipForwardIcon} onClick={onSkip} title={__tr("Skip this step")}>
+        {__tr("Skip")}</Button>
+      <IconButton size="sm" icon={CloseIcon} label={__tr("Cancel picker")} onClick={onCancel} />
     </div>
   );
 }

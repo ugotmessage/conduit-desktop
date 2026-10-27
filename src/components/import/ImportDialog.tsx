@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useCallback } from "react";
 import { invoke } from "../../lib/electron";
 import { Button, Dialog, Spinner } from "../ui";
@@ -103,31 +104,28 @@ export default function ImportDialog({ onClose }: Props) {
 
   const footer =
     step === "select" ? (
-      <Button onClick={onClose}>Cancel</Button>
+      <Button onClick={onClose}>{__tr("Cancel")}</Button>
     ) : step === "preview" && !duplicatePrompt ? (
       <>
         <Button onClick={() => { setStep("select"); setPreviewEntries([]); setDuplicatePrompt(false); }}>
-          Back
-        </Button>
+          {__tr("Back")}</Button>
         <Button variant="primary" onClick={handleImportClick} disabled={importCount === 0}>
-          Import {importCount} {importCount === 1 ? "Entry" : "Entries"}
+          {__tr("Import")} {importCount} {importCount === 1 ? __tr("Entry") : __tr("Entries")}
         </Button>
       </>
     ) : step === "results" ? (
       <>
         <Button icon="download" onClick={handleSaveLog}>
-          Save Log
-        </Button>
+          {__tr("Save Log")}</Button>
         <Button variant="primary" onClick={onClose}>
-          Close
-        </Button>
+          {__tr("Close")}</Button>
       </>
     ) : null;
 
   return (
     <Dialog
       open
-      title="Import from Remote Desktop Manager"
+      title={__tr("Import from Remote Desktop Manager")}
       icon="fileImport"
       onClose={onClose}
       closeOnEscape={canClose}
@@ -162,7 +160,7 @@ export default function ImportDialog({ onClose }: Props) {
       {step === "importing" && (
         <div className="flex flex-col items-center gap-3 py-12">
           <Spinner size={24} className="text-link" />
-          <p className="text-ink-muted">Importing entries...</p>
+          <p className="text-ink-muted">{__tr("Importing entries...")}</p>
         </div>
       )}
 

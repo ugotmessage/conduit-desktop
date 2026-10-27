@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -36,7 +37,7 @@ export default function SessionConflictDialog({ event }: { event: SessionConflic
       else await syncApi.sessionLockHere();
       useSyncStore.getState().setSessionConflict(null);
     } catch (err) {
-      toast.error("Could not answer", errorText(err, "Try again."));
+      toast.error(__tr("Could not answer"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -47,27 +48,26 @@ export default function SessionConflictDialog({ event }: { event: SessionConflic
     <SyncDialogFrame
       icon="devices"
       tone="warn"
-      title={deviceCap ? "Too many devices" : `Also open on ${deviceNameOr(first?.deviceName)}`}
+      title={deviceCap ? __tr("Too many devices") : __tr("Also open on {v0}", { v0: (deviceNameOr(first?.deviceName)) })}
       footer={
         <>
-          <DialogButton onClick={() => void answer("lock-here")} disabled={busy}>Lock here</DialogButton>
+          <DialogButton onClick={() => void answer("lock-here")} disabled={busy}>{__tr("Lock here")}</DialogButton>
           <DialogButton variant="primary" onClick={() => void answer("use-here")} disabled={busy} autoFocus>
-            Use here instead
-          </DialogButton>
+            {__tr("Use here instead")}</DialogButton>
         </>
       }
     >
       {deviceCap ? (
         <>
-          <p className="text-ink">You're using Conduit on {event.deviceCap ?? DEFAULT_DEVICE_CAP} devices. Close one to use it here.</p>
-          <p>Using it here locks your vaults on {deviceNameOr(first?.deviceName)}.</p>
+          <p className="text-ink">{__tr("You're using Conduit on")} {event.deviceCap ?? DEFAULT_DEVICE_CAP} {__tr("devices. Close one to use it here.")}</p>
+          <p>{__tr("Using it here locks your vaults on")} {deviceNameOr(first?.deviceName)}.</p>
         </>
       ) : (
         <p className="text-ink">
-          This vault is also open on {first ? holderActivity(first) : "another device"}.
+          {__tr("This vault is also open on")} {first ? holderActivity(first) : __tr("another device")}.
         </p>
       )}
-      <p>Your changes are saved on this device. If you don't answer, the vault locks here in {left} seconds.</p>
+      <p>{__tr("Your changes are saved on this device. If you don't answer, the vault locks here in")} {left} {__tr("seconds.")}</p>
     </SyncDialogFrame>
   );
 }

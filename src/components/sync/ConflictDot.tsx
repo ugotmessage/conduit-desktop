@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useSyncStore } from "../../stores/syncStore";
 
 interface ConflictDotProps {
@@ -14,7 +15,7 @@ export default function ConflictDot({ tbl, rowId }: ConflictDotProps) {
     <span
       role="button"
       tabIndex={-1}
-      title="Changes from your other devices need review"
+      title={__tr("Changes from your other devices need review")}
       onClick={(e) => {
         e.stopPropagation();
         useSyncStore.getState().openView({ kind: "review", row: { tbl, rowId } });

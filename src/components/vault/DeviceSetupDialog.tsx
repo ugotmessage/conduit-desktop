@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { invoke } from "../../lib/electron";
 import RecoveryPassphraseDialog from "./RecoveryPassphraseDialog";
@@ -74,7 +75,7 @@ export default function DeviceSetupDialog({
       setGeneratedPassphrase(result.recoveryPassphrase);
       setMode("show-passphrase");
     } catch (err) {
-      setError(errorText(err, "Failed to generate identity key"));
+      setError(errorText(err, __tr("Failed to generate identity key")));
       setErrorReturnMode("first-time");
       setMode("error");
     }
@@ -97,7 +98,7 @@ export default function DeviceSetupDialog({
       setTimeout(onComplete, 1500);
     } catch (err) {
       setError(
-        errorText(err, "Invalid recovery passphrase")
+        errorText(err, __tr("Invalid recovery passphrase"))
       );
       setErrorReturnMode("choose");
       setMode("error");
@@ -131,8 +132,8 @@ export default function DeviceSetupDialog({
             setPollTimer(null);
             setError(
               status.status === "denied"
-                ? "Request was denied by the other device"
-                : "Request expired. Please try again."
+                ? __tr("Request was denied by the other device")
+                : __tr("Request expired. Please try again.")
             );
             setErrorReturnMode("choose");
             setMode("error");
@@ -145,7 +146,7 @@ export default function DeviceSetupDialog({
       setPollTimer(timer);
     } catch (err) {
       setError(
-        errorText(err, "Failed to create auth request")
+        errorText(err, __tr("Failed to create auth request"))
       );
       setErrorReturnMode("choose");
       setMode("error");
@@ -180,8 +181,7 @@ export default function DeviceSetupDialog({
 
   const skip = (
     <Button variant="ghost" onClick={onSkip}>
-      Skip for now
-    </Button>
+      {__tr("Skip for now")}</Button>
   );
 
   const footer =
@@ -189,28 +189,26 @@ export default function DeviceSetupDialog({
       <>
         {skip}
         <Button variant="primary" onClick={handleGenerateKey}>
-          Generate Identity Key
-        </Button>
+          {__tr("Generate Identity Key")}</Button>
       </>
     ) : mode === "choose" ? (
       skip
     ) : mode === "passphrase" ? (
       <>
-        <Button onClick={handleCancel}>Back</Button>
+        <Button onClick={handleCancel}>{__tr("Back")}</Button>
         <Button variant="primary" onClick={handleRecoverWithPassphrase} disabled={!passphrase.trim()} loading={loading}>
-          Recover
-        </Button>
+          {__tr("Recover")}</Button>
       </>
     ) : mode === "error" ? (
       <>
-        <Button onClick={handleErrorBack}>Back</Button>
+        <Button onClick={handleErrorBack}>{__tr("Back")}</Button>
         {skip}
       </>
     ) : undefined;
 
   return (
-    <Dialog open title="Set Up Team Access" icon="devices" width={440} hideClose closeOnEscape={false} onClose={onSkip} footer={footer}>
-      <p className="-mt-2 pl-9 text-label text-ink-muted">Configure this device for team vaults</p>
+    <Dialog open title={__tr("Set Up Team Access")} icon="devices" width={440} hideClose closeOnEscape={false} onClose={onSkip} footer={footer}>
+      <p className="-mt-2 pl-9 text-label text-ink-muted">{__tr("Configure this device for team vaults")}</p>
 
       {mode === "loading" && (
         <div className="flex items-center justify-center py-8">
@@ -219,36 +217,31 @@ export default function DeviceSetupDialog({
       )}
 
       {mode === "first-time" && (
-        <Callout tone="info" icon="shieldCheck" title="Identity Key Required">
-          Team vaults use zero-knowledge encryption. An identity key will
-          be generated for this device and a recovery passphrase will be
-          provided for backup.
-        </Callout>
+        <Callout tone="info" icon="shieldCheck" title={__tr("Identity Key Required")}>
+          {__tr("Team vaults use zero-knowledge encryption. An identity key will be generated for this device and a recovery passphrase will be provided for backup.")}</Callout>
       )}
 
       {mode === "generating" && (
         <div className="flex flex-col items-center gap-3 py-8">
           <Spinner size={24} className="text-ink-muted" />
-          <p className="text-body text-ink">Generating identity key...</p>
+          <p className="text-body text-ink">{__tr("Generating identity key...")}</p>
         </div>
       )}
 
       {mode === "choose" && (
         <>
           <p className="text-body text-ink-secondary">
-            An identity key was previously set up on another device. Choose how
-            to recover it:
-          </p>
+            {__tr("An identity key was previously set up on another device. Choose how to recover it:")}</p>
           <RecoveryOption
             icon={KeyIcon}
-            title="Enter Recovery Passphrase"
-            description="Use your 6-word recovery passphrase"
+            title={__tr("Enter Recovery Passphrase")}
+            description={__tr("Use your 6-word recovery passphrase")}
             onClick={() => setMode("passphrase")}
           />
           <RecoveryOption
             icon={DesktopIcon}
-            title="Authorize From Existing Device"
-            description="Approve access from a device you already use"
+            title={__tr("Authorize From Existing Device")}
+            description={__tr("Approve access from a device you already use")}
             onClick={handleRequestDeviceAuth}
             disabled={loading}
           />
@@ -258,13 +251,11 @@ export default function DeviceSetupDialog({
       {mode === "passphrase" && (
         <>
           <p className="text-body text-ink-secondary">
-            Enter the 6-word recovery passphrase you saved when setting up
-            your first device.
-          </p>
+            {__tr("Enter the 6-word recovery passphrase you saved when setting up your first device.")}</p>
           <TextInput
             value={passphrase}
             onChange={(e) => setPassphrase(e.target.value)}
-            placeholder="word1 word2 word3 word4 word5 word6"
+            placeholder={__tr("word1 word2 word3 word4 word5 word6")}
             className="font-mono"
             autoFocus
             onKeyDown={(e) => {
@@ -278,12 +269,11 @@ export default function DeviceSetupDialog({
         <div className="flex flex-col items-center gap-4 py-6">
           <Spinner size={24} className="text-ink-muted" />
           <div className="text-center">
-            <p className="text-body text-ink">Waiting for approval...</p>
+            <p className="text-body text-ink">{__tr("Waiting for approval...")}</p>
             <p className="mt-1 text-label text-ink-muted">
-              Open Conduit on your existing device and approve the request
-            </p>
+              {__tr("Open Conduit on your existing device and approve the request")}</p>
           </div>
-          <Button onClick={handleCancel}>Cancel</Button>
+          <Button onClick={handleCancel}>{__tr("Cancel")}</Button>
         </div>
       )}
 
@@ -292,7 +282,7 @@ export default function DeviceSetupDialog({
           <div className="flex size-12 items-center justify-center rounded-full bg-success-bg">
             <CheckIcon size={24} className="text-success" />
           </div>
-          <p className="text-body text-ink">Device set up successfully!</p>
+          <p className="text-body text-ink">{__tr("Device set up successfully!")}</p>
         </div>
       )}
 

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useState } from "react";
 import { CHECK_ALL_LIMIT } from "../../../types/dashboard";
 import { toast } from "../../common/Toast";
@@ -28,12 +29,12 @@ export default function CheckAllButton({
     } finally {
       setProgress(null);
     }
-    if (capped) toast.info(`Checked the first ${CHECK_ALL_LIMIT} entries`, "Search or sort the list to check others.");
+    if (capped) toast.info(__tr("Checked the first {v0} entries", { v0: (CHECK_ALL_LIMIT) }), __tr("Search or sort the list to check others."));
   };
 
   return (
     <Button disabled={progress !== null || ids.length === 0} onClick={() => void onClick()}>
-      {progress ? `Checking ${progress.done} of ${progress.total}...` : "Check all"}
+      {progress ? __tr("Checking {v0} of {v1}...", { v0: (progress.done), v1: (progress.total) }) : __tr("Check all")}
     </Button>
   );
 }

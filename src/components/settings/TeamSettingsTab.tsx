@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 /**
  * Team settings tab content for the SettingsDialog.
  *
@@ -33,7 +34,7 @@ export default function TeamSettingsTab() {
   }, [isAuthenticated, authMode, loadTeam, loadMembers, loadTeamVaults]);
 
   if (authMode === 'local') {
-    return <EmptyState icon={UsersIcon} title="Not signed in" description="Sign in to access team features" />;
+    return <EmptyState icon={UsersIcon} title={__tr("Not signed in")} description={__tr("Sign in to access team features")} />;
   }
 
   if (!team) {
@@ -41,17 +42,15 @@ export default function TeamSettingsTab() {
       <div className="space-y-4">
         <EmptyState
           icon={UsersIcon}
-          title="No team"
+          title={__tr("No team")}
           description={
             <>
-              You&apos;re not a member of any team yet.
-              {profile?.is_team_member ? '' : ' Create or join a team on the website.'}
+              {__tr("You're not a member of any team yet.")}{profile?.is_team_member ? '' : __tr(" Create or join a team on the website.")}
             </>
           }
           action={
             <Button variant="primary" icon={ExternalLinkIcon} className="mt-2" onClick={() => void window.electron.invoke('auth_open_account')}>
-              Manage on conduitdesktop.com
-            </Button>
+              {__tr("Manage on conduitdesktop.com")}</Button>
           }
         />
       </div>
@@ -62,7 +61,7 @@ export default function TeamSettingsTab() {
     <div className="space-y-4">
       {/* Team info */}
       <div>
-        <SectionHeader title="Team" />
+        <SectionHeader title={__tr("Team")} />
         <Card>
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-md bg-selected">
@@ -71,8 +70,7 @@ export default function TeamSettingsTab() {
             <div className="min-w-0 flex-1">
               <p className="truncate text-body font-semibold text-ink">{team.name}</p>
               <p className={HINT}>
-                {members.length} / {team.max_seats} seats
-                {myRole && <span className="ml-2 text-ink-secondary">({myRole})</span>}
+                {members.length} / {team.max_seats} {__tr("seats")}{myRole && <span className="ml-2 text-ink-secondary">({myRole})</span>}
               </p>
             </div>
           </div>
@@ -81,7 +79,7 @@ export default function TeamSettingsTab() {
 
       {/* Members */}
       <div>
-        <SectionHeader title="Members" />
+        <SectionHeader title={__tr("Members")} />
         <div className={LIST}>
           {members.map((member) => (
             <div key={member.id} className="flex items-center gap-3 px-3 py-2">
@@ -94,18 +92,17 @@ export default function TeamSettingsTab() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-label font-semibold text-ink">
-                  {member.user_display_name ?? member.user_email ?? 'Unknown'}
+                  {member.user_display_name ?? member.user_email ?? __tr("Unknown")}
                 </p>
                 <p className="text-meta text-ink-faint">
-                  {member.role} &middot; joined {new Date(member.joined_at).toLocaleDateString()}
+                  {member.role} {__tr("· joined")} {new Date(member.joined_at).toLocaleDateString()}
                 </p>
               </div>
             </div>
           ))}
           {members.length === 0 && (
             <div className="px-3 py-4 text-center text-meta text-ink-faint">
-              No members loaded
-            </div>
+              {__tr("No members loaded")}</div>
           )}
         </div>
       </div>
@@ -113,7 +110,7 @@ export default function TeamSettingsTab() {
       {/* Team Vaults */}
       <div>
         <SectionHeader
-          title="Team Vaults"
+          title={__tr("Team Vaults")}
           actions={
             myRole === 'admin' && (
               <Button
@@ -122,8 +119,7 @@ export default function TeamSettingsTab() {
                 icon={PlusIcon}
                 onClick={() => document.dispatchEvent(new CustomEvent('conduit:create-team-vault'))}
               >
-                Create
-              </Button>
+                {__tr("Create")}</Button>
             )
           }
         />
@@ -140,11 +136,11 @@ export default function TeamSettingsTab() {
                     <p className="truncate text-label font-semibold text-ink">
                       {vault.name}
                       {isActive && (
-                        <span className="ml-1.5 text-meta font-normal text-ink-secondary">(active)</span>
+                        <span className="ml-1.5 text-meta font-normal text-ink-secondary">{__tr("(active)")}</span>
                       )}
                     </p>
                     <p className="text-meta text-ink-faint">
-                      {vault.member_count} {vault.member_count === 1 ? 'member' : 'members'}
+                      {vault.member_count} {vault.member_count === 1 ? __tr("member") : __tr("members")}
                       {vault.description && <span> &middot; {vault.description}</span>}
                     </p>
                   </div>
@@ -154,12 +150,12 @@ export default function TeamSettingsTab() {
           </div>
         ) : (
           <div className="rounded-md border border-card-border bg-well px-3 py-4 text-center text-meta text-ink-faint">
-            <p>No team vaults yet.</p>
+            <p>{__tr("No team vaults yet.")}</p>
             {myRole !== 'admin' && (() => {
               const admins = members.filter(m => m.role === 'admin');
               const adminNames = admins.map(a => a.user_display_name ?? a.user_email ?? 'Unknown').join(', ');
               return adminNames ? (
-                <p className="mt-1">Ask {adminNames} to create the first vault.</p>
+                <p className="mt-1">{__tr("Ask")} {adminNames} {__tr("to create the first vault.")}</p>
               ) : null;
             })()}
           </div>
@@ -170,12 +166,10 @@ export default function TeamSettingsTab() {
       <div className="flex items-center gap-2 pt-2">
         {myRole === 'admin' && (
           <Button icon={HistoryIcon} onClick={() => setShowAuditLog(true)}>
-            View Audit Log
-          </Button>
+            {__tr("View Audit Log")}</Button>
         )}
         <Button icon={ExternalLinkIcon} onClick={() => void window.electron.invoke('auth_open_account')}>
-          Manage team on conduitdesktop.com
-        </Button>
+          {__tr("Manage team on conduitdesktop.com")}</Button>
       </div>
 
       {/* Audit log modal */}

@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 import { create } from "zustand";
 import { invoke } from "../lib/electron";
 import type { CredentialMeta, CredentialDto } from "../types/credential";
@@ -379,7 +380,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
     } catch (err) {
       set({
         isLoading: false,
-        error: errorText(err, "Failed to open vault"),
+        error: errorText(err, __tr("Failed to open vault")),
       });
       throw err;
     }
@@ -434,7 +435,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       return credential;
     } catch (err) {
       const msg =
-        errorText(err, "Failed to create credential");
+        errorText(err, __tr("Failed to create credential"));
       set({ error: msg });
       throw err;
     }
@@ -474,7 +475,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       return credential;
     } catch (err) {
       const msg =
-        errorText(err, "Failed to update credential");
+        errorText(err, __tr("Failed to update credential"));
       set({ error: msg });
       throw err;
     }
@@ -487,7 +488,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       await get().loadCredentials();
     } catch (err) {
       const msg =
-        errorText(err, "Failed to delete credential");
+        errorText(err, __tr("Failed to delete credential"));
       set({ error: msg });
       throw err;
     }
@@ -755,7 +756,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       await useTeamStore.getState().loadMyVaultRole(teamVaultId);
       await useTeamStore.getState().loadFolderPermissions(teamVaultId);
     } catch (err) {
-      const msg = errorText(err, "Failed to open team vault");
+      const msg = errorText(err, __tr("Failed to open team vault"));
       set({ isLoading: false, error: msg });
       throw err;
     }

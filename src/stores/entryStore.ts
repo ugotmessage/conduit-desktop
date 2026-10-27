@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 import { create } from "zustand";
 import { invoke } from "../lib/electron";
 import type { EntryMeta, EntryFull, FolderData, ResolvedCredential, EntryType, RdpEntryConfig, WebEntryConfig } from "../types/entry";
@@ -119,7 +120,7 @@ function withoutHiddenDescendants(hidden: EntryMeta[], rootId: string): EntryMet
 }
 
 function announceConverted(count: number | undefined): void {
-  if (count) toast.success(count === 1 ? "1 secret encrypted" : `${count} secrets encrypted`);
+  if (count) toast.success(count === 1 ? __tr("1 secret encrypted") : __tr("{v0} secrets encrypted", { v0: (count) }));
 }
 
 interface EntryState {
@@ -260,7 +261,7 @@ async function connectEntry(
         },
       });
     }).catch((err) => {
-      const msg = errorText(err, "Connection failed");
+      const msg = errorText(err, __tr("Connection failed"));
       useSessionStore.getState().updateSessionStatus(entry.id, "disconnected", msg);
     });
     return;
@@ -350,7 +351,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       const { authMode } = useAuthStore.getState();
       if (authMode !== 'local' && params.entry_type !== 'credential' && params.entry_type !== 'document') {
         if (!useTierStore.getState().canCreateEntry()) {
-          toast.error("Entry limit reached — upgrade your plan to add more connections");
+          toast.error(__tr("Entry limit reached — upgrade your plan to add more connections"));
           return null;
         }
       }
@@ -367,7 +368,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       return entry;
     } catch (err) {
       console.error("Failed to create entry:", err);
-      toast.error("Couldn't create the entry");
+      toast.error(__tr("Couldn't create the entry"));
       return null;
     }
   },
@@ -380,7 +381,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       const { authMode } = useAuthStore.getState();
       if (authMode !== 'local' && entry.entry_type !== 'credential' && entry.entry_type !== 'document') {
         if (!useTierStore.getState().canCreateEntry()) {
-          toast.error("Entry limit reached — upgrade your plan to add more connections");
+          toast.error(__tr("Entry limit reached — upgrade your plan to add more connections"));
           return null;
         }
       }
@@ -394,10 +395,10 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('TIER_LIMIT_REACHED')) {
-        toast.error("Entry limit reached — upgrade your plan to add more connections");
+        toast.error(__tr("Entry limit reached — upgrade your plan to add more connections"));
       } else {
         console.error("Failed to duplicate entry:", err);
-        toast.error("Failed to duplicate entry");
+        toast.error(__tr("Failed to duplicate entry"));
       }
       return null;
     }
@@ -423,7 +424,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       return entry;
     } catch (err) {
       console.error("Failed to update entry:", err);
-      toast.error("Couldn't save the entry");
+      toast.error(__tr("Couldn't save the entry"));
       return null;
     }
   },
@@ -501,7 +502,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       return folder;
     } catch (err) {
       console.error("Failed to create folder:", err);
-      toast.error("Couldn't create the folder");
+      toast.error(__tr("Couldn't create the folder"));
       return null;
     }
   },
@@ -515,7 +516,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       return folder;
     } catch (err) {
       console.error("Failed to update folder:", err);
-      toast.error("Couldn't save the folder");
+      toast.error(__tr("Couldn't save the folder"));
       return null;
     }
   },
@@ -649,7 +650,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
 
     // Tier enforcement: prevent opening locked entries
     if (useTierStore.getState().isEntryLocked(id)) {
-      toast.error("This entry is locked — upgrade your plan to access it");
+      toast.error(__tr("This entry is locked — upgrade your plan to access it"));
       return;
     }
 
@@ -666,7 +667,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       const cred = await get().resolveCredential(id);
       await connectEntry(entry, cred, sessionStore);
     } catch (err) {
-      const msg = errorText(err, "Connection failed");
+      const msg = errorText(err, __tr("Connection failed"));
       sessionStore.updateSessionStatus(entry.id, "disconnected", msg);
       console.error("Failed to open entry:", err);
     } finally {
@@ -679,7 +680,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     if (!entry || entry.entry_type === "credential") return;
 
     if (useTierStore.getState().isEntryLocked(id)) {
-      toast.error("This entry is locked — upgrade your plan to access it");
+      toast.error(__tr("This entry is locked — upgrade your plan to access it"));
       return;
     }
 
@@ -703,7 +704,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
       };
       await connectEntry(entry, cred, sessionStore);
     } catch (err) {
-      const msg = errorText(err, "Connection failed");
+      const msg = errorText(err, __tr("Connection failed"));
       sessionStore.updateSessionStatus(entry.id, "disconnected", msg);
       console.error("Failed to open entry with credential:", err);
     } finally {
@@ -760,7 +761,7 @@ export const useEntryStore = create<EntryState>((set, get) => ({
     try {
       await get().openEntry(entryId);
     } catch (err) {
-      const msg = errorText(err, "Reconnection failed");
+      const msg = errorText(err, __tr("Reconnection failed"));
       useSessionStore.getState().updateSessionStatus(trackingId, "disconnected", msg);
     } finally {
       // Clear reconnecting flag — find by entryId since ID may have changed again

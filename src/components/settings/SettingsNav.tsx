@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import {
   KeyboardIcon, PaletteIcon, RobotIcon, FloppyIcon, UsersIcon, UserIcon,
   TerminalIcon, DesktopIcon, EyeIcon, GlobeIcon,
@@ -7,28 +8,28 @@ import { NavList, type NavEntry } from "../ui";
 import type { SettingsTab } from "./SettingsHelpers";
 
 export const SETTINGS_NAV: ReadonlyArray<NavEntry> = [
-  { id: "general", icon: KeyboardIcon, label: "General" },
-  { id: "appearance", icon: PaletteIcon, label: "Appearance" },
-  { id: "security", icon: FingerprintIcon, label: "Security" },
+  { id: "general", icon: KeyboardIcon, label: __tr("General") },
+  { id: "appearance", icon: PaletteIcon, label: __tr("Appearance") },
+  { id: "security", icon: FingerprintIcon, label: __tr("Security") },
   {
     kind: "group",
     id: "sessions",
     icon: TerminalIcon,
-    label: "Sessions",
+    label: __tr("Sessions"),
     children: [
-      { id: "sessions/terminal", icon: TerminalIcon, label: "Terminal" },
+      { id: "sessions/terminal", icon: TerminalIcon, label: __tr("Terminal") },
       { id: "sessions/ssh", icon: KeyIcon, label: "SSH" },
       { id: "sessions/rdp", icon: DesktopIcon, label: "RDP" },
       { id: "sessions/vnc", icon: EyeIcon, label: "VNC" },
-      { id: "sessions/web", icon: GlobeIcon, label: "Web" },
+      { id: "sessions/web", icon: GlobeIcon, label: __tr("Web") },
     ],
   },
   { id: "ai/agent", icon: RobotIcon, label: "AI" },
-  { id: "backup", icon: FloppyIcon, label: "Backup" },
-  { id: "sync", icon: CloudSyncIcon, label: "Sync" },
-  { id: "mobile", icon: DeviceMobileIcon, label: "Mobile" },
-  { id: "team", icon: UsersIcon, label: "Team" },
-  { id: "account", icon: UserIcon, label: "Account" },
+  { id: "backup", icon: FloppyIcon, label: __tr("Backup") },
+  { id: "sync", icon: CloudSyncIcon, label: __tr("Sync") },
+  { id: "mobile", icon: DeviceMobileIcon, label: __tr("Mobile") },
+  { id: "team", icon: UsersIcon, label: __tr("Team") },
+  { id: "account", icon: UserIcon, label: __tr("Account") },
 ];
 
 interface SettingsNavProps {

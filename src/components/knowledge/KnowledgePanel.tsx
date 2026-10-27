@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useRef, useState } from "react";
 import type { KbKind } from "../../lib/kb";
 import { useEntryStore } from "../../stores/entryStore";
@@ -37,12 +38,11 @@ export default function KnowledgePanel({ target }: { target: PanelTarget }) {
     <div data-cv-knowledge-panel="">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-label text-ink-faint">
-          {own.length === 0 ? "No articles yet" : `${own.length} ${own.length === 1 ? "article" : "articles"}`}
+          {own.length === 0 ? __tr("No articles yet") : `${own.length} ${own.length === 1 ? "article" : "articles"}`}
         </span>
         <span ref={addRef}>
           <Button size="sm" icon="plus" onClick={() => setMenuOpen((o) => !o)}>
-            Article
-          </Button>
+            {__tr("Article")}</Button>
         </span>
         <Popover anchorRef={addRef} open={menuOpen} onClose={() => setMenuOpen(false)} placement="bottom-end" padding={false}>
           <Menu onClose={() => setMenuOpen(false)}>
@@ -76,15 +76,14 @@ export default function KnowledgePanel({ target }: { target: PanelTarget }) {
 
       {own.length === 0 && !overview && (
         <p className="px-2 py-3 text-body text-ink-muted">
-          Agents add what they learn here as they work. You can also start with an overview.
-        </p>
+          {__tr("Agents add what they learn here as they work. You can also start with an overview.")}</p>
       )}
 
       {inherited.length > 0 && (
         <section className="mt-3 border-t border-divider pt-2">
           <button type="button" className="flex w-full items-center gap-1 px-2 text-meta font-semibold uppercase tracking-wide text-ink-faint" onClick={() => setShowInherited((v) => !v)}>
             <IconSlot icon={showInherited ? "chevronDown" : "chevronRight"} size={12} />
-            Also applies ({inherited.length})
+            {__tr("Also applies (")}{inherited.length})
           </button>
           {showInherited &&
             inherited.map((i) => (

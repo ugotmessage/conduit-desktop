@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useRef, useState } from "react";
 import { useEntryStore } from "../../stores/entryStore";
 import { toast } from "../common/Toast";
@@ -35,7 +36,7 @@ export default function SecretChip({ kind, id, field, pending, label }: SecretCh
     try {
       return await readChipValue(ref, hiddenEntries);
     } catch (err) {
-      toast.error(errorText(err, "Couldn't read this secret"));
+      toast.error(errorText(err, __tr("Couldn't read this secret")));
       return null;
     }
   };
@@ -57,9 +58,9 @@ export default function SecretChip({ kind, id, field, pending, label }: SecretCh
     if (v === null) return;
     try {
       await navigator.clipboard.writeText(v);
-      toast.success(`${name} copied`);
+      toast.success(__tr("{v0} copied", { v0: (name) }));
     } catch {
-      toast.error("Couldn't copy the secret");
+      toast.error(__tr("Couldn't copy the secret"));
     }
   };
 
@@ -67,12 +68,12 @@ export default function SecretChip({ kind, id, field, pending, label }: SecretCh
     const v = await read();
     if (v === null) return;
     const inSession = !!getTypeableActiveSession();
-    toast.info(inSession ? "Typing in 2s — click the target field now" : "Typing in 3s — switch to the target app now");
+    toast.info(inSession ? __tr("Typing in 2s — click the target field now") : __tr("Typing in 3s — switch to the target app now"));
     try {
       await (inSession ? typeIntoActiveSession(v) : globalTypeText(v));
-      toast.success(`${name} typed`);
+      toast.success(__tr("{v0} typed", { v0: (name) }));
     } catch (err) {
-      toast.error(errorText(err, "Couldn't type the secret"));
+      toast.error(errorText(err, __tr("Couldn't type the secret")));
     }
   };
 
@@ -82,7 +83,7 @@ export default function SecretChip({ kind, id, field, pending, label }: SecretCh
         missing ? "border-danger text-danger" : "border-card-border bg-well text-ink"
       }`}
       data-cv-secret-chip={id}
-      title={missing ? "This secret is not in the vault any more" : undefined}
+      title={missing ? __tr("This secret is not in the vault any more") : undefined}
     >
       <LockIcon size={12} className="text-ink-muted" />
       {value !== null ? (
@@ -95,13 +96,13 @@ export default function SecretChip({ kind, id, field, pending, label }: SecretCh
       )}
       {!missing && (
         <>
-          <button type="button" className={ICON_BUTTON} onClick={toggle} title={value !== null ? "Hide" : "Reveal"} aria-label={value !== null ? `Hide ${name}` : `Reveal ${name}`}>
+          <button type="button" className={ICON_BUTTON} onClick={toggle} title={value !== null ? __tr("Hide") : __tr("Reveal")} aria-label={value !== null ? __tr("Hide {v0}", { v0: (name) }) : __tr("Reveal {v0}", { v0: (name) })}>
             {value !== null ? <EyeOffIcon size={12} /> : <EyeIcon size={12} />}
           </button>
-          <button type="button" className={ICON_BUTTON} onClick={copy} title="Copy" aria-label={`Copy ${name}`}>
+          <button type="button" className={ICON_BUTTON} onClick={copy} title={__tr("Copy")} aria-label={__tr("Copy {v0}", { v0: (name) })}>
             <CopyIcon size={12} />
           </button>
-          <button type="button" className={ICON_BUTTON} onClick={type} title="Type into the active session" aria-label={`Type ${name}`}>
+          <button type="button" className={ICON_BUTTON} onClick={type} title={__tr("Type into the active session")} aria-label={__tr("Type {v0}", { v0: (name) })}>
             <KeyboardIcon size={12} />
           </button>
         </>

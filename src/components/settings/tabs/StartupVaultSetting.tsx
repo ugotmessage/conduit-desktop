@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect, useState } from "react";
 import { useStartupVaultStore, type StartupVault } from "../../../stores/startupVaultStore";
 import { useVaultStore } from "../../../stores/vaultStore";
@@ -64,7 +65,7 @@ export default function StartupVaultSetting({ onOpenSecurity }: StartupVaultSett
       if (nextName) toastStartupSet(nextName);
       else if (prevName) toastStartupCleared(prevName, false);
     } catch (err) {
-      toast.error("Couldn't change the startup vault", errorText(err, "Try again."));
+      toast.error(__tr("Couldn't change the startup vault"), errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
@@ -81,7 +82,7 @@ export default function StartupVaultSetting({ onOpenSecurity }: StartupVaultSett
 
   const keys = isMacPlatform(status?.platform) ? (
     <>
-      <Kbd>Shift</Kbd> or <Kbd>Option</Kbd>
+      <Kbd>Shift</Kbd> {__tr("or")} <Kbd>Option</Kbd>
     </>
   ) : (
     <Kbd>Shift</Kbd>
@@ -89,20 +90,19 @@ export default function StartupVaultSetting({ onOpenSecurity }: StartupVaultSett
 
   return (
     <div>
-      <SectionHeader title="Startup" />
+      <SectionHeader title={__tr("Startup")} />
       <SettingsRow
-        title="Open at startup"
+        title={__tr("Open at startup")}
         description={
           <>
-            What Conduit shows when it starts. Hold {keys} while it starts to go to the Vault Hub once.
-          </>
+            {__tr("What Conduit shows when it starts. Hold")} {keys} {__tr("while it starts to go to the Vault Hub once.")}</>
         }
       >
-        <Select value={value} onChange={(e) => onChange(e.target.value)} disabled={busy} aria-label="Open at startup">
-          {teamMember && <option value="automatic">Last team vault used</option>}
-          <option value="hub">Vault Hub</option>
+        <Select value={value} onChange={(e) => onChange(e.target.value)} disabled={busy} aria-label={__tr("Open at startup")}>
+          {teamMember && <option value="automatic">{__tr("Last team vault used")}</option>}
+          <option value="hub">{__tr("Vault Hub")}</option>
           {personalPaths.length > 0 && (
-            <optgroup label="Personal vaults">
+            <optgroup label={__tr("Personal vaults")}>
               {personalPaths.map((p) => (
                 <option key={p} value={`p:${p}`}>
                   {labels.get(p)}
@@ -111,7 +111,7 @@ export default function StartupVaultSetting({ onOpenSecurity }: StartupVaultSett
             </optgroup>
           )}
           {teamMember && teamVaults.length > 0 && (
-            <optgroup label="Team vaults">
+            <optgroup label={__tr("Team vaults")}>
               {teamVaults.map((t) => (
                 <option key={t.id} value={`t:${t.id}`}>
                   {t.name}
@@ -122,25 +122,23 @@ export default function StartupVaultSetting({ onOpenSecurity }: StartupVaultSett
         </Select>
         {value === "automatic" && (
           <p className="mt-1 text-label text-ink-muted">
-            Conduit reconnects to the team vault you used last, like today. Otherwise it shows the Vault Hub.
-          </p>
+            {__tr("Conduit reconnects to the team vault you used last, like today. Otherwise it shows the Vault Hub.")}</p>
         )}
-        {sv?.kind === "team" && <p className="mt-1 text-label text-ink-muted">Team vaults open without a password on this computer.</p>}
+        {sv?.kind === "team" && <p className="mt-1 text-label text-ink-muted">{__tr("Team vaults open without a password on this computer.")}</p>}
         {sv?.kind === "personal" && status?.savedPath === sv.path && (
           <p className="mt-1 flex items-center gap-1 text-label text-ink-muted">
             <IconSlot icon="lockOpen" size={12} />
-            Unlocks automatically on this computer. Change in{" "}
+            {__tr("Unlocks automatically on this computer. Change in")}{" "}
             <Button variant="link" size="sm" onClick={onOpenSecurity}>
-              Security
-            </Button>
+              {__tr("Security")}</Button>
           </p>
         )}
       </SettingsRow>
       {confirm && (
         <ConfirmDialog
-          title="Turn off automatic unlock?"
-          message={`${confirm.oldName} unlocks automatically at startup. Choosing another startup vault turns that off and forgets the saved password.`}
-          confirmLabel="Continue"
+          title={__tr("Turn off automatic unlock?")}
+          message={__tr("{v0} unlocks automatically at startup. Choosing another startup vault turns that off and forgets the saved password.", { v0: (confirm.oldName) })}
+          confirmLabel={__tr("Continue")}
           layer="stacked"
           onCancel={() => setConfirm(null)}
           onConfirm={() => {

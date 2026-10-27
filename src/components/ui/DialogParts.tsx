@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { createContext, useContext, type ComponentPropsWithRef, type ReactNode } from "react";
 import { cx } from "./cx";
 import { IconButton } from "./IconButton";
@@ -86,7 +87,7 @@ export function DialogHeader({ title, subtitle, description, icon, tone, hideClo
         </div>
       )}
       {children}
-      {!noClose && ctx?.onClose && <IconButton icon="close" label="Close" onClick={ctx.onClose} />}
+      {!noClose && ctx?.onClose && <IconButton icon="close" label={__tr("Close")} onClick={ctx.onClose} />}
     </div>
   );
 }

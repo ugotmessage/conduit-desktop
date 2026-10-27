@@ -1,3 +1,4 @@
+import { t as __tr } from "../lib/i18n";
 import { useEffect } from "react";
 
 interface Shortcut {
@@ -16,7 +17,7 @@ const shortcuts: Shortcut[] = [
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:new-entry")),
-    description: "New Entry",
+    description: __tr("New Entry"),
   },
   {
     key: "n",
@@ -24,42 +25,42 @@ const shortcuts: Shortcut[] = [
     shift: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:new-folder")),
-    description: "New Folder",
+    description: __tr("New Folder"),
   },
   {
     key: "n",
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:quick-connect")),
-    description: "Quick Connect",
+    description: __tr("Quick Connect"),
   },
   {
     key: "t",
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:new-terminal")),
-    description: "New Local Terminal",
+    description: __tr("New Local Terminal"),
   },
   {
     key: ",",
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:settings")),
-    description: "Settings",
+    description: __tr("Settings"),
   },
   {
     key: "w",
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:close-tab")),
-    description: "Close Tab",
+    description: __tr("Close Tab"),
   },
   {
     key: "Tab",
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:next-tab")),
-    description: "Next Tab",
+    description: __tr("Next Tab"),
   },
   {
     key: "Tab",
@@ -67,14 +68,14 @@ const shortcuts: Shortcut[] = [
     shift: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:prev-tab")),
-    description: "Previous Tab",
+    description: __tr("Previous Tab"),
   },
   {
     key: "b",
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:toggle-sidebar")),
-    description: "Toggle Sidebar",
+    description: __tr("Toggle Sidebar"),
   },
   {
     key: "b",
@@ -82,7 +83,7 @@ const shortcuts: Shortcut[] = [
     shift: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:toggle-sidebar-pin")),
-    description: "Pin / Unpin Sidebar",
+    description: __tr("Pin / Unpin Sidebar"),
   },
   {
     key: "l",
@@ -90,7 +91,7 @@ const shortcuts: Shortcut[] = [
     shift: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:lock-vault")),
-    description: "Lock Vault",
+    description: __tr("Lock Vault"),
   },
   {
     key: "h",
@@ -98,25 +99,25 @@ const shortcuts: Shortcut[] = [
     shift: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:home")),
-    description: "Go to Home",
+    description: __tr("Go to Home"),
   },
   {
     key: "F2",
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:rename-selected")),
-    description: "Rename Selected",
+    description: __tr("Rename Selected"),
   },
   {
     key: "Delete",
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:delete-selected")),
-    description: "Delete Selected",
+    description: __tr("Delete Selected"),
   },
   {
     key: "Backspace",
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:delete-selected")),
-    description: "Delete Selected (macOS)",
+    description: __tr("Delete Selected (macOS)"),
   },
   {
     key: "a",
@@ -124,21 +125,21 @@ const shortcuts: Shortcut[] = [
     shift: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:new-agent")),
-    description: "New AI Agent Tab",
+    description: __tr("New AI Agent Tab"),
   },
   {
     key: "g",
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:password-generator")),
-    description: "Password Generator",
+    description: __tr("Password Generator"),
   },
   {
     key: "\\",
     ctrl: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:split-right")),
-    description: "Split Right",
+    description: __tr("Split Right"),
   },
   {
     key: "\\",
@@ -146,7 +147,7 @@ const shortcuts: Shortcut[] = [
     shift: true,
     action: () =>
       document.dispatchEvent(new CustomEvent("conduit:split-down")),
-    description: "Split Down",
+    description: __tr("Split Down"),
   },
 ];
 

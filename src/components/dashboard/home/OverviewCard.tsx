@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useMemo } from "react";
 import type { EntryMeta } from "../../../types/entry";
 import { Card, SectionHeader } from "../../ui";
@@ -11,7 +12,7 @@ export default function OverviewCard({ entries }: { entries: readonly EntryMeta[
   if (!CONNECTION_TYPES.some((type) => (counts[type] ?? 0) > 0)) return null;
   return (
     <Card>
-      <SectionHeader title="Overview" />
+      <SectionHeader title={__tr("Overview")} />
       <TypeTiles counts={counts} types={CONNECTION_TYPES} className="grid-cols-3" />
     </Card>
   );

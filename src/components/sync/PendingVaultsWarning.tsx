@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { Badge, Button, IconSlot } from "../ui";
 import { syncApi } from "../../lib/sync-api";
@@ -17,9 +18,8 @@ export function PendingBadge({ vaultPath }: { vaultPath: string }) {
   const pending = useSyncStore((s) => isPendingPath(s.state, vaultPath));
   if (!pending) return null;
   return (
-    <Badge tone="warning" title="Unlock this vault to sync them">
-      Changes not yet synced
-    </Badge>
+    <Badge tone="warning" title={__tr("Unlock this vault to sync them")}>
+      {__tr("Changes not yet synced")}</Badge>
   );
 }
 
@@ -35,19 +35,19 @@ export default function PendingVaultsWarning() {
       await action();
       await useSyncStore.getState().refresh();
     } catch (err) {
-      toast.error(failTitle, errorText(err, "Try again."));
+      toast.error(failTitle, errorText(err, __tr("Try again.")));
     } finally {
       setBusy(false);
     }
   };
   const turnOn = () => run(async () => {
     await syncApi.setEnabled(true);
-    toast.success("Multi-device sync is on.", "The changes sync the next time you unlock the vault.");
+    toast.success(__tr("Multi-device sync is on."), __tr("The changes sync the next time you unlock the vault."));
   }, "Could not turn sync on");
   const exportThem = () => run(async () => {
     for (const p of state.pendingVaults) {
       const { path } = await syncApi.exportUnsynced(p.lineageId);
-      toast.info("Exported unsynced changes", baseName(path));
+      toast.info(__tr("Exported unsynced changes"), baseName(path));
     }
   }, "Could not export");
 
@@ -56,15 +56,13 @@ export default function PendingVaultsWarning() {
       <IconSlot icon="alertTriangle" className="mt-px shrink-0 text-warning" />
       <div className="flex-1 space-y-0.5 text-body text-ink-secondary">
         {state.pendingVaults.map((p) => (
-          <p key={p.lineageId}>Changes to '{nameOf(p)}' exist only on this device.</p>
+          <p key={p.lineageId}>{__tr("Changes to '")}{nameOf(p)}{__tr("' exist only on this device.")}</p>
         ))}
       </div>
       <Button size="sm" variant="primary" disabled={busy} onClick={() => void turnOn()}>
-        Turn sync back on
-      </Button>
+        {__tr("Turn sync back on")}</Button>
       <Button size="sm" disabled={busy} onClick={() => void exportThem()}>
-        Export them
-      </Button>
+        {__tr("Export them")}</Button>
     </div>
   );
 }

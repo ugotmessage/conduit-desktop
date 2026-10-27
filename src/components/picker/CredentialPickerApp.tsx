@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback, type CSSProperties } from "react";
 import { invoke, listen } from "../../lib/electron";
 import { KeyIcon } from "../../lib/icons";
@@ -116,9 +117,8 @@ export default function CredentialPickerApp() {
       <div className="flex h-11 shrink-0 items-center justify-between border-b border-divider px-3" style={DRAG_REGION}>
         <div className="flex items-center gap-2 text-body font-semibold">
           <KeyIcon size={16} className="text-link" />
-          Credential Picker
-        </div>
-        <IconButton icon="close" label="Close" onClick={handleClose} style={NO_DRAG_REGION} />
+          {__tr("Credential Picker")}</div>
+        <IconButton icon="close" label={__tr("Close")} onClick={handleClose} style={NO_DRAG_REGION} />
       </div>
 
       {/* Content */}

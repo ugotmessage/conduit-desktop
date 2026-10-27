@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { invoke } from "../../lib/electron";
 import { useAiStore } from "../../stores/aiStore";
@@ -62,6 +63,7 @@ export default function SettingsDialog({ onClose, initialTab }: SettingsDialogPr
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab ?? "general");
   const [settings, setSettings] = useState<Settings>({
     theme: "system",
+    ui_language: "system",
     color_scheme: DEFAULT_SCHEME,
     icon_pack: DEFAULT_ICON_PACK,
     default_shell: "default",
@@ -106,6 +108,9 @@ export default function SettingsDialog({ onClose, initialTab }: SettingsDialogPr
       // Refresh the cached session defaults store
       await useSettingsStore.getState().refresh();
 
+      // The language changes on next launch, keeping live remote sessions intact.
+      localStorage.setItem("conduit:ui-language", settings.ui_language ?? "system");
+
       // Apply the saved appearance
       dispatchThemeChange(settings);
 
@@ -116,7 +121,7 @@ export default function SettingsDialog({ onClose, initialTab }: SettingsDialogPr
 
       onClose();
     } catch (err) {
-      setError(errorText(err, "Failed to save settings"));
+      setError(errorText(err, __tr("Failed to save settings")));
     } finally {
       setIsSaving(false);
     }
@@ -189,7 +194,7 @@ export default function SettingsDialog({ onClose, initialTab }: SettingsDialogPr
   };
 
   return (
-    <Dialog open onClose={handleCancel} title="Settings" width={SETTINGS_WIDTH} layout="custom" data-cv-settings="">
+    <Dialog open onClose={handleCancel} title={__tr("Settings")} width={SETTINGS_WIDTH} layout="custom" data-cv-settings="">
       <DialogHeader />
       <div className="flex h-[500px] min-h-0 border-y border-divider">
         <SettingsNav activeTab={activeTab} onTabChange={setActiveTab} />
@@ -204,11 +209,9 @@ export default function SettingsDialog({ onClose, initialTab }: SettingsDialogPr
       </div>
       <DialogFooter divided>
         <Button variant="secondary" onClick={handleCancel}>
-          Cancel
-        </Button>
+          {__tr("Cancel")}</Button>
         <Button variant="primary" onClick={handleSave} loading={isSaving} loadingLabel="Saving...">
-          Save
-        </Button>
+          {__tr("Save")}</Button>
       </DialogFooter>
     </Dialog>
   );

@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useCallback, useEffect } from "react";
 import { useAppIcon } from "../../hooks/useAppIcon";
 import { useAuthStore } from "../../stores/authStore";
@@ -106,7 +107,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-card-border rounded-lg">
                       <Icon size={48} stroke={1.2} className="text-ink-faint mb-3" />
-                      <span className="text-label text-ink-faint">Animation coming soon</span>
+                      <span className="text-label text-ink-faint">{__tr("Animation coming soon")}</span>
                     </div>
                   )}
                 </div>
@@ -143,10 +144,10 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                   <img src={appIcon} alt="Conduit" className="w-7 h-7 rounded-md" />
                   <span className="text-meta font-semibold text-ink-muted">
                     {step.minTier === "free"
-                      ? "Included"
+                      ? __tr("Included")
                       : step.minTier === "pro"
-                        ? "Pro Feature"
-                        : "Teams Feature"}
+                        ? __tr("Pro Feature")
+                        : __tr("Teams Feature")}
                   </span>
                 </div>
 
@@ -169,7 +170,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
               <div className="flex-shrink-0 pt-5">
                 {/* Step counter */}
                 <div className="text-label text-ink-faint mb-3">
-                  {currentStep + 1} of {steps.length}
+                  {currentStep + 1} {__tr("of")} {steps.length}
                 </div>
 
                 {/* Dot indicators */}
@@ -179,8 +180,8 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                       key={i}
                       type="button"
                       onClick={() => goTo(i)}
-                      aria-label={`Go to step ${i + 1}`}
-                      title={`Go to step ${i + 1}`}
+                      aria-label={__tr("Go to step {v0}", { v0: (i + 1) })}
+                      title={__tr("Go to step {v0}", { v0: (i + 1) })}
                       aria-current={i === currentStep ? "step" : undefined}
                       className={cx(
                         "h-1.5 rounded-full transition-all duration-300",
@@ -193,8 +194,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                 {/* Navigation buttons */}
                 <div className="flex items-center justify-between">
                   <Button variant="ghost" size="lg" onClick={finish} className="-ml-3">
-                    Skip
-                  </Button>
+                    {__tr("Skip")}</Button>
 
                   <div className="flex items-center gap-2">
                     {!isFirst && (
@@ -205,14 +205,12 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                         onClick={() => goTo(currentStep - 1)}
                         disabled={isAnimating}
                       >
-                        Back
-                      </Button>
+                        {__tr("Back")}</Button>
                     )}
 
                     {isLast ? (
                       <Button variant="primary" size="lg" onClick={finish}>
-                        Get Started
-                      </Button>
+                        {__tr("Get Started")}</Button>
                     ) : (
                       <Button
                         variant="primary"
@@ -221,8 +219,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                         onClick={() => goTo(currentStep + 1)}
                         disabled={isAnimating}
                       >
-                        Next
-                      </Button>
+                        {__tr("Next")}</Button>
                     )}
                   </div>
                 </div>

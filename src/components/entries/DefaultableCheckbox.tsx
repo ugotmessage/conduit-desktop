@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 /**
  * A tri-state checkbox rendered as a select with Default / On / Off options.
  * When "Default" is selected, the value is undefined (inherit from global defaults).
@@ -13,7 +14,7 @@ interface DefaultableCheckboxProps {
 
 export default function DefaultableCheckbox({ value, defaultValue, label, onChange }: DefaultableCheckboxProps) {
   const selectValue = value === undefined ? "default" : value ? "on" : "off";
-  const defaultLabel = defaultValue ? "On" : "Off";
+  const defaultLabel = defaultValue ? __tr("On") : __tr("Off");
 
   return (
     <div className="flex items-center justify-between gap-3">
@@ -27,9 +28,9 @@ export default function DefaultableCheckbox({ value, defaultValue, label, onChan
             onChange(v === "default" ? undefined : v === "on");
           }}
         >
-          <option value="default">Default ({defaultLabel})</option>
-          <option value="on">On</option>
-          <option value="off">Off</option>
+          <option value="default">{__tr("Default (")}{defaultLabel})</option>
+          <option value="on">{__tr("On")}</option>
+          <option value="off">{__tr("Off")}</option>
         </Select>
       </div>
     </div>

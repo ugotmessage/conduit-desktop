@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useEffect, useRef, useState } from "react";
 import { useEntryStore } from "../../../stores/entryStore";
 import { useVaultStore } from "../../../stores/vaultStore";
@@ -53,15 +54,14 @@ export default function OpenAllButton({ entryIds }: { entryIds: readonly string[
           title={count === 0 ? NOTHING_TO_OPEN : undefined}
           onClick={onClick}
         >
-          Open all
-        </Button>
+          {__tr("Open all")}</Button>
       </span>
       {confirming && (
         <ConfirmDialog
-          title={`Open ${confirming.length} connections?`}
-          message={`This opens ${confirming.length} sessions at once. Commands and documents are not opened.`}
+          title={__tr("Open {v0} connections?", { v0: (confirming.length) })}
+          message={__tr("This opens {v0} sessions at once. Commands and documents are not opened.", { v0: (confirming.length) })}
           confirmLabel={`Open ${confirming.length}`}
-          cancelLabel="Cancel"
+          cancelLabel={__tr("Cancel")}
           onConfirm={() => void openAll(confirming)}
           onCancel={() => setConfirming(null)}
         />

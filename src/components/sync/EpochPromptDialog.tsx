@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { syncApi } from "../../lib/sync-api";
 import { errorText } from "../../lib/errorText";
@@ -56,14 +57,14 @@ export default function EpochPromptDialog({ prompt }: { prompt: EpochPrompt }) {
     try {
       const result = await runFlow(prompt, password, askPrevious ? previous : null, keep);
       if (result.ok) {
-        toast.success("Password updated. Syncing again.");
+        toast.success(__tr("Password updated. Syncing again."));
         await useSyncStore.getState().refresh();
         return;
       }
       if (result.reason === "needs-previous-password") setAskPrevious(true);
       setError(FLOW_ERRORS[result.reason]);
     } catch (err) {
-      setError(errorText(err, "Could not update the password."));
+      setError(errorText(err, __tr("Could not update the password.")));
     } finally {
       setBusy(false);
     }
@@ -74,29 +75,28 @@ export default function EpochPromptDialog({ prompt }: { prompt: EpochPrompt }) {
     <SyncDialogFrame
       icon="key"
       tone="warn"
-      title="Syncing paused"
+      title={__tr("Syncing paused")}
       onSubmit={() => {
         if (canSubmit) void submit();
       }}
       footer={
         <>
-          <DialogButton onClick={() => useSyncStore.getState().deferPrompt(prompt.id)} disabled={busy}>Later</DialogButton>
+          <DialogButton onClick={() => useSyncStore.getState().deferPrompt(prompt.id)} disabled={busy}>{__tr("Later")}</DialogButton>
           <DialogButton type="submit" variant="primary" disabled={!canSubmit} loading={busy} loadingLabel="Checking...">
-            Continue
-          </DialogButton>
+            {__tr("Continue")}</DialogButton>
         </>
       }
     >
       <p className="text-ink">{introFor(prompt)}</p>
-      <p>Your changes are saved on this device. {concurrent ? "Enter the password set on the other device." : "Enter the new password to keep syncing."}</p>
-      <PasswordField label={concurrent ? "Other device's password" : "New master password"} value={password} onChange={setPassword} autoFocus />
-      {askPrevious && <PasswordField label="Previous master password" value={previous} onChange={setPrevious} />}
+      <p>{__tr("Your changes are saved on this device.")} {concurrent ? __tr("Enter the password set on the other device.") : __tr("Enter the new password to keep syncing.")}</p>
+      <PasswordField label={concurrent ? __tr("Other device's password") : __tr("New master password")} value={password} onChange={setPassword} autoFocus />
+      {askPrevious && <PasswordField label={__tr("Previous master password")} value={previous} onChange={setPrevious} />}
       {concurrent && (
         <fieldset>
-          <legend className="mb-1.5 text-body font-semibold text-ink">Which password do you want to keep?</legend>
+          <legend className="mb-1.5 text-body font-semibold text-ink">{__tr("Which password do you want to keep?")}</legend>
           <RadioGroup value={keep} onChange={setKeep} name="keep" className="gap-1.5">
-            <Radio value="this-device">The one I use on this device</Radio>
-            <Radio value="other">The other device's password</Radio>
+            <Radio value="this-device">{__tr("The one I use on this device")}</Radio>
+            <Radio value="other">{__tr("The other device's password")}</Radio>
           </RadioGroup>
         </fieldset>
       )}

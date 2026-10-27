@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useEffect, useMemo, useState } from "react";
 import { errorText } from "../../lib/errorText";
 import { useSyncStore } from "../../stores/syncStore";
@@ -9,7 +10,7 @@ import ConflictItemView from "./ConflictItemView";
 import SyncNoticeList from "./SyncNoticeList";
 import { plural } from "./sync-copy";
 
-const REVIEW_TITLE = "Review changes";
+const REVIEW_TITLE = __tr("Review changes");
 const PANEL_WIDTH = 896;
 const PANEL_SIZE = { height: 600, maxHeight: "90vh" } as const;
 
@@ -18,9 +19,9 @@ type BulkChoice = "keep-newest-all" | "keep-newest-older-apps";
 async function bulkResolve(choice: BulkChoice): Promise<void> {
   try {
     const res = await useSyncStore.getState().resolveGroup({ kind: "bulk", choice });
-    toast.success(res.conflictCount === 0 ? "All changes resolved." : `${plural(res.conflictCount, "change")} left to review.`);
+    toast.success(res.conflictCount === 0 ? __tr("All changes resolved.") : __tr("{v0} left to review.", { v0: (plural(res.conflictCount, "change")) }));
   } catch (err) {
-    toast.error("Could not resolve", errorText(err, "Try again."));
+    toast.error(__tr("Could not resolve"), errorText(err, __tr("Try again.")));
   }
 }
 
@@ -50,7 +51,7 @@ function GroupDetail({ group }: { group: ConflictGroup }) {
     <div className="space-y-3">
       <div>
         <h3 className="text-body font-semibold text-ink">{group.title}</h3>
-        {group.snoozed && <p className="mt-0.5 text-label text-ink-muted">Snoozed on this device. The newest version is in use.</p>}
+        {group.snoozed && <p className="mt-0.5 text-label text-ink-muted">{__tr("Snoozed on this device. The newest version is in use.")}</p>}
       </div>
       {group.items.map((item, i) => (
         <ConflictItemView key={`${rowKeyString(group.row)}-${i}`} item={item} title={group.title} />
@@ -93,20 +94,20 @@ export default function ConflictReviewPanel({ initialRow }: { initialRow: SyncRo
     >
       <DialogHeader className="[&>h2]:flex-none">
         <span className="flex-1 text-label text-ink-muted">{plural(groups.length, "item")}</span>
-        <Button size="sm" disabled={groups.length === 0} onClick={() => void bulkResolve("keep-newest-all")}>Keep newest for all</Button>
-        <Button size="sm" disabled={groups.length === 0} onClick={() => void bulkResolve("keep-newest-older-apps")}>Keep newest for older-app changes</Button>
+        <Button size="sm" disabled={groups.length === 0} onClick={() => void bulkResolve("keep-newest-all")}>{__tr("Keep newest for all")}</Button>
+        <Button size="sm" disabled={groups.length === 0} onClick={() => void bulkResolve("keep-newest-older-apps")}>{__tr("Keep newest for older-app changes")}</Button>
       </DialogHeader>
       <div className="px-4"><SyncNoticeList /></div>
       {groups.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-2 text-ink-muted">
           <IconSlot icon="circleCheck" size={32} className="text-success" />
-          <p className="text-body">Nothing to review. Every device agrees.</p>
+          <p className="text-body">{__tr("Nothing to review. Every device agrees.")}</p>
         </div>
       ) : (
         <div className="mt-3 flex min-h-0 flex-1 border-t border-stroke">
           <GroupList groups={groups} selected={selected} onSelect={setSelected} />
           <div className="flex-1 overflow-y-auto p-4">
-            {current ? <GroupDetail group={current} /> : <p className="text-body text-ink-muted">This item was resolved, maybe on another device. Pick another item.</p>}
+            {current ? <GroupDetail group={current} /> : <p className="text-body text-ink-muted">{__tr("This item was resolved, maybe on another device. Pick another item.")}</p>}
           </div>
         </div>
       )}

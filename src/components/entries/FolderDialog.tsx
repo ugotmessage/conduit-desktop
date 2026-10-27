@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { useEntryStore } from "../../stores/entryStore";
 import { useVaultStore } from "../../stores/vaultStore";
@@ -61,7 +62,7 @@ export default function FolderDialog({ onClose, parentId, editingFolderId }: Fol
   const FolderIcon = getEntryIcon("folder", false, customIcon);
   const colorResult = getEntryColor("folder", customColor);
 
-  const title = isEditing ? "Edit Folder" : "New Folder";
+  const title = isEditing ? __tr("Edit Folder") : __tr("New Folder");
 
   return (
     <Dialog
@@ -85,10 +86,10 @@ export default function FolderDialog({ onClose, parentId, editingFolderId }: Fol
       {isViewerInTeamVault && <ViewOnlyNotice />}
 
       <DialogBody className="py-4">
-        <Field label="Folder Name">
-          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="My Servers" autoFocus />
+        <Field label={__tr("Folder Name")}>
+          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder={__tr("My Servers")} autoFocus />
         </Field>
-        <Field label="Appearance" group>
+        <Field label={__tr("Appearance")} group>
           <AppearancePickers
             Icon={FolderIcon}
             colorResult={colorResult}
@@ -103,7 +104,7 @@ export default function FolderDialog({ onClose, parentId, editingFolderId }: Fol
       </DialogBody>
 
       <DialogFooter>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{__tr("Cancel")}</Button>
         <Button
           type="submit"
           variant="primary"
@@ -111,7 +112,7 @@ export default function FolderDialog({ onClose, parentId, editingFolderId }: Fol
           loading={isSubmitting}
           loadingLabel={isEditing ? "Saving..." : "Creating..."}
         >
-          {isEditing ? "Save" : "Create"}
+          {isEditing ? __tr("Save") : __tr("Create")}
         </Button>
       </DialogFooter>
     </Dialog>

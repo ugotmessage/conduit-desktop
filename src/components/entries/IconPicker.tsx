@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useRef, useEffect, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { ICON_CATEGORIES, resolveIcon } from "./iconRegistry";
@@ -63,12 +64,12 @@ export default function IconPicker({ value, onSelect, onClose, customColor, anch
       style={{ top: pos.top, left: pos.left, maxHeight: "360px" }}
     >
       <div className="flex items-center justify-between px-3 pb-1 pt-3">
-        <span className={PICKER_TITLE}>Icon</span>
-        <IconButton size="sm" icon="close" label="Close" onClick={onClose} />
+        <span className={PICKER_TITLE}>{__tr("Icon")}</span>
+        <IconButton size="sm" icon="close" label={__tr("Close")} onClick={onClose} />
       </div>
 
       <div className="px-3 pb-2">
-        <SearchInput ref={searchRef} value={search} onChange={setSearch} placeholder="Search icons..." />
+        <SearchInput ref={searchRef} value={search} onChange={setSearch} placeholder={__tr("Search icons...")} />
       </div>
 
       <div className="px-3 pb-2">
@@ -78,8 +79,7 @@ export default function IconPicker({ value, onSelect, onClose, customColor, anch
           {...(value === null ? { "data-selected": "" } : {})}
           className={defaultRowClass(value === null)}
         >
-          Use Default
-        </button>
+          {__tr("Use Default")}</button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 pb-3">
@@ -110,7 +110,7 @@ export default function IconPicker({ value, onSelect, onClose, customColor, anch
           </div>
         ))}
         {filteredCategories.length === 0 && (
-          <p className="py-4 text-center text-meta text-ink-muted">No icons match "{search}"</p>
+          <p className="py-4 text-center text-meta text-ink-muted">{__tr("No icons match \"")}{search}"</p>
         )}
       </div>
     </div>,

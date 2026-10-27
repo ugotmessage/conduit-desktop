@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect } from "react";
 import { invoke } from "../../lib/electron";
 import { toast } from "../common/Toast";
@@ -34,7 +35,7 @@ export default function PasswordHistoryDialog({ entryId, entryName, onClose }: P
       });
       setHistory(entries);
     } catch (err) {
-      toast.error(errorText(err, "Failed to load password history"));
+      toast.error(errorText(err, __tr("Failed to load password history")));
     } finally {
       setLoading(false);
     }
@@ -58,9 +59,9 @@ export default function PasswordHistoryDialog({ entryId, entryName, onClose }: P
     try {
       await invoke("password_history_delete", { id: historyId });
       setHistory((prev) => prev.filter((h) => h.id !== historyId));
-      toast.success("History entry deleted");
+      toast.success(__tr("History entry deleted"));
     } catch (err) {
-      toast.error(errorText(err, "Failed to delete history entry"));
+      toast.error(errorText(err, __tr("Failed to delete history entry")));
     }
   };
 
@@ -78,7 +79,7 @@ export default function PasswordHistoryDialog({ entryId, entryName, onClose }: P
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard`);
+    toast.success(__tr("{v0} copied to clipboard", { v0: (label) }));
   };
 
   const canDelete = vaultType === "personal" || myVaultRole === "admin";
@@ -88,20 +89,19 @@ export default function PasswordHistoryDialog({ entryId, entryName, onClose }: P
     <>
       {isFreeTier && (
         <p className="mr-auto self-center text-meta text-ink-faint">
-          Free plan shows {limit} most recent changes.{" "}
+          {__tr("Free plan shows")} {limit} {__tr("most recent changes.")}{" "}
           <Button variant="link" size="sm" onClick={() => invoke("auth_open_pricing")} className="underline">
-            Upgrade for full history.
-          </Button>
+            {__tr("Upgrade for full history.")}</Button>
         </p>
       )}
-      <Button onClick={onClose}>Close</Button>
+      <Button onClick={onClose}>{__tr("Close")}</Button>
     </>
   );
 
   return (
     <Dialog
       open
-      title="Password History"
+      title={__tr("Password History")}
       icon="history"
       width={520}
       style={{ maxHeight: 600 }}
@@ -119,7 +119,7 @@ export default function PasswordHistoryDialog({ entryId, entryName, onClose }: P
 
       {!loading && history.length === 0 && (
         <div className="py-4">
-          <EmptyState icon="history" title="No password changes recorded yet" />
+          <EmptyState icon="history" title={__tr("No password changes recorded yet")} />
         </div>
       )}
 
@@ -140,14 +140,14 @@ export default function PasswordHistoryDialog({ entryId, entryName, onClose }: P
                         <IconButton
                           size="sm"
                           icon={visible ? "eyeOff" : "eye"}
-                          label={visible ? "Hide password" : "Show password"}
+                          label={visible ? __tr("Hide password") : __tr("Show password")}
                           onClick={() => togglePasswordVisibility(entry.id)}
                         />
-                        <IconButton size="sm" icon="copy" label="Copy password" onClick={() => copyToClipboard(entry.password!, "Password")} />
+                        <IconButton size="sm" icon="copy" label={__tr("Copy password")} onClick={() => copyToClipboard(entry.password!, "Password")} />
                       </>
                     )}
                     {canDelete && (
-                      <IconButton size="sm" icon="trash" tone="danger" label="Delete history entry" onClick={() => handleDelete(entry.id)} />
+                      <IconButton size="sm" icon="trash" tone="danger" label={__tr("Delete history entry")} onClick={() => handleDelete(entry.id)} />
                     )}
                   </div>
                 </div>
@@ -155,7 +155,7 @@ export default function PasswordHistoryDialog({ entryId, entryName, onClose }: P
                 {entry.username && (
                   <div className="mb-1 flex items-center gap-1.5 text-label">
                     <UserIcon size={12} compact className="text-ink-faint" />
-                    <span className="text-ink-muted">Username</span>
+                    <span className="text-ink-muted">{__tr("Username")}</span>
                     <span className="text-ink">{entry.username}</span>
                   </div>
                 )}
@@ -163,12 +163,12 @@ export default function PasswordHistoryDialog({ entryId, entryName, onClose }: P
                 {entry.password && (
                   <div className="mb-1 flex items-center gap-1.5 text-label">
                     <LockIcon size={12} compact className="text-ink-faint" />
-                    <span className="text-ink-muted">Password</span>
+                    <span className="text-ink-muted">{__tr("Password")}</span>
                     <span className="font-mono text-ink">{visible ? entry.password : "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"}</span>
                   </div>
                 )}
 
-                {entry.changed_by && <div className="mt-1 text-meta text-ink-faint">Changed by {entry.changed_by}</div>}
+                {entry.changed_by && <div className="mt-1 text-meta text-ink-faint">{__tr("Changed by")} {entry.changed_by}</div>}
               </div>
             );
           })}

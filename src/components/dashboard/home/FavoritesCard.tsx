@@ -1,3 +1,4 @@
+import { t as __tr } from "../../../lib/i18n";
 import { useMemo } from "react";
 import { useEntryStore } from "../../../stores/entryStore";
 import { Card, ListRow, SectionHeader } from "../../ui";
@@ -11,7 +12,7 @@ export default function FavoritesCard() {
   if (favorites.length === 0) return null;
   return (
     <Card>
-      <SectionHeader title="Favorites" />
+      <SectionHeader title={__tr("Favorites")} />
       <div className="space-y-px">
         {favorites.map((entry) => (
           <ListRow

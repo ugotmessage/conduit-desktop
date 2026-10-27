@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { syncApi } from "../../lib/sync-api";
 import { toast } from "../common/Toast";
 import type { OpenErrorPayload, TakeoverHolder } from "../../types/sync";
@@ -17,7 +18,7 @@ interface TakeoverDialogProps {
 function openPricing(): void {
   syncApi.openPricing().catch((err) => {
     console.error("[sync] Failed to open pricing:", err);
-    toast.error("Could not open the pricing page");
+    toast.error(__tr("Could not open the pricing page"));
   });
 }
 
@@ -25,7 +26,7 @@ function HolderLine({ holder }: { holder: TakeoverHolder }) {
   const busy = holderBusyText(deviceNameOr(holder.deviceName), holder.busySessions, holder.busyJobs);
   return (
     <Card className="space-y-1">
-      <p className="text-ink">This vault is open on {holderActivity(holder)}.</p>
+      <p className="text-ink">{__tr("This vault is open on")} {holderActivity(holder)}.</p>
       {busy && <p className="text-label text-ink-muted">{busy}</p>}
     </Card>
   );
@@ -46,24 +47,23 @@ function DeviceCapDialog({ payload, busy, onUseHere, onCancel }: TakeoverDialogP
     <SyncDialogFrame
       icon="devices"
       tone="warn"
-      title="Too many devices"
+      title={__tr("Too many devices")}
       onEscape={onCancel}
       footer={
         <>
-          <DialogButton onClick={onCancel} disabled={busy}>Cancel</DialogButton>
+          <DialogButton onClick={onCancel} disabled={busy}>{__tr("Cancel")}</DialogButton>
           <DialogButton variant="primary" onClick={onUseHere} loading={busy} loadingLabel="Opening..." autoFocus>
-            Use here instead
-          </DialogButton>
+            {__tr("Use here instead")}</DialogButton>
         </>
       }
     >
-      <p className="text-ink">You're using Conduit on {n} devices. Close one to use it here.</p>
+      <p className="text-ink">{__tr("You're using Conduit on")} {n} {__tr("devices. Close one to use it here.")}</p>
       {payload.holders.map((h) => (
         <Card key={h.deviceId}>
           <p className="text-ink">{deviceHolderLine(h)}</p>
         </Card>
       ))}
-      <p>Conduit will lock your vaults on {victim}, the one you used least recently.</p>
+      <p>{__tr("Conduit will lock your vaults on")} {victim}{__tr(", the one you used least recently.")}</p>
     </SyncDialogFrame>
   );
 }
@@ -79,30 +79,27 @@ export default function TakeoverDialog(props: TakeoverDialogProps) {
     <SyncDialogFrame
       icon="devices"
       tone="warn"
-      title="Vault open on another device"
+      title={__tr("Vault open on another device")}
       onEscape={onCancel}
       footer={
         <>
-          {freePlan && <DialogButton onClick={openPricing}>Upgrade to Pro</DialogButton>}
-          <DialogButton onClick={onCancel} disabled={busy}>Cancel</DialogButton>
+          {freePlan && <DialogButton onClick={openPricing}>{__tr("Upgrade to Pro")}</DialogButton>}
+          <DialogButton onClick={onCancel} disabled={busy}>{__tr("Cancel")}</DialogButton>
           <DialogButton variant="primary" onClick={onUseHere} loading={busy} loadingLabel="Opening..." autoFocus>
-            Use here instead
-          </DialogButton>
+            {__tr("Use here instead")}</DialogButton>
         </>
       }
     >
       {payload.holders.length === 0 ? (
-        <p>This vault is open on another device.</p>
+        <p>{__tr("This vault is open on another device.")}</p>
       ) : (
         payload.holders.map((h) => <HolderLine key={h.deviceId} holder={h} />)
       )}
       {payload.locationDiffers && first && (
         <p>
-          {deviceNameOr(first.deviceName)} has this vault open from {providerName(first.location)}. That may be a
-          different copy than the one you are opening.
-        </p>
+          {deviceNameOr(first.deviceName)} {__tr("has this vault open from")} {providerName(first.location)}{__tr(". That may be a different copy than the one you are opening.")}</p>
       )}
-      {freePlan && <p className="text-ink-muted">On the Free plan a vault can be open on one device at a time.</p>}
+      {freePlan && <p className="text-ink-muted">{__tr("On the Free plan a vault can be open on one device at a time.")}</p>}
       {alsoLocks && <p>{alsoLocks}</p>}
     </SyncDialogFrame>
   );

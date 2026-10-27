@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useRef, useState } from "react";
 import { invoke } from "../../lib/electron";
 import { errorText } from "../../lib/errorText";
@@ -36,10 +37,10 @@ export default function AddSecretPopover({ ownerId, onInsert }: AddSecretPopover
       });
       await loadAll();
       onInsert({ id: created.id, label: label.trim() || "Secret" });
-      toast.success(generate ? "Secret generated and encrypted" : "Secret encrypted");
+      toast.success(generate ? __tr("Secret generated and encrypted") : __tr("Secret encrypted"));
       close();
     } catch (err) {
-      toast.error(errorText(err, "Couldn't save the secret"));
+      toast.error(errorText(err, __tr("Couldn't save the secret")));
     } finally {
       setBusy(false);
     }
@@ -47,7 +48,7 @@ export default function AddSecretPopover({ ownerId, onInsert }: AddSecretPopover
 
   return (
     <span ref={anchorRef} className="inline-flex">
-      <IconButton size="sm" icon="key" label="Add encrypted secret" onClick={() => setOpen((o) => !o)} />
+      <IconButton size="sm" icon="key" label={__tr("Add encrypted secret")} onClick={() => setOpen((o) => !o)} />
       <Popover anchorRef={anchorRef} open={open} onClose={close} placement="bottom-start">
         <form
           className="w-72 space-y-2 p-2"
@@ -58,20 +59,18 @@ export default function AddSecretPopover({ ownerId, onInsert }: AddSecretPopover
             if (value) void save(false);
           }}
         >
-          <FormField label="Label">
-            <TextInput value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Local admin" autoFocus maxLength={80} />
+          <FormField label={__tr("Label")}>
+            <TextInput value={label} onChange={(e) => setLabel(e.target.value)} placeholder={__tr("Local admin")} autoFocus maxLength={80} />
           </FormField>
-          <FormField label="Value">
-            <PasswordInput value={value} onChange={(e) => setValue(e.target.value)} placeholder="Leave empty to generate" />
+          <FormField label={__tr("Value")}>
+            <PasswordInput value={value} onChange={(e) => setValue(e.target.value)} placeholder={__tr("Leave empty to generate")} />
           </FormField>
-          <p className="text-label text-ink-faint">Stored encrypted. The notes keep only a link to it.</p>
+          <p className="text-label text-ink-faint">{__tr("Stored encrypted. The notes keep only a link to it.")}</p>
           <div className="flex justify-end gap-2">
             <Button type="button" onClick={() => void save(true)} disabled={busy || value.length > 0}>
-              Generate
-            </Button>
+              {__tr("Generate")}</Button>
             <Button type="submit" variant="primary" disabled={busy || value.length === 0} loading={busy && value.length > 0}>
-              Add
-            </Button>
+              {__tr("Add")}</Button>
           </div>
         </form>
       </Popover>

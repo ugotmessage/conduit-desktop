@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState, useEffect, useCallback } from "react";
 import { listen } from "../../lib/electron";
 import { AlertTriangleIcon, CheckIcon, HammerIcon } from "../../lib/icons";
@@ -36,7 +37,7 @@ export default function StartupStatus() {
         const next = new Map(prev);
         next.set("freerdp", {
           id: "freerdp",
-          label: "FreeRDP Helper",
+          label: __tr("FreeRDP Helper"),
           phase,
           message,
           detail,
@@ -108,7 +109,7 @@ export default function StartupStatus() {
         </div>
       )}
 
-      <IconButton icon="close" label="Dismiss" size="sm" className="ml-auto" onClick={handleDismiss} />
+      <IconButton icon="close" label={__tr("Dismiss")} size="sm" className="ml-auto" onClick={handleDismiss} />
     </div>
   );
 }

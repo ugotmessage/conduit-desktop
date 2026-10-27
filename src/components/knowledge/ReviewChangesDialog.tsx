@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import { useState } from "react";
 import { baselineRevision, readHistory, type KbMeta } from "../../lib/kb";
 import type { EntryMeta } from "../../types/entry";
@@ -19,7 +20,7 @@ export default function ReviewChangesDialog({ entry, kb, onClose }: { entry: Ent
       : await kbCall(command, { id: entry.id }, "Couldn't update the article");
     setBusy(false);
     if (ok !== null) {
-      toast.success(command === "kb_keep" ? "Changes kept" : command === "kb_undo" ? "Agent changes undone" : "Article archived");
+      toast.success(command === "kb_keep" ? __tr("Changes kept") : command === "kb_undo" ? __tr("Agent changes undone") : __tr("Article archived"));
       onClose();
     }
   };
@@ -27,7 +28,7 @@ export default function ReviewChangesDialog({ entry, kb, onClose }: { entry: Ent
   return (
     <Dialog
       open
-      title={`Review changes by ${editorLabel(kb)}`}
+      title={__tr("Review changes by {v0}", { v0: (editorLabel(kb)) })}
       icon="robot"
       size="lg"
       onClose={onClose}
@@ -35,16 +36,13 @@ export default function ReviewChangesDialog({ entry, kb, onClose }: { entry: Ent
         <>
           {baseline ? (
             <Button onClick={() => void act("kb_undo")} disabled={busy}>
-              Undo changes
-            </Button>
+              {__tr("Undo changes")}</Button>
           ) : (
             <Button variant="danger" onClick={() => void act("archive")} disabled={busy}>
-              Archive article
-            </Button>
+              {__tr("Archive article")}</Button>
           )}
           <Button variant="primary" onClick={() => void act("kb_keep")} loading={busy}>
-            Keep
-          </Button>
+            {__tr("Keep")}</Button>
         </>
       }
     >
@@ -52,7 +50,7 @@ export default function ReviewChangesDialog({ entry, kb, onClose }: { entry: Ent
         <DiffView before={baseline.content} after={contentOf(entry)} />
       ) : (
         <>
-          <p className="mb-2 text-body text-ink-muted">An agent created this article and nobody has reviewed it yet.</p>
+          <p className="mb-2 text-body text-ink-muted">{__tr("An agent created this article and nobody has reviewed it yet.")}</p>
           <DiffView before="" after={contentOf(entry)} />
         </>
       )}

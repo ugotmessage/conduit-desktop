@@ -1,3 +1,4 @@
+import { t as __tr } from "../../lib/i18n";
 import {
   BoldIcon, CodeIcon, Heading1Icon, Heading2Icon, ItalicIcon, LinkIcon, ListIcon, ListNumbersIcon, LockIcon, PhotoIcon, QuoteIcon, StrikethroughIcon, TableIcon
 } from "../../lib/icons";
@@ -51,34 +52,34 @@ export const TABLE_TEMPLATE = `| Column 1 | Column 2 | Column 3 |
 export const toolbarActions: ToolbarAction[] = [
   {
     icon: BoldIcon,
-    title: "Bold",
+    title: __tr("Bold"),
     action: (ta, v) => wrapSelection(ta, v, "**", "**", "bold text"),
   },
   {
     icon: ItalicIcon,
-    title: "Italic",
+    title: __tr("Italic"),
     action: (ta, v) => wrapSelection(ta, v, "_", "_", "italic text"),
   },
   {
     icon: StrikethroughIcon,
-    title: "Strikethrough",
+    title: __tr("Strikethrough"),
     action: (ta, v) => wrapSelection(ta, v, "~~", "~~", "strikethrough"),
   },
   { separator: true },
   {
     icon: Heading1Icon,
-    title: "Heading 1",
+    title: __tr("Heading 1"),
     action: (ta, v) => prefixLine(ta, v, "# "),
   },
   {
     icon: Heading2Icon,
-    title: "Heading 2",
+    title: __tr("Heading 2"),
     action: (ta, v) => prefixLine(ta, v, "## "),
   },
   { separator: true },
   {
     icon: LinkIcon,
-    title: "Link",
+    title: __tr("Link"),
     action: (ta, v) => {
       const start = ta.selectionStart;
       const end = ta.selectionEnd;
@@ -92,7 +93,7 @@ export const toolbarActions: ToolbarAction[] = [
   },
   {
     icon: PhotoIcon,
-    title: "Image",
+    title: __tr("Image"),
     action: (ta, v) => {
       const start = ta.selectionStart;
       const insert = "![alt text](image-url)";
@@ -103,7 +104,7 @@ export const toolbarActions: ToolbarAction[] = [
   { separator: true },
   {
     icon: CodeIcon,
-    title: "Code",
+    title: __tr("Code"),
     action: (ta, v) => {
       const start = ta.selectionStart;
       const end = ta.selectionEnd;
@@ -116,17 +117,17 @@ export const toolbarActions: ToolbarAction[] = [
   },
   {
     icon: ListIcon,
-    title: "Bullet List",
+    title: __tr("Bullet List"),
     action: (ta, v) => prefixLine(ta, v, "- "),
   },
   {
     icon: ListNumbersIcon,
-    title: "Numbered List",
+    title: __tr("Numbered List"),
     action: (ta, v) => prefixLine(ta, v, "1. "),
   },
   {
     icon: TableIcon,
-    title: "Table",
+    title: __tr("Table"),
     action: (ta, v) => {
       const start = ta.selectionStart;
       const needsNewline = start > 0 && v[start - 1] !== "\n" ? "\n" : "";
@@ -138,12 +139,12 @@ export const toolbarActions: ToolbarAction[] = [
   { separator: true },
   {
     icon: LockIcon,
-    title: "Secret (!!secret!!, encrypted when saved)",
+    title: __tr("Secret (!!secret!!, encrypted when saved)"),
     action: (ta, v) => wrapSelection(ta, v, "!!", "!!", "secret"),
   },
   {
     icon: QuoteIcon,
-    title: "Blockquote",
+    title: __tr("Blockquote"),
     action: (ta, v) => prefixLine(ta, v, "> "),
   },
 ];
