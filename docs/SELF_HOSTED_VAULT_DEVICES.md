@@ -4,7 +4,7 @@ This fork adds an **opt-in seed-time setting** to allow concurrent opening of a 
 
 ## Scope
 
-- Only applies to a **new private Appwrite stack** provisioned with `CONDUIT_SELF_HOSTED=1`.
+- Only applies to a **private Appwrite stack** provisioned with `CONDUIT_SELF_HOSTED=1`.
 - Sets the **Free** tier's `vault_max_open_devices` to `-1`. Pro/Team remain unchanged.
 - Does not remove the account-level device cap (currently five), ownership rules, minimum-version checks, or the existing synchronization safety protocol.
 - Does not enable paid cloud backup, team vaults, or paid chat sync.
@@ -19,7 +19,7 @@ This fork adds an **opt-in seed-time setting** to allow concurrent opening of a 
 4. Verify on the server that the Free tier's `features.vault_max_open_devices` is `-1` before testing two signed-in clients.
 5. Place the same `.conduit` vault file in a shared/synced location accessible to both clients and verify changes merge; backing up the vault before tests is strongly recommended.
 
-**Existing installations:** The seed routine uses `ignoreDuplicates: true`; do not expect an existing Free tier row to be updated. Changing existing tier rows requires an explicit migration/admin operation on **your own** backend. No migration is included here.
+**Existing private installations:** Running the deployment with `CONDUIT_SELF_HOSTED=1` and `--seed` also updates the existing Free tier row. Back up the tier configuration first. This is deliberately opt-in and does not modify an official service.
 
 ## Verification checklist
 
@@ -30,3 +30,7 @@ This fork adds an **opt-in seed-time setting** to allow concurrent opening of a 
 - On the official backend or without the environment opt-in, the Free tier remains limited.
 
 This patch has **not** been validated end-to-end against a running Appwrite instance or a packaged macOS/Windows build. It changes the private backend's seed configuration only.
+
+## VNC cursor fallback
+
+The VNC renderer now sets noVNC `showDotCursor = true`, enabling its fallback dot when a VNC server supplies a hidden/empty cursor. This does not modify the remote machine's pointer, and does not guarantee repair if a server incorrectly sends an opaque but invisible-looking cursor bitmap. Verify against the affected VNC server and check cursor visibility, movement, and input alignment at multiple display scales.
