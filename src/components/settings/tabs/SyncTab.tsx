@@ -8,7 +8,8 @@ import { errorText } from "../../../lib/errorText";
 import { toast } from "../../common/Toast";
 import SyncDevicesList from "../../sync/SyncDevicesList";
 import SyncNoticeList from "../../sync/SyncNoticeList";
-import { Button, Card, SectionHeader } from "../../ui";
+import { Button, Card, SectionHeader, Switch } from "../../ui";
+import type { TabProps } from "../SettingsHelpers";
 import { HINT } from "../settings-styles";
 import { deviceCapText, deviceLimitText, ownerLineText, releaseAfterText, statusDetail, statusLabel } from "../../sync/sync-copy";
 
@@ -92,8 +93,9 @@ function OwnerBlock() {
 }
 
 /** Settings > Sync: plan limit, status, devices and review tools. Sync itself has no on/off switch. */
-export default function SyncTab() {
+export default function SyncTab({ settings, setSettings }: TabProps) {
   const vaultType = useVaultStore((s) => s.vaultType);
+  const signedIn = useAuthStore((s) => s.isAuthenticated);
   const stateLimit = useSyncStore((s) => s.state?.deviceLimit ?? null);
   const tierLimit = useTierStore((s) => s.maxOpenDevices);
   const engineRunning = useSyncStore((s) => activeStatus(s.state) !== null);
@@ -118,6 +120,28 @@ export default function SyncTab() {
           {capText && ` ${capText}`}
         </p>
         {killSwitch && <p data-cv-sync-paused="" className="mt-2 text-meta text-warning">Conduit paused syncing for now. Your changes are saved on this device.</p>}
+      </Section>
+      <Section title="Local file sync (no server required)">
+        <Card className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-body font-semibold text-ink">Allow concurrent access in Local Mode</p>
+            <p className={HINT}>
+              Use a shared encrypted .conduit file in Synology Drive, iCloud Drive, OneDrive or
+              another synced folder. No account or Appwrite server is required.
+            </p>
+          </div>
+          <Switch
+            checked={settings.local_file_sync_unlimited === true}
+            onChange={(checked) => setSettings((old) => ({ ...old, local_file_sync_unlimited: checked }))}
+            label="Allow concurrent access in Local Mode"
+          />
+        </Card>
+        <p className={HINT}>
+          Save, then lock and reopen the vault on each device. Only works when signed out (Local Mode).
+          {signedIn ? " You are currently signed in; this option will not override your account's plan." : ""}
+          {" "}Keep independent backups, only open vaults you own, and review any sync conflicts before accepting them.
+          The local app maintains a working copy; do not directly edit the synced file with another SQLite tool.
+        </p>
       </Section>
       {vaultType === "personal" && (
         <Section title="This vault">
