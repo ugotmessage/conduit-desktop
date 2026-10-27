@@ -115,9 +115,9 @@ export default function SyncTab({ settings, setSettings }: TabProps) {
           Conduit merges changes from every device that opens a vault file in a synced folder.
         </p>
         <p data-cv-sync-plan="" className={`mt-2 ${HINT}`}>
-          Your plan: a vault can be open {deviceLimitText(stateLimit ?? tierLimit)}
-          {stateLimit?.source === "dev-override" ? " (dev override)" : ""}. Team vaults sync through your team.
-          {capText && ` ${capText}`}
+          {settings.local_file_sync_unlimited === true && !signedIn
+            ? "Local Mode: concurrent vault opening is enabled after locking and reopening your vault."
+            : <>Your plan: a vault can be open {deviceLimitText(stateLimit ?? tierLimit)}{stateLimit?.source === "dev-override" ? " (dev override)" : ""}. Team vaults sync through your team.{capText && ` ${capText}`}</>}
         </p>
         {killSwitch && <p data-cv-sync-paused="" className="mt-2 text-meta text-warning">Conduit paused syncing for now. Your changes are saved on this device.</p>}
       </Section>
@@ -126,7 +126,7 @@ export default function SyncTab({ settings, setSettings }: TabProps) {
           <div className="min-w-0">
             <p className="text-body font-semibold text-ink">Allow concurrent access in Local Mode</p>
             <p className={HINT}>
-              Use a shared encrypted .conduit file in Synology Drive, iCloud Drive, OneDrive or
+              Use a shared .conduit vault file in Synology Drive, iCloud Drive, OneDrive or
               another synced folder. No account or Appwrite server is required.
             </p>
           </div>
