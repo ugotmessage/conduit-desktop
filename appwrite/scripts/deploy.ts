@@ -201,7 +201,7 @@ async function seed(): Promise<void> {
   const service = { role: 'service' as const, uid: null, email: null };
   // Opt-in for private Appwrite deployments only. This does not alter the vendor backend.
   const selfHosted = env.CONDUIT_SELF_HOSTED === '1';
-  if (selfHosted && /cloudwise\\.ca|conduitdesktop\\.com/i.test(env.APPWRITE_ENDPOINT ?? '')) {
+  if (selfHosted && /cloudwise\.ca|conduitdesktop\.com/i.test(env.APPWRITE_ENDPOINT ?? '')) {
     throw new Error('Refusing self-hosted plan changes against an official Conduit endpoint');
   }
   const tiers = selfHosted
