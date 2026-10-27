@@ -22,6 +22,8 @@ export interface Settings {
   session_defaults_ssh: SshGlobalDefaults;
   /** Multi-device sync (on by default). No UI; support can turn it off through sync_set_enabled. */
   personal_sync_enabled: boolean;
+  /** Opt-in local mode: permit multiple devices on a synced .conduit file. */
+  local_file_sync_unlimited: boolean;
   /** Idle auto-lock in minutes; 0 = off (the default). */
   vault_idle_lock_minutes: number;
   /** Saved by updater_set_beta_updates, not by Save; undefined = follow the running version. */
