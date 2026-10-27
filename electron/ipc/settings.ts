@@ -113,6 +113,8 @@ export interface AppSettings {
   engine_picker_completed: boolean;
   // Personal-vault multi-device sync; no UI, kept for support (docs/MULTI_DEVICE_SYNC.md 5.11)
   personal_sync_enabled: boolean;
+  // Fork opt-in: permit concurrent local-mode vault access via synced file (no service).
+  local_file_sync_unlimited: boolean;
   // Idle auto-lock of the personal vault in minutes; 0 = off
   vault_idle_lock_minutes: number;
   // What opens at startup (docs/AUTO_UNLOCK.md 3.5); null = the last team vault used, else the Vault Hub
@@ -152,6 +154,7 @@ const defaultSettings: AppSettings = {
   analytics_opt_out: false,
   engine_picker_completed: false,
   personal_sync_enabled: true,
+  local_file_sync_unlimited: false,
   vault_idle_lock_minutes: 0,
   startup_vault: null,
 };
