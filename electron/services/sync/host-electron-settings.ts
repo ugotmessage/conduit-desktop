@@ -17,6 +17,8 @@ export interface SettingsSource {
 
 /** settings.json key of multi-device sync on this device (absent means on; no UI). */
 export const PERSONAL_SYNC_SETTING = 'personal_sync_enabled';
+/** Explicit opt-in: no server lease or owner-claim cap in signed-out local file mode. */
+export const LOCAL_FILE_SYNC_SETTING = 'local_file_sync_unlimited';
 /** settings.json key of the optional idle auto-lock, in minutes (absent or 0 means off). */
 export const IDLE_LOCK_SETTING = 'vault_idle_lock_minutes';
 
@@ -33,6 +35,11 @@ function stringList(v: unknown): readonly string[] {
 /** Missing or malformed reads as on (the engine is on by default). */
 export function personalSyncEnabled(s: RawSettings): boolean {
   return s[PERSONAL_SYNC_SETTING] !== false;
+}
+
+/** Only a strict true opts in; an absent or malformed setting keeps standard enforcement. */
+export function localFileSyncEnabled(settings: RawSettings, userId: string | null): boolean {
+  return settings[LOCAL_FILE_SYNC_SETTING] === true && userId === null;
 }
 
 /** Idle auto-lock minutes; 0 when off or malformed. */
