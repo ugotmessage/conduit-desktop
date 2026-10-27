@@ -31,7 +31,7 @@ import {
 import type { SessionHost, VaultAccessHost } from '../vault-session/host.js';
 import { createConsoleLogger, nodeRandom } from './host-node.js';
 import { createElectronSyncHost, sendToAll, allWindows, type AuthSource, type SyncableVault, type WindowList } from './host-electron.js';
-import { PERSONAL_SYNC_SETTING, personalSyncEnabled, type SettingsSource } from './host-electron-settings.js';
+import { LOCAL_FILE_SYNC_SETTING, PERSONAL_SYNC_SETTING, localFileSyncEnabled, personalSyncEnabled, type SettingsSource } from './host-electron-settings.js';
 import { SYNC_LOG_PREFIX, type SyncHost, type SyncLogger, type WaitingState } from './host.js';
 import { FINAL_CYCLE_CAP_MS } from './sync-engine.js';
 import { hasConflict } from './conflicts.js';
@@ -39,6 +39,7 @@ import { TBL } from './types.js';
 import { loadLaunchIdentity, type LaunchIdentity } from './app-sync-identity.js';
 import { openInPlace } from './app-sync-open.js';
 import { devDeviceLimitOverride, devLimitCollaborators } from './app-sync-dev.js';
+import { UNLIMITED } from '../vault-session/effective-limit.js';
 import { devIgnoreOwnerTag } from './app-sync-dev-owner.js';
 import { exportClosedLineage, lineageForPath, pendingVaults, type LineageLookupDeps } from './app-sync-lineage.js';
 import { exportUnsynced as exportOpen, sideFileTuples } from './app-sync-actions.js';
@@ -207,14 +208,19 @@ export class AppSyncManager {
       create: req.create === true,
       recoverWorkingCopy: req.recoverWorkingCopy === true,
     };
+    // This opt-in affects only signed-out Local Mode, never an authenticated account
+    // or its server-authoritative plan limit. Read at unlock: changing settings
+    // requires closing and reopening the vault.
+    const localFileSync = localFileSyncEnabled(this.deps.settings.read(), s.syncHost.account.userId());
     const openDeps: OpenDeps = {
       host: s.sessionHost,
       config: s.identity.config,
       progress: this.progress(),
       incarnations: s.identity.incarnations,
       tickets: this.tickets,
-      collaborators: devLimitCollaborators(s.devLimit),
-      ignoreOwnerTag: s.ignoreOwnerTag,
+      collaborators: devLimitCollaborators(localFileSync ? UNLIMITED : s.devLimit),
+      ignoreOwnerTag: localFileSync || s.ignoreOwnerTag,
+      localFileSync,
     };
     try {
       const opened = await this.slot.open(() => (this.isEnabled() ? openPersonalVault(input, openDeps) : openInPlace(input, openDeps)));
@@ -304,6 +310,8 @@ export class AppSyncManager {
   deviceLimit(): Dto.DeviceLimit | null {
     const o = this.opened;
     if (o === null) return null;
+    const localFileSync = localFileSyncEnabled(this.deps.settings.read(), this.started?.syncHost.account.userId() ?? null);
+    if (localFileSync) return { limit: UNLIMITED, source: 'default' };
     const forced = this.started?.devLimit ?? null;
     if (forced !== null) return { limit: forced, source: 'dev-override' };
     const e = o.runtime.effectiveLimit();
