@@ -10,8 +10,7 @@ permissions:
 
 concurrency:
   group: pr-installers-${{ github.ref }}
-  # Let native dependency builds finish and save their caches before the next revision.
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
