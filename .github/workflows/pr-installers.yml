@@ -67,7 +67,13 @@ jobs:
         run: >-
           npx vitest run
           electron/services/ssh/__tests__
+          electron/services/terminal/__tests__/ssh-startup.test.ts
           electron/ipc-server/__tests__/server-agent-sessions.test.ts
+          electron/ipc-server/__tests__/ssh-startup-open.test.ts
+          src/stores/__tests__/entry-ssh-startup.test.ts
+          src/components/entries/__tests__/SshStartupTab.test.tsx
+          src/components/entries/__tests__/EntryDialog.test.tsx
+          src/components/connections/__tests__/QuickConnect.test.tsx
           mcp/src/tools/__tests__/connection.test.ts
           electron/services/sync/__tests__/local-file-sync.test.ts
           electron/services/sync/__tests__/sync-engine-e2e.test.ts

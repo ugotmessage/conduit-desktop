@@ -22,6 +22,7 @@ import { StringDecoder } from 'node:string_decoder';
 
 import { createLocalPty, parseShellType, type LocalPty, type ShellType } from './pty.js';
 import { SshSession, type SshConfig } from '../ssh/client.js';
+import { SshStartupRunner, type PreparedSshStartup } from '../ssh/startup-script.js';
 import { AnsiStripper } from './ansi.js';
 import { CommandExecution, type ExecIo, type ExecResult } from './command-execution.js';
 import { DisplayFilter } from './display-filter.js';
@@ -71,6 +72,11 @@ interface SshEntry extends SessionState {
   kind: 'ssh';
   session: SshSession;
   lastError: string | null;
+  startup: SshStartupRunner | null;
+}
+
+export interface CreateSshSessionOptions {
+  startup?: PreparedSshStartup | null;
 }
 
 type SessionEntry = LocalShellEntry | SshEntry;
@@ -194,7 +200,7 @@ export class TerminalManager {
   // ── SSH session ──────────────────────────────────────────────────
 
   /** Create and connect an SSH session. Returns the session ID. */
-  async createSshSession(config: SshConfig): Promise<string> {
+  async createSshSession(config: SshConfig, options?: CreateSshSessionOptions): Promise<string> {
     const id = randomUUID();
     const session = new SshSession(config);
     const decoder = new StringDecoder('utf8');
@@ -203,6 +209,7 @@ export class TerminalManager {
       kind: 'ssh',
       session,
       lastError: null,
+      startup: null,
       ...this.newState('posix'),
       display: new DisplayFilter((text) => this.show(id, entry, text)),
     };
@@ -211,21 +218,27 @@ export class TerminalManager {
     session.on('error', (err: Error) => {
       console.error(`[terminal] SSH session ${id} error:`, err.message);
       entry.lastError = err.message;
+      entry.startup?.cancel();
     });
 
     // Attached BEFORE connect() so MOTD/banner data is never lost. The decoder
     // keeps multi-byte characters intact across chunk boundaries.
     session.on('data', (data: Buffer) => this.ingest(entry, decoder.write(data)));
-    session.on('close', () => this.notifyClosed(entry));
+    session.on('close', () => {
+      entry.startup?.cancel();
+      this.notifyClosed(entry);
+    });
 
     try {
       await session.connect();
     } catch (err) {
+      entry.startup?.cancel();
       this.disposeState(entry);
       throw err;
     }
 
     this.sessions.set(id, entry);
+    this.startStartupScript(id, entry, options?.startup);
     return id;
   }
 
@@ -566,8 +579,29 @@ export class TerminalManager {
     this.disposeState(entry);
   }
 
+  private startStartupScript(
+    sessionId: string,
+    entry: SshEntry,
+    startup: PreparedSshStartup | null | undefined,
+  ): void {
+    if (!startup || startup.steps.length === 0 || entry.closed || entry.lastError || !entry.session.connected) return;
+    const runner = new SshStartupRunner(startup, {
+      write: (data) => {
+        if (entry.closed || !entry.session.connected) return;
+        this.write(sessionId, data);
+      },
+      isActive: () => {
+        const current = this.sessions.get(sessionId);
+        return current === entry && !entry.closed && entry.session.connected;
+      },
+    });
+    entry.startup = runner;
+    runner.start();
+  }
+
   private disposeState(entry: SessionEntry): void {
     entry.closed = true;
+    if (entry.kind === 'ssh') entry.startup?.cancel();
     this.notifyClosed(entry);
     entry.exec?.dispose();
     entry.display.dispose();

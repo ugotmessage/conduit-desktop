@@ -16,6 +16,11 @@ import {
   resolveSshConnection,
   sshInputFromSessionArgs,
 } from '../services/ssh/resolve-connection.js';
+import type { CredentialData } from '../services/ssh/resolve-auth.js';
+import {
+  passwordFromConnectionSecrets,
+  prepareSshStartup,
+} from '../services/ssh/startup-script.js';
 import type { RdpEngineConfig } from '../services/rdp/engine.js';
 import { GatewayConfigError, gatewayIdOf } from '../services/rdp/gateway-config.js';
 import { describeGateway } from '../services/rdp/gateway-connect.js';
@@ -619,7 +624,7 @@ async function dispatchRequest(
 
         if (entry.entry_type === 'ssh') {
           try {
-            let credential = null;
+            let credential: CredentialData | null = null;
             if (entry.credential_id) {
               // Explicit credential reference — use the full credential so its
               // ssh_auth_method preference is honored. getCredential throws if
@@ -648,10 +653,15 @@ async function dispatchRequest(
                 sshAuthMethod: overrideAuthMethod,
               }),
             );
+            const startup = prepareSshStartup(
+              entryConfig,
+              passwordFromConnectionSecrets(credential),
+            );
             const result = await openSshSession(state, {
               config: resolved.config,
               alias: resolved.alias,
               name: entry.name,
+              startup,
             });
             return successResponse({ ...result, entry_id, name: entry.name });
           } catch (e) {

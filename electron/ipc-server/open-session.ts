@@ -12,6 +12,7 @@
 import { randomUUID } from 'node:crypto';
 import { AppState } from '../services/state.js';
 import type { SshConfig } from '../services/ssh/client.js';
+import type { PreparedSshStartup } from '../services/ssh/startup-script.js';
 import type { RdpEngineConfig } from '../services/rdp/engine.js';
 import { ensureFreeRdpReady } from '../services/rdp/engines/factory.js';
 
@@ -68,9 +69,9 @@ function registerMcpConnection(
 /** Open an SSH terminal session and wire it into the MCP registry + UI. */
 export async function openSshSession(
   state: AppState,
-  opts: { config: SshConfig; name: string; alias?: string },
+  opts: { config: SshConfig; name: string; alias?: string; startup?: PreparedSshStartup },
 ): Promise<OpenedSession> {
-  const sessionId = await state.terminalManager.createSshSession(opts.config);
+  const sessionId = await state.terminalManager.createSshSession(opts.config, { startup: opts.startup });
   state.terminalManager.startReading(sessionId);
 
   const host = opts.alias ?? opts.config.host;

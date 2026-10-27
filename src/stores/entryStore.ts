@@ -312,6 +312,7 @@ async function connectEntry(
       password: cred?.password ?? null,
       privateKey: cred?.private_key ?? null,
       sshAuthMethod: (entryConfig?.ssh_auth_method as string) ?? null,
+      entryConfig: entryConfig ?? null,
     });
     sessionStore.replaceSessionId(entry.id, realSessionId, { status: "connected" });
     return;

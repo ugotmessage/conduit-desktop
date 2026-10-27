@@ -1,4 +1,8 @@
 import type { RdpEntryGatewayFields } from "../lib/rdpGateway";
+import type { SshStartupScript } from "../lib/sshStartup";
+
+export type { SshStartupInputMode, SshStartupScript, SshStartupStep } from "../lib/sshStartup";
+export { DEFAULT_SSH_STARTUP } from "../lib/sshStartup";
 
 export type EntryType = 'ssh' | 'rdp' | 'vnc' | 'web' | 'credential' | 'document' | 'command';
 
@@ -135,6 +139,11 @@ export const HARDCODED_TERMINAL_DEFAULTS: TerminalGlobalDefaults = {
 };
 
 export type SshAuthMethod = 'key' | 'password';
+
+export interface SshEntryConfig {
+  ssh_auth_method?: SshAuthMethod;
+  startup?: SshStartupScript;
+}
 
 export interface SshGlobalDefaults {
   authMethodWhenKeyPresent: SshAuthMethod;

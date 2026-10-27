@@ -13,6 +13,10 @@ import {
   resolveSshConnection,
   sshInputFromSessionArgs,
 } from '../services/ssh/resolve-connection.js';
+import {
+  passwordFromConnectionSecrets,
+  prepareSshStartup,
+} from '../services/ssh/startup-script.js';
 import { readSettings } from './settings.js';
 import { getDataDir, getEnvConfig } from '../services/env-config.js';
 import { getSocketPath } from '../ipc-server/server.js';
@@ -123,8 +127,9 @@ export function registerTerminalHandlers(): void {
       password?: string | null;
       privateKey?: string | null;
       sshAuthMethod?: string | null;
+      entryConfig?: Record<string, unknown> | null;
     }) => {
-      const { host, port, credentialId, username, password, privateKey, sshAuthMethod } = args;
+      const { host, port, credentialId, username, password, privateKey, sshAuthMethod, entryConfig } = args;
 
       let credential = null;
       if (credentialId) {
@@ -147,7 +152,11 @@ export function registerTerminalHandlers(): void {
         }),
       );
       const sshPort = resolved.config.port ?? 22;
-      const sessionId = await state.terminalManager.createSshSession(resolved.config);
+      const startup = prepareSshStartup(
+        entryConfig,
+        passwordFromConnectionSecrets(credential, password),
+      );
+      const sessionId = await state.terminalManager.createSshSession(resolved.config, { startup });
 
       // Register in MCP connection registry so MCP tools can see UI-opened sessions
       let connName = `SSH ${resolved.alias}`;

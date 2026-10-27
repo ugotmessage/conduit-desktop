@@ -4,8 +4,9 @@ import { useSessionStore } from "../../stores/sessionStore";
 import { useVaultStore } from "../../stores/vaultStore";
 import { useTeamStore } from "../../stores/teamStore";
 import { useSettingsStore } from "../../stores/settingsStore";
-import type { EntryMeta, EntryType, RdpEntryConfig, WebEntryConfig, WebAutofillConfig, CommandEntryConfig } from "../../types/entry";
-import { DEFAULT_COMMAND_CONFIG } from "../../types/entry";
+import type { EntryMeta, EntryType, RdpEntryConfig, WebEntryConfig, WebAutofillConfig, CommandEntryConfig, SshStartupScript } from "../../types/entry";
+import { DEFAULT_COMMAND_CONFIG, DEFAULT_SSH_STARTUP } from "../../types/entry";
+import { loadSshStartupConfig, serializeSshStartupConfig, sshStartupSaveError } from "../../lib/sshStartup";
 import type { CredentialType } from "../../types/credential";
 import { RD_GATEWAY_CREDENTIAL_TYPE, type RdGatewayConfig } from "../../lib/rdpGateway";
 import { Button, Dialog, DialogFooter, DialogHeader, type DialogLayer } from "../ui";
@@ -23,6 +24,7 @@ import SecurityTab from "./tabs/SecurityTab";
 import AutofillTab from "./tabs/AutofillTab";
 import InformationTab from "./tabs/InformationTab";
 import CommandTab from "./tabs/CommandTab";
+import SshStartupTab from "./tabs/SshStartupTab";
 import GatewayTab from "./tabs/GatewayTab";
 import GatewayServerTab from "./tabs/GatewayServerTab";
 import GatewayLoginTab from "./tabs/GatewayLoginTab";
@@ -121,6 +123,7 @@ export default function EntryDialog({
 
   // SSH auth method (for SSH entries or credentials with both key+password)
   const [sshAuthMethod, setSshAuthMethod] = useState<string | null>(null);
+  const [sshStartup, setSshStartup] = useState<SshStartupScript>({ ...DEFAULT_SSH_STARTUP, steps: [] });
 
   // TOTP fields (for credential entries)
   const [totpSecret, setTotpSecret] = useState("");
@@ -177,6 +180,9 @@ export default function EntryDialog({
       if (entry.config) {
         const cfg = entry.config as Record<string, unknown>;
         if (cfg.ssh_auth_method) setSshAuthMethod(cfg.ssh_auth_method as string);
+      }
+      if (entry.entry_type === "ssh") {
+        setSshStartup(loadSshStartupConfig(entry.config));
       }
       // Load TOTP fields for any entry type
       if (entry.totp_secret) {
@@ -287,10 +293,12 @@ export default function EntryDialog({
       Object.assign(config, totpMeta);
       if (Object.keys(config).length > 0) return config;
     }
-    // SSH entries: store ssh_auth_method in config
+    // SSH entries: store ssh_auth_method and optional startup steps in config
     if (entryType === "ssh") {
       const config: Record<string, unknown> = {};
       if (sshAuthMethod) config.ssh_auth_method = sshAuthMethod;
+      const startup = serializeSshStartupConfig(sshStartup);
+      if (startup) config.startup = startup;
       Object.assign(config, totpMeta);
       if (Object.keys(config).length > 0) return config;
       return undefined;
@@ -339,6 +347,18 @@ export default function EntryDialog({
       setValidationError('Username is required for SSH connections');
       setActiveTab('credentials');
       return;
+    }
+    if (entryType === 'ssh') {
+      const startupError = sshStartupSaveError(sshStartup, {
+        hasInlinePassword: Boolean(password),
+        hasLinkedCredential: Boolean(credentialId),
+        allowRuntimePasswordLookup: Boolean(editingEntryId || folderId),
+      });
+      if (startupError) {
+        setValidationError(startupError);
+        setActiveTab('startup');
+        return;
+      }
     }
     const gatewayError = isGateway ? gatewayEntryValidationError(gatewayConfig, gatewayLogin, credentialId) : null;
     if (gatewayError) {
@@ -541,6 +561,13 @@ export default function EntryDialog({
           <CommandTab
             config={commandConfig}
             onChange={setCommandConfig}
+          />
+        );
+      case "startup":
+        return (
+          <SshStartupTab
+            config={sshStartup}
+            onChange={(next) => { setSshStartup(next); setValidationError(null); }}
           />
         );
       case "information":

@@ -1,7 +1,7 @@
 import type { EntryType } from "../../types/entry";
 import { RD_GATEWAY_CREDENTIAL_TYPE } from "../../lib/rdpGateway";
 import {
-  DesktopIcon, DevicesIcon, InfoCircleIcon, KeyIcon, NetworkIcon, PlayerPlayIcon, RobotIcon, SettingsIcon, ShieldLockIcon, UserIcon
+  ClockIcon, DesktopIcon, DevicesIcon, InfoCircleIcon, KeyIcon, NetworkIcon, PlayerPlayIcon, RobotIcon, SettingsIcon, ShieldLockIcon, UserIcon
 } from "../../lib/icons";
 import type { IconComponent } from "../../lib/icons";
 
@@ -16,6 +16,7 @@ export type EntryTabId =
   | "gateway_login"
   | "autofill"
   | "command"
+  | "startup"
   | "information";
 
 export interface EntryTab {
@@ -87,6 +88,13 @@ export function getTabCategories(entryType: EntryType, credentialType?: string |
       label: "Execution",
       tabs: [
         { id: "command", label: "Command", icon: PlayerPlayIcon },
+      ],
+    });
+  } else if (entryType === "ssh") {
+    categories.push({
+      label: "Connection",
+      tabs: [
+        { id: "startup", label: "Startup", icon: ClockIcon },
       ],
     });
   }
