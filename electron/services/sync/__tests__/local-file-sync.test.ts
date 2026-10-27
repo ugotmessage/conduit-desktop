@@ -62,7 +62,7 @@ it('does not start backend links or displace Local Mode after merging another de
   t.knobs.userId = null;
   const engine = new RuntimeEngine();
   const replica = new RuntimeReplica();
-  replica.current = stateWithClaim(presence(t.clock.now()), true);
+  replica.current = stateWithClaim(presence('Other Mac', t.clock.now()), true);
   const runtime = new LocalFileSyncRuntime({
     host: t.host, config: { syncRoot: root, machineDir: root, dataDir: root, deviceUuid: OWN, sessionNonce: NONCE },
     lineageId: LINEAGE, shared: true, fileName: 'Vault.conduit',
@@ -71,7 +71,7 @@ it('does not start backend links or displace Local Mode after merging another de
   runtime.attachEngine(engine.asEngine());
   try {
     runtime.start(null);
-    runtime.signals().afterMerge();
+    runtime.signals().afterMerge(replica.current);
     await t.clock.advance(60_000);
     expect(runtime.effectiveLimit().limit).toBe(-1);
     expect(runtime.isSoftLocked()).toBe(false);

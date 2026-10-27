@@ -125,6 +125,21 @@ describe('CopyScanner with the real replica', () => {
     expect(again.copies.map((c) => [c.name, c.cls])).toEqual([['Vault 2.conduit', 'nothing-new']]);
   });
 
+  it('retains and offers an unrecognized cloud conflict filename for review', async () => {
+    const tracker = new FileBindingTracker({ replica, shared: createSharedFile(d.t.host), host: d.t.host });
+    B.edit((v) => v.updateEntry(legacy.ids.db, { notes: 'offline edit from NAS client' }));
+    const copyPath = path.join(share, 'Vault_HT-PC_Oct-27-1300_Conflict.conduit');
+    B.publish(copyPath);
+    const scanner = scannerWith(tracker);
+    const result = await scanner.scan();
+    const copy = result.copies.find((c) => c.path === copyPath);
+    expect(copy?.cls).toBe('needs-review');
+    expect(await scanner.mergeSafe(copy!)).toBeNull();
+    expect(await scanner.queueForReview(copy!)).toBe('cand');
+    expect(added).toHaveLength(1);
+    expect(fs.existsSync(copyPath)).toBe(true);
+  });
+
   it('rebinds through the real replica when S is renamed on another device (12 row 19)', async () => {
     const tracker = new FileBindingTracker({ replica, shared: createSharedFile(d.t.host), host: d.t.host });
     const before = tracker.binding();
