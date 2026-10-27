@@ -28,7 +28,7 @@ export type IpcRequest =
   | { type: SecretRequestType; payload: Record<string, unknown> }
   | { type: KbRequestType; payload: Record<string, unknown> }
   | { type: 'ConnectionList'; payload: Record<string, never> }
-  | { type: 'ConnectionOpen'; payload: { connection_type: string; host: string; port: number; credential_id: string | null; username: string | null; password: string | null; ssh_auth_method?: string | null } }
+  | { type: 'ConnectionOpen'; payload: { connection_type: string; host: string; port: number | null; credential_id: string | null; username: string | null; password: string | null; ssh_auth_method?: string | null } }
   | { type: 'ConnectionOpenEntry'; payload: { entry_id: string; ssh_auth_method: string | null } }
   | { type: 'ConnectionClose'; payload: { id: string } }
   | { type: 'RdpScreenshot'; payload: { connection_id: string; format: string; quality: number; region: [number, number, number, number] | null; max_width: number | null } }
@@ -394,7 +394,7 @@ export class ConduitClient {
   async connectionOpen(
     connectionType: string,
     host: string,
-    port: number,
+    port: number | null,
     credentialId: string | null,
     username: string | null = null,
     password: string | null = null,

@@ -63,9 +63,12 @@ jobs:
         run: npm run build
       - name: Rebuild SQLite for Node test runner
         run: npm rebuild better-sqlite3
-      - name: Test sync, session gates, VNC and RDP clipboard
+      - name: Test sync, SSH config, session gates, VNC and RDP clipboard
         run: >-
           npx vitest run
+          electron/services/ssh/__tests__
+          electron/ipc-server/__tests__/server-agent-sessions.test.ts
+          mcp/src/tools/__tests__/connection.test.ts
           electron/services/sync/__tests__/local-file-sync.test.ts
           electron/services/sync/__tests__/sync-engine-e2e.test.ts
           electron/services/sync/__tests__/copy-scanner-integration.test.ts

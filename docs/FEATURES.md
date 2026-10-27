@@ -1,7 +1,7 @@
 # Conduit Features
 
 > **Auto-maintained**: This document is updated whenever a new feature is implemented.
-> Last updated: 2026-09-29
+> Last updated: 2026-10-27
 
 ---
 
@@ -14,6 +14,7 @@
 - **Global SSH auth default**: Configurable in Settings → Sessions → SSH — sets the default auth method when both key and password are present
 - **Terminal font family**: Settings → Sessions → Terminal takes any installed font (type a name or browse the installed fonts), with a live preview including Nerd Font icons. The built-in fonts (Menlo, Monaco, Consolas, Courier New) stay as the fallback. Applies to SSH, local, agent and command terminals, and open terminals switch as soon as the setting is saved. Nerd Font icons are scaled to fit their cell
 - Auto-detection of local SSH keys (~/.ssh/id_rsa, id_ed25519)
+- **OpenSSH user config** (`~/.ssh/config`): UI and MCP SSH sessions apply matching `Host` / `HostName` / `User` / `Port` / `IdentityFile` / `ServerAliveInterval` / `ForwardAgent` (only when `SSH_AUTH_SOCK` exists). SOCKS5 `ProxyCommand nc -X 5 -x host:port %h %p` is implemented without a shell; unsupported `ProxyCommand` / `ProxyJump` fail instead of connecting directly. Explicit entry/MCP user, port and credentials win over config. See `docs/SSH_CONFIG.md`
 - Real-time terminal via xterm.js + node-pty
 - Terminal buffer reading with configurable history
 - Dynamic terminal resize (cols/rows)

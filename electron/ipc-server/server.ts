@@ -12,8 +12,10 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { AppState } from '../services/state.js';
-import type { SshAuth } from '../services/ssh/client.js';
-import { resolveSshAuth, resolveSshAuthSystem } from '../services/ssh/resolve-auth.js';
+import {
+  resolveSshConnection,
+  sshInputFromSessionArgs,
+} from '../services/ssh/resolve-connection.js';
 import type { RdpEngineConfig } from '../services/rdp/engine.js';
 import { GatewayConfigError, gatewayIdOf } from '../services/rdp/gateway-config.js';
 import { describeGateway } from '../services/rdp/gateway-connect.js';
@@ -423,7 +425,7 @@ async function dispatchRequest(
         const { connection_type, host, port, credential_id, username, password, private_key, ssh_auth_method } = request.payload as {
           connection_type: string;
           host: string;
-          port: number;
+          port?: number | null;
           credential_id: string | null;
           username: string | null;
           password: string | null;
@@ -433,10 +435,8 @@ async function dispatchRequest(
 
         if (connection_type === 'ssh') {
           try {
-            let auth: SshAuth;
-
+            let credential = null;
             if (credential_id) {
-              // Resolve credential from vault
               if (!state.getActiveVault().isUnlocked()) {
                 return lockedResponse(state, 'Vault is locked. Unlock it in the Conduit app first.');
               }
@@ -444,22 +444,24 @@ async function dispatchRequest(
               if (!cred) {
                 return errorResponse('CREDENTIAL_NOT_FOUND', `Credential not found: ${credential_id}`);
               }
-              auth = resolveSshAuth(cred, ssh_auth_method);
-            } else if (username) {
-              auth = resolveSshAuth({
-                username,
-                password: password || null,
-                private_key: private_key || null,
-              }, ssh_auth_method);
-            } else {
-              auth = resolveSshAuthSystem();
+              credential = cred;
             }
 
+            const resolved = resolveSshConnection(
+              sshInputFromSessionArgs({
+                host,
+                port,
+                credential,
+                username,
+                password,
+                privateKey: private_key,
+                sshAuthMethod: ssh_auth_method,
+              }),
+            );
             const result = await openSshSession(state, {
-              host,
-              port: port ?? 22,
-              auth,
-              name: `SSH ${host}`,
+              config: resolved.config,
+              alias: resolved.alias,
+              name: `SSH ${resolved.alias}`,
             });
             return successResponse(result);
           } catch (e) {
@@ -611,46 +613,44 @@ async function dispatchRequest(
         }
         // Per-entry auth-method override: explicit MCP arg wins, then the SSH
         // entry's stored config, then the credential's own preference (applied
-        // inside resolveSshAuth).
+        // inside resolveSshAuth via resolveSshConnection).
         const overrideAuthMethod =
           ssh_auth_method ?? (entryConfig.ssh_auth_method as string | undefined) ?? null;
 
         if (entry.entry_type === 'ssh') {
           try {
-            let auth: SshAuth;
+            let credential = null;
             if (entry.credential_id) {
               // Explicit credential reference — use the full credential so its
               // ssh_auth_method preference is honored. getCredential throws if
               // the referenced credential no longer exists.
-              let cred: ReturnType<typeof vault.getCredential>;
               try {
-                cred = vault.getCredential(entry.credential_id);
+                credential = vault.getCredential(entry.credential_id);
               } catch {
                 return errorResponse('CREDENTIAL_NOT_FOUND', `Credential not found: ${entry.credential_id}`);
               }
-              auth = resolveSshAuth(cred, overrideAuthMethod);
             } else {
-              // Inline credentials on the entry, or inherited from a parent
-              // entry / folder.
-              const resolved = vault.resolveCredential(entry_id);
-              if (resolved && (resolved.username || resolved.password || resolved.private_key)) {
-                auth = resolveSshAuth(
-                  {
-                    username: resolved.username,
-                    password: resolved.password,
-                    private_key: resolved.private_key,
-                  },
-                  overrideAuthMethod,
-                );
-              } else {
-                auth = resolveSshAuthSystem();
+              const resolvedCred = vault.resolveCredential(entry_id);
+              if (resolvedCred && (resolvedCred.username || resolvedCred.password || resolvedCred.private_key)) {
+                credential = {
+                  username: resolvedCred.username,
+                  password: resolvedCred.password,
+                  private_key: resolvedCred.private_key,
+                };
               }
             }
 
+            const resolved = resolveSshConnection(
+              sshInputFromSessionArgs({
+                host,
+                port: entry.port,
+                credential,
+                sshAuthMethod: overrideAuthMethod,
+              }),
+            );
             const result = await openSshSession(state, {
-              host,
-              port: entry.port ?? 22,
-              auth,
+              config: resolved.config,
+              alias: resolved.alias,
               name: entry.name,
             });
             return successResponse({ ...result, entry_id, name: entry.name });

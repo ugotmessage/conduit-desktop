@@ -62,7 +62,9 @@ export default function QuickConnect({ onClose }: QuickConnectProps) {
           url,
         });
       } else {
-        const resolvedPort = parseInt(port) || defaultPorts[type];
+        const resolvedPort = type === "ssh" && !port.trim()
+          ? undefined
+          : (parseInt(port, 10) || defaultPorts[type]);
 
         if (type === "ssh") {
           sessionId = await invoke<string>("ssh_session_create", {

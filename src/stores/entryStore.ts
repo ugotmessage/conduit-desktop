@@ -306,7 +306,7 @@ async function connectEntry(
     const entryConfig = entry.config as Record<string, unknown> | undefined;
     const realSessionId = await invoke<string>("ssh_session_create", {
       host: entry.host,
-      port: entry.port ?? 22,
+      port: entry.port ?? undefined,
       credentialId: entry.credential_id ?? null,
       username: cred?.username ?? null,
       password: cred?.password ?? null,

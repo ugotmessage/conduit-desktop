@@ -9,8 +9,10 @@
 
 import { ipcMain } from 'electron';
 import { AppState } from '../services/state.js';
-import type { SshAuth } from '../services/ssh/client.js';
-import { resolveSshAuth, resolveSshAuthSystem } from '../services/ssh/resolve-auth.js';
+import {
+  resolveSshConnection,
+  sshInputFromSessionArgs,
+} from '../services/ssh/resolve-connection.js';
 import { readSettings } from './settings.js';
 import { getDataDir, getEnvConfig } from '../services/env-config.js';
 import { getSocketPath } from '../ipc-server/server.js';
@@ -124,39 +126,36 @@ export function registerTerminalHandlers(): void {
     }) => {
       const { host, port, credentialId, username, password, privateKey, sshAuthMethod } = args;
 
-      let auth: SshAuth;
-
+      let credential = null;
       if (credentialId) {
-        // Resolve credential from vault
         const cred = state.getActiveVault().getCredential(credentialId);
         if (!cred) {
           throw new Error(`Credential not found: ${credentialId}`);
         }
-        auth = resolveSshAuth(cred, sshAuthMethod);
-      } else if (username) {
-        auth = resolveSshAuth({
-          username,
-          password: password || null,
-          private_key: privateKey || null,
-        }, sshAuthMethod);
-      } else {
-        auth = resolveSshAuthSystem();
+        credential = cred;
       }
 
-      const sshPort = port ?? 22;
-      const sessionId = await state.terminalManager.createSshSession({
-        host,
-        port: sshPort,
-        auth,
-      });
+      const resolved = resolveSshConnection(
+        sshInputFromSessionArgs({
+          host,
+          port,
+          credential,
+          username,
+          password,
+          privateKey,
+          sshAuthMethod,
+        }),
+      );
+      const sshPort = resolved.config.port ?? 22;
+      const sessionId = await state.terminalManager.createSshSession(resolved.config);
 
       // Register in MCP connection registry so MCP tools can see UI-opened sessions
-      let connName = `SSH ${host}`;
+      let connName = `SSH ${resolved.alias}`;
       try {
         if (state.getActiveVault().isUnlocked()) {
           const entries = state.getActiveVault().listEntries();
           const match = entries.find(
-            (e) => e.host === host && (e.port ?? 22) === sshPort && e.entry_type === 'ssh',
+            (e) => e.host === host && (e.port == null || e.port === sshPort) && e.entry_type === 'ssh',
           );
           if (match) connName = match.name;
         }
@@ -167,7 +166,7 @@ export function registerTerminalHandlers(): void {
         session_id: sessionId,
         name: connName,
         connection_type: 'ssh',
-        host,
+        host: resolved.alias,
         port: sshPort,
         status: 'connected',
         created_at: Date.now(),
