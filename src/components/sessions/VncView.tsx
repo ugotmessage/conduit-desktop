@@ -93,6 +93,11 @@ export default function VncView({
         });
         rfbRef.current = rfb;
 
+        // Some VNC servers send an empty/invisible cursor shape. noVNC normally
+        // hides the local cursor in that case, leaving the user with no pointer.
+        // Show its small fallback dot until the server supplies a visible cursor.
+        rfb.showDotCursor = true;
+
         // Enable viewport scaling (fits to container, GPU-accelerated CSS scaling)
         rfb.scaleViewport = true;
         rfb.resizeSession = false;
