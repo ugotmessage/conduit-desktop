@@ -18,6 +18,11 @@ import { createPendingUpdateGate, type PendingUpdateGate } from '../services/pen
 
 type ElectronUpdaterModule = typeof import('electron-updater');
 
+/** Do not install vendor releases over this fork's local-file-sync behavior. */
+export function upstreamUpdatesDisabledForLocalSync(): boolean {
+  return readSettings().local_file_sync_unlimited === true;
+}
+
 let autoUpdater: ElectronUpdaterModule['autoUpdater'] | null = null;
 let gate: PendingUpdateGate | null = null;
 
@@ -54,6 +59,7 @@ function stripHtml(html: string): string {
 }
 
 async function getAutoUpdater() {
+  if (upstreamUpdatesDisabledForLocalSync()) return null;
   if (autoUpdater) return autoUpdater;
   try {
     const mod = await import('electron-updater');
@@ -83,6 +89,7 @@ function dropBlockedUpdate(): void {
 
 /** Perform an update check, guarded against concurrent calls. */
 async function doUpdateCheck(): Promise<CachedUpdateInfo | null> {
+  if (upstreamUpdatesDisabledForLocalSync()) return null;
   if (checkInFlight) return cachedUpdateInfo;
   checkInFlight = runUpdateCheck();
   try {
@@ -234,6 +241,10 @@ export function registerUpdaterHandlers(): void {
 
 /** Called from main.ts on app ready to silently check for updates + start periodic checks. */
 export async function setupAutoUpdater(): Promise<void> {
+  if (upstreamUpdatesDisabledForLocalSync()) {
+    console.info('[updater] Vendor auto-update disabled for local-file-sync fork mode');
+    return;
+  }
   const updater = await getAutoUpdater();
   if (!updater) return;
 
