@@ -199,7 +199,17 @@ async function seed(): Promise<void> {
     effects: { syncVaultMembership: async () => {}, newUserProfile: async () => {}, feedbackSubmitted: async () => {}, fileReleased: async () => {} },
   };
   const service = { role: 'service' as const, uid: null, email: null };
-  for (const [table, rows] of [['tiers', SEED_TIERS], ['app_config', SEED_CONFIG]] as const) {
+  // Opt-in for private Appwrite deployments only. This does not alter the vendor backend.
+  const selfHosted = env.CONDUIT_SELF_HOSTED === '1';
+  if (selfHosted && /cloudwise\\.ca|conduitdesktop\\.com/i.test(env.APPWRITE_ENDPOINT ?? '')) {
+    throw new Error('Refusing self-hosted plan changes against an official Conduit endpoint');
+  }
+  const tiers = selfHosted
+    ? SEED_TIERS.map(tier => tier.name === 'free'
+        ? { ...tier, features: { ...tier.features, vault_max_open_devices: -1 } }
+        : tier)
+    : SEED_TIERS;
+  for (const [table, rows] of [['tiers', tiers], ['app_config', SEED_CONFIG]] as const) {
     for (const row of rows) {
       const r = await handle({ kind: 'query', op: 'upsert', table, rows: row, ignoreDuplicates: true }, service, deps);
       if (r.body.error) throw new Error(`seed ${table}: ${r.body.error.message}`);
