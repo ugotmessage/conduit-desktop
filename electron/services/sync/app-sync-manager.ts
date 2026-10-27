@@ -171,7 +171,10 @@ export class AppSyncManager {
   /** settings personal_sync_enabled (on by default; no UI, support can turn it off). */
   isEnabled(): boolean {
     try {
-      return personalSyncEnabled(this.deps.settings.read());
+      const settings = this.deps.settings.read();
+      // Concurrent local-file access must always use independent working copies.
+      // Never fall through to openInPlace even if an old support setting disabled sync.
+      return personalSyncEnabled(settings) || localFileSyncEnabled(settings, this.started?.syncHost.account.userId() ?? null);
     } catch (err) {
       this.logger.warn(`${SYNC_LOG_PREFIX} settings unreadable; sync stays on`, { name: (err as Error)?.name ?? 'Error' });
       return true;
