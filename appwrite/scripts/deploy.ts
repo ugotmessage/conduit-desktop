@@ -211,7 +211,11 @@ async function seed(): Promise<void> {
     : SEED_TIERS;
   for (const [table, rows] of [['tiers', tiers], ['app_config', SEED_CONFIG]] as const) {
     for (const row of rows) {
-      const r = await handle({ kind: 'query', op: 'upsert', table, rows: row, ignoreDuplicates: true }, service, deps);
+      // In the explicitly selected private backend, refresh existing Free tier
+      // capabilities as well as provisioning new installations. Other tiers and
+      // normal deployments retain the prior seed-only behavior.
+      const refreshPrivateFree = selfHosted && table === 'tiers' && 'name' in row && row.name === 'free';
+      const r = await handle({ kind: 'query', op: 'upsert', table, rows: row, ignoreDuplicates: !refreshPrivateFree }, service, deps);
       if (r.body.error) throw new Error(`seed ${table}: ${r.body.error.message}`);
     }
   }
