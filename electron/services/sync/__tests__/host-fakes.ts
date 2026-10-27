@@ -380,5 +380,6 @@ export function makeTestSyncHost(root: string, overrides: Partial<SyncHost> = {}
 
 /** mkdtemp under the OS temp folder; remove with fs.rmSync(dir, { recursive: true, force: true }). */
 export function makeTempRoot(label: string): string {
-  return fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), `conduit-${label}-`));
+  // Match fs.promises.realpath used by the production host, including Windows 8.3 aliases.
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), `conduit-${label}-`)));
 }

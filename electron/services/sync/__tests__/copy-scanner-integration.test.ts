@@ -147,7 +147,7 @@ describe('CopyScanner with the real replica', () => {
     const res = await tracker.resolveMissing();
     expect(res.kind).toBe('rebound');
     const stored = JSON.parse(fs.readFileSync(replica.paths.local, 'utf8')) as { binding: { realpath: string; fileId: string } };
-    expect(stored.binding).toMatchObject({ realpath: fs.realpathSync(path.join(share, 'Renamed.conduit')), fileId: before.fileId });
+    expect(stored.binding).toMatchObject({ realpath: fs.realpathSync.native(path.join(share, 'Renamed.conduit')), fileId: before.fileId });
     expect(await tracker.undoRebind()).toBe(true);
     expect(replica.local().binding).toEqual(before);
   });

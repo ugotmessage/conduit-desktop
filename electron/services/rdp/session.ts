@@ -8,7 +8,7 @@
 import { BrowserWindow, clipboard } from 'electron';
 import { createHash } from 'node:crypto';
 import { mkdtempSync, rmSync, statSync, readdirSync } from 'node:fs';
-import { join, sep } from 'node:path';
+import { basename, join, sep } from 'node:path';
 import { tmpdir } from 'node:os';
 import sharp from 'sharp';
 import { FrameBuffer, type ImageFormat } from './framebuffer.js';
@@ -664,7 +664,7 @@ export class RdpSession {
     for (const p of filePaths) {
       try {
         const stat = statSync(p);
-        const baseName = p.split('/').pop() || p.split('\\').pop() || 'unknown';
+        const baseName = basename(p) || 'unknown';
 
         if (stat.isDirectory()) {
           entries.push({ path: p, name: baseName, size: 0, isDirectory: true });
@@ -673,7 +673,7 @@ export class RdpSession {
           entries.push({ path: p, name: baseName, size: stat.size, isDirectory: false });
         }
       } catch {
-        entries.push({ path: p, name: p.split('/').pop() || 'unknown', size: 0, isDirectory: false });
+        entries.push({ path: p, name: basename(p) || 'unknown', size: 0, isDirectory: false });
       }
     }
 
