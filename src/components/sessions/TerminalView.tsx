@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
-import { showContextMenu } from "../../utils/contextMenu";
 import { WebglAddon } from "@xterm/addon-webgl";
 import { TERMINAL_RENDERER_EVENT, getTerminalRendererMode, clearTerminalRendererMode, type TerminalRendererMode } from "../../lib/terminalRenderer";
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
@@ -290,11 +289,9 @@ export default function TerminalView({
     event.preventDefault();
     event.stopPropagation();
     const selectedText = terminal.getSelection();
-    const action = await showContextMenu(event.clientX, event.clientY, [
-      { id: "copy", label: "Copy" },
-      { id: "paste", label: "Paste" },
-      { id: "select_all", label: "Select All" },
-    ]);
+    const action = await invoke<"copy" | "paste" | "select_all" | null>("show_terminal_native_menu", {
+      hasSelection: !!selectedText,
+    });
     try {
       if (action === "copy" && selectedText) {
         await navigator.clipboard.writeText(selectedText);
