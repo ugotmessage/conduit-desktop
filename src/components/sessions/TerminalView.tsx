@@ -284,27 +284,42 @@ export default function TerminalView({
     });
   }, [terminal, isAgentTerminal]);
 
-  const handleTerminalContextMenu = useCallback(async (event: React.MouseEvent<HTMLDivElement>) => {
+  // Native menu item clicks arrive as IPC events, not Menu.popup dismiss results.
+  useEffect(() => {
+    if (!terminal) return;
+    let disposed = false;
+    let unlisten: UnlistenFn | undefined;
+    void listen<{ sessionId: string; action: string }>("terminal:native-menu-action", async (event) => {
+      if (disposed || event.payload.sessionId !== sessionId) return;
+      try {
+        if (event.payload.action === "copy") {
+          const value = terminal.getSelection();
+          if (value) await navigator.clipboard.writeText(value);
+        } else if (event.payload.action === "paste") {
+          const value = await navigator.clipboard.readText();
+          if (value) terminal.paste(value);
+        } else if (event.payload.action === "select_all") {
+          terminal.selectAll();
+        }
+      } catch (error) {
+        console.error("[terminal] Native clipboard action failed:", error);
+      }
+    }).then((stop) => {
+      if (disposed) stop();
+      else unlisten = stop;
+    });
+    return () => { disposed = true; unlisten?.(); };
+  }, [terminal, sessionId]);
+
+  const handleTerminalContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     if (!terminal) return;
     event.preventDefault();
     event.stopPropagation();
-    const selectedText = terminal.getSelection();
-    const action = await invoke<"copy" | "paste" | "select_all" | null>("show_terminal_native_menu", {
-      hasSelection: !!selectedText,
-    });
-    try {
-      if (action === "copy" && selectedText) {
-        await navigator.clipboard.writeText(selectedText);
-      } else if (action === "paste") {
-        const text = await navigator.clipboard.readText();
-        if (text) terminal.paste(text);
-      } else if (action === "select_all") {
-        terminal.selectAll();
-      }
-    } catch (error) {
-      console.error("[terminal] Clipboard operation failed:", error);
-    }
-  }, [terminal]);
+    void invoke("show_terminal_native_menu", {
+      sessionId,
+      hasSelection: terminal.hasSelection(),
+    }).catch((error) => console.error("[terminal] Failed to open native context menu:", error));
+  }, [terminal, sessionId]);
 
   // Re-fit and focus when tab becomes active
   useEffect(() => {
