@@ -517,7 +517,7 @@ export default function Sidebar() {
         ) : authMode === 'local' ? (
           <div className="px-2 py-1.5 border-t border-divider">
             <Button variant="link" size="sm" icon="login" onClick={() => useAuthStore.getState().exitToSignIn()}>
-              Sign in to start a free Pro trial
+              Sign in
             </Button>
           </div>
         ) : null}
