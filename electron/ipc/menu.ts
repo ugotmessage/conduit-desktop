@@ -6,7 +6,7 @@
  * while allowing full CSS styling to match the app theme.
  */
 
-import { ipcMain, BrowserWindow, screen } from 'electron';
+import { ipcMain, BrowserWindow, Menu, screen } from 'electron';
 import { AppState } from '../services/state.js';
 import { sanitizeSvg } from './menu-svg.js';
 
@@ -554,4 +554,22 @@ async function showPopupMenu(args: unknown): Promise<string | null> {
 
 export function registerMenuHandlers(): void {
   ipcMain.handle('show_context_menu_popup', (_e, args: unknown) => showPopupMenu(args));
+  ipcMain.handle('show_terminal_native_menu', (_e, args: { x?: number; y?: number; hasSelection?: boolean }) => {
+    const win = AppState.getInstance().getMainWindow();
+    if (!win) return null;
+    const items = [
+      { label: 'Copy', id: 'copy', enabled: args?.hasSelection === true },
+      { label: 'Paste', id: 'paste', enabled: true },
+      { label: 'Select All', id: 'select_all', enabled: true },
+    ];
+    return new Promise<string | null>((resolve) => {
+      let selected: string | null = null;
+      const menu = Menu.buildFromTemplate(items.map((item) => ({
+        label: item.label,
+        enabled: item.enabled,
+        click: () => { selected = item.id; },
+      })));
+      menu.popup({ window: win, callback: () => resolve(selected) });
+    });
+  });
 }
