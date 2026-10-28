@@ -554,22 +554,22 @@ async function showPopupMenu(args: unknown): Promise<string | null> {
 
 export function registerMenuHandlers(): void {
   ipcMain.handle('show_context_menu_popup', (_e, args: unknown) => showPopupMenu(args));
-  ipcMain.handle('show_terminal_native_menu', (_e, args: { x?: number; y?: number; hasSelection?: boolean }) => {
-    const win = AppState.getInstance().getMainWindow();
-    if (!win) return null;
-    const items = [
-      { label: 'Copy', id: 'copy', enabled: args?.hasSelection === true },
-      { label: 'Paste', id: 'paste', enabled: true },
-      { label: 'Select All', id: 'select_all', enabled: true },
-    ];
-    return new Promise<string | null>((resolve) => {
-      let selected: string | null = null;
-      const menu = Menu.buildFromTemplate(items.map((item) => ({
-        label: item.label,
-        enabled: item.enabled,
-        click: () => { selected = item.id; },
-      })));
-      menu.popup({ window: win, callback: () => resolve(selected) });
-    });
+  ipcMain.handle('show_terminal_native_menu', (event, args: { sessionId?: string; hasSelection?: boolean }) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win || typeof args?.sessionId !== 'string' || args.sessionId.length > 128) return false;
+    const sessionId = args.sessionId;
+    const menu = Menu.buildFromTemplate([
+      { label: 'Copy', enabled: args.hasSelection === true,
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'copy' }) },
+      { label: 'Paste',
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'paste' }) },
+      { type: 'separator' },
+      { label: 'Select All',
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'select_all' }) },
+    ]);
+    // Return immediately. Execute the selected command from the click handler
+    // rather than relying on Menu.popup's dismiss callback ordering.
+    menu.popup({ window: win });
+    return true;
   });
 }
