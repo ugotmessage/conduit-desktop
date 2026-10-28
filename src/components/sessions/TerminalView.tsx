@@ -63,6 +63,7 @@ export default function TerminalView({
   const [terminal, setTerminal] = useState<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const resizeTimeoutRef = useRef<number | null>(null);
+  const contextMenuSelectionRef = useRef("");
   const onTitleChangeRef = useRef(onTitleChange);
   const startedRef = useRef(false);
   useEffect(() => { onTitleChangeRef.current = onTitleChange; }, [onTitleChange]);
@@ -293,7 +294,7 @@ export default function TerminalView({
       if (disposed || event.payload.sessionId !== sessionId) return;
       try {
         if (event.payload.action === "copy") {
-          const value = terminal.getSelection();
+          const value = contextMenuSelectionRef.current || terminal.getSelection();
           if (value) await navigator.clipboard.writeText(value);
         } else if (event.payload.action === "paste") {
           const value = await navigator.clipboard.readText();
@@ -315,9 +316,10 @@ export default function TerminalView({
     if (!terminal) return;
     event.preventDefault();
     event.stopPropagation();
+    contextMenuSelectionRef.current = terminal.getSelection();
     void invoke("show_terminal_native_menu", {
       sessionId,
-      hasSelection: terminal.hasSelection(),
+      hasSelection: !!contextMenuSelectionRef.current,
     }).catch((error) => console.error("[terminal] Failed to open native context menu:", error));
   }, [terminal, sessionId]);
 
