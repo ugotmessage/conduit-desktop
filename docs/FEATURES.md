@@ -16,6 +16,7 @@
 - Auto-detection of local SSH keys (~/.ssh/id_rsa, id_ed25519)
 - **OpenSSH user config** (`~/.ssh/config`): UI and MCP SSH sessions apply matching `Host` / `HostName` / `User` / `Port` / `IdentityFile` / `ServerAliveInterval` / `ForwardAgent` (only when `SSH_AUTH_SOCK` exists). SOCKS5 `ProxyCommand nc -X 5 -x host:port %h %p` is implemented without a shell; unsupported `ProxyCommand` / `ProxyJump` fail instead of connecting directly. Explicit entry/MCP user, port and credentials win over config. See `docs/SSH_CONFIG.md`
 - **SSH login startup steps**: Each SSH entry can run an optional ordered list of keystrokes after login. Every step waits a fixed number of seconds (relative to the previous step), then types text or the connection password and Enter. There is no prompt / expect matching. Off by default. Opening the entry in the UI and MCP `connection_open_entry` use the same saved settings; Quick Connect and MCP `connection_open` do not. See `docs/SSH_STARTUP.md`
+- Terminal text uses xterm.js DOM rendering for SSH, local, agent and command sessions, avoiding stale WebGL glyph atlases after tab reuse or GPU context loss
 - Real-time terminal via xterm.js + node-pty
 - Terminal buffer reading with configurable history
 - Dynamic terminal resize (cols/rows)
