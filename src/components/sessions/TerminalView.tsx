@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
+import { WebglAddon } from "@xterm/addon-webgl";
+import { TERMINAL_RENDERER_EVENT, getTerminalRendererMode, clearTerminalRendererMode, type TerminalRendererMode } from "../../lib/terminalRenderer";
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
 import { getTerminalTheme } from "../../lib/terminalTheme";
 import { AGENT_NEWLINE_SEQUENCE, isAgentNewlineKey, type AgentZoom } from "../../lib/agentTerminalKeys";
@@ -19,6 +21,8 @@ interface TerminalEntry {
   terminal: Terminal;
   fitAddon: FitAddon;
   element: HTMLDivElement;  // the div that xterm.js rendered into
+  webgl: WebglAddon | null;
+  webglFailed: boolean;
   started: boolean;         // whether terminal_start was already called
 }
 const terminalRegistry = new Map<string, TerminalEntry>();
@@ -27,7 +31,9 @@ const terminalRegistry = new Map<string, TerminalEntry>();
 export function disposeTerminalEntry(sessionId: string): void {
   const entry = terminalRegistry.get(sessionId);
   if (entry) {
+    entry.webgl?.dispose();
     entry.terminal.dispose();
+    clearTerminalRendererMode(sessionId);
     terminalRegistry.delete(sessionId);
   }
 }
@@ -111,9 +117,7 @@ export default function TerminalView({
 
     term.open(termElement);
 
-    // Keep xterm's DOM renderer. Preserved terminals can outlive GPU contexts;
-    // stale WebGL glyph atlases may hide output even while selection still paints.
-    // Do not recreate GPU contexts on timers after a context loss.
+    // Default DOM is stable. A per-session choice can enable WebGL live.
 
     fitAddon.fit();
 
@@ -122,6 +126,8 @@ export default function TerminalView({
       terminal: term,
       fitAddon,
       element: termElement,
+      webgl: null,
+      webglFailed: false,
       started: false,
     });
     startedRef.current = false;
@@ -135,6 +141,53 @@ export default function TerminalView({
       }
     };
   }, [sessionId]);
+
+  // Switch the renderer addon only; SSH connection and xterm buffer stay intact.
+  useEffect(() => {
+    if (!terminal) return;
+    const applyRenderer = (mode: TerminalRendererMode, explicit: boolean) => {
+      const entry = terminalRegistry.get(sessionId);
+      if (!entry || entry.terminal !== terminal) return;
+      if (explicit) entry.webglFailed = false;
+      if (mode === "dom" || (mode === "auto" && entry.webglFailed)) {
+        if (entry.webgl) {
+          const previous = entry.webgl;
+          entry.webgl = null;
+          previous.dispose();
+        }
+        terminal.refresh(0, terminal.rows - 1);
+        return;
+      }
+      if (entry.webgl) return;
+      try {
+        const addon = new WebglAddon();
+        addon.onContextLoss(() => {
+          const current = terminalRegistry.get(sessionId);
+          if (!current || current.terminal !== terminal || current.webgl !== addon) return;
+          current.webgl = null;
+          current.webglFailed = true;
+          addon.dispose();
+          terminal.refresh(0, terminal.rows - 1);
+        });
+        terminal.loadAddon(addon);
+        entry.webgl = addon;
+        terminal.refresh(0, terminal.rows - 1);
+      } catch (error) {
+        entry.webglFailed = true;
+        entry.webgl?.dispose();
+        entry.webgl = null;
+        console.warn("[terminal] WebGL unavailable; staying on DOM", error);
+        terminal.refresh(0, terminal.rows - 1);
+      }
+    };
+    const onChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ sessionId: string; mode: TerminalRendererMode }>).detail;
+      if (detail?.sessionId === sessionId) applyRenderer(detail.mode, true);
+    };
+    document.addEventListener(TERMINAL_RENDERER_EVENT, onChange);
+    applyRenderer(getTerminalRendererMode(sessionId), false);
+    return () => document.removeEventListener(TERMINAL_RENDERER_EVENT, onChange);
+  }, [sessionId, terminal]);
 
   const refit = useCallback(() => fitAddonRef.current?.fit(), []);
   useTerminalFontFamily(terminal, refit);
