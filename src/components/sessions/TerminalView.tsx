@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
+import { showContextMenu } from "../../utils/contextMenu";
 import { WebglAddon } from "@xterm/addon-webgl";
 import { TERMINAL_RENDERER_EVENT, getTerminalRendererMode, clearTerminalRendererMode, type TerminalRendererMode } from "../../lib/terminalRenderer";
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
@@ -250,20 +251,21 @@ export default function TerminalView({
         return false;
       }
 
-      if (IS_MAC || ev.type !== "keydown") return true;
+      if (ev.type !== "keydown") return true;
 
       const isCtrl = ev.ctrlKey && !ev.altKey && !ev.metaKey;
+      const isMacCopy = IS_MAC && ev.metaKey && !ev.ctrlKey && !ev.altKey && !ev.shiftKey;
 
       // Ctrl+Shift+C  OR  Ctrl+C with active selection → Copy
-      if (isCtrl && ev.key === "c" && (ev.shiftKey || terminal.hasSelection())) {
+      if ((isMacCopy || isCtrl) && ev.key.toLowerCase() === "c" && (isMacCopy || ev.shiftKey || terminal.hasSelection())) {
         const selection = terminal.getSelection();
         if (selection) {
+          ev.preventDefault();
           navigator.clipboard.writeText(selection).catch((err) => {
             console.error("Failed to copy terminal selection:", err);
           });
-          terminal.clearSelection();
         }
-        return false;
+        return selection ? false : true;
       }
 
       // Ctrl+V or Ctrl+Shift+V → Paste
@@ -282,6 +284,30 @@ export default function TerminalView({
       return true;
     });
   }, [terminal, isAgentTerminal]);
+
+  const handleTerminalContextMenu = useCallback(async (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!terminal) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const selectedText = terminal.getSelection();
+    const action = await showContextMenu(event.clientX, event.clientY, [
+      { id: "copy", label: "Copy" },
+      { id: "paste", label: "Paste" },
+      { id: "select_all", label: "Select All" },
+    ]);
+    try {
+      if (action === "copy" && selectedText) {
+        await navigator.clipboard.writeText(selectedText);
+      } else if (action === "paste") {
+        const text = await navigator.clipboard.readText();
+        if (text) terminal.paste(text);
+      } else if (action === "select_all") {
+        terminal.selectAll();
+      }
+    } catch (error) {
+      console.error("[terminal] Clipboard operation failed:", error);
+    }
+  }, [terminal]);
 
   // Re-fit and focus when tab becomes active
   useEffect(() => {
@@ -413,7 +439,7 @@ export default function TerminalView({
   }, [terminal, sessionId]);
 
   return (
-    <div data-session-keyboard className="h-full w-full bg-editor overflow-hidden">
+    <div data-session-keyboard className="h-full w-full bg-editor overflow-hidden" onContextMenu={handleTerminalContextMenu}>
       <div
         ref={terminalRef}
         {...(isAgentTerminal && onFontZoom ? { [AGENT_TERMINAL_ATTR]: "" } : {})}
