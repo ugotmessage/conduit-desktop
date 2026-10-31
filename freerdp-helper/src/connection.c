@@ -322,8 +322,12 @@ static BOOL apply_gateway_settings(rdpSettings *settings, const GatewayConfig *g
 
 static BOOL apply_proxy_settings(rdpSettings *settings, const ProxyConfig *px) {
     /* Also protect direct helper callers from environment-driven proxy bypass. */
-    if (!SetEnvironmentVariableA("no_proxy", NULL) ||
-        !SetEnvironmentVariableA("NO_PROXY", NULL)) return FALSE;
+    /* Windows names are case-insensitive, and deleting an absent variable may fail.
+     * Check the resulting values instead of treating an already-absent name as an error. */
+    SetEnvironmentVariableA("no_proxy", NULL);
+    SetEnvironmentVariableA("NO_PROXY", NULL);
+    if (GetEnvironmentVariableA("no_proxy", NULL, 0) > 0 ||
+        GetEnvironmentVariableA("NO_PROXY", NULL, 0) > 0) return FALSE;
     /* FreeRDP ProxyPort is UINT16 (the UINT32 setter rejects this setting). */
     if (!freerdp_settings_set_uint32(settings, FreeRDP_ProxyType, PROXY_TYPE_SOCKS) ||
         !freerdp_settings_set_string(settings, FreeRDP_ProxyHostname, px->host) ||
