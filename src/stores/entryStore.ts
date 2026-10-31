@@ -265,6 +265,11 @@ async function connectEntry(
       deviceScaleFactor,
       enableClipboard: rdpCfg.clipboard,
       gatewayId,
+      proxyEnabled: rdpCfg.proxyEnabled,
+      proxyType: rdpCfg.proxyType,
+      proxyHost: rdpCfg.proxyHost,
+      proxyPort: rdpCfg.proxyPort,
+      proxyCredentialId: rdpCfg.proxyCredentialId,
     }).then((result) => {
       useSessionStore.getState().addSession({
         id: entry.id, type: "rdp", title: entry.name,
@@ -306,12 +311,13 @@ async function connectEntry(
     const entryConfig = entry.config as Record<string, unknown> | undefined;
     const realSessionId = await invoke<string>("ssh_session_create", {
       host: entry.host,
-      port: entry.port ?? 22,
+      port: entry.port ?? undefined,
       credentialId: entry.credential_id ?? null,
       username: cred?.username ?? null,
       password: cred?.password ?? null,
       privateKey: cred?.private_key ?? null,
       sshAuthMethod: (entryConfig?.ssh_auth_method as string) ?? null,
+      entryConfig: entryConfig ?? null,
     });
     sessionStore.replaceSessionId(entry.id, realSessionId, { status: "connected" });
     return;

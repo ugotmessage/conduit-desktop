@@ -77,6 +77,7 @@ export default function SettingsDialog({ onClose, initialTab }: SettingsDialogPr
     session_defaults_terminal: { ...HARDCODED_TERMINAL_DEFAULTS },
     session_defaults_ssh: { ...HARDCODED_SSH_DEFAULTS },
     personal_sync_enabled: true,
+    local_file_sync_unlimited: false,
     vault_idle_lock_minutes: 0,
   });
   const originalSettingsRef = useRef<Settings | null>(null);
@@ -176,7 +177,7 @@ export default function SettingsDialog({ onClose, initialTab }: SettingsDialogPr
       case "backup":
         return <BackupTab />;
       case "sync":
-        return <SyncTab />;
+        return <SyncTab settings={settings} setSettings={setSettings} onClose={onClose} />;
       case "mobile":
         return <MobileTab />;
       case "team":

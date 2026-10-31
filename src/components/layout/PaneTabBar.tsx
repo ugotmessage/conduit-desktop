@@ -21,6 +21,7 @@ import { invoke } from "../../lib/electron";
 import { connectionErrorText } from "../../lib/errorMessages";
 import { useTierStore } from "../../stores/tierStore";
 import { useDragContext } from "./DragContext";
+import { setTerminalRendererMode, getTerminalRendererMode } from "../../lib/terminalRenderer";
 import { toast } from "../common/Toast";
 import { openDashboardForEntry } from "../../lib/openDashboard";
 import { dashboardViewOf, isHomeSession } from "../../lib/dashboardSessions";
@@ -83,6 +84,13 @@ function tabMenuItems(session: Session | undefined, entry: EntryMeta | undefined
   }
   if (entryId && session?.type !== "dashboard") {
     items.push({ id: "view_info", label: "View Info", icon: "infoCircle" });
+  }
+  if (session?.type === "ssh" || session?.type === "local_shell") {
+    const current = getTerminalRendererMode(session.id);
+    items.push({ id: "renderer_header", label: `Renderer (current: ${current.toUpperCase()})`, type: "header" });
+    items.push({ id: "renderer_auto", label: "Auto — WebGL, fallback to DOM" });
+    items.push({ id: "renderer_dom", label: "DOM — compatibility" });
+    items.push({ id: "renderer_webgl", label: "WebGL — accelerated" });
   }
   if (session?.type === "rdp" && session?.status === "connected") {
     items.push({ id: "send_cad", label: "Send Ctrl+Alt+Delete", icon: "keyboard" });
@@ -225,6 +233,11 @@ export default function PaneTabBar({ paneId, isFocused: _isFocused, rightSlot, e
   const runTabMenuAction = async (selected: string, session: Session) => {
     const entryId = session.entryId;
     switch (selected) {
+      case "renderer_auto":
+      case "renderer_dom":
+      case "renderer_webgl":
+        setTerminalRendererMode(session.id, selected.slice("renderer_".length) as "auto" | "dom" | "webgl");
+        break;
       case "rename":
         setRenamingId(session.id);
         setRenameValue(session.title);

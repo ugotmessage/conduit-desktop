@@ -1,0 +1,146 @@
+name: PR installers
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-installers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.repository == 'ugotmessage/conduit-desktop'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            platform: darwin
+            flags: --mac dmg --arm64
+          - os: windows-2022
+            platform: win32
+            flags: --win nsis --x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      CONDUIT_ENV: production
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Build the actual PR branch, not a synthetic merge with main.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Set up MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Install macOS build tools
+        if: runner.os == 'macOS'
+        run: brew install cmake ninja pkg-config
+      - name: Cache FreeRDP dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            freerdp-helper/deps
+            freerdp-helper/deps-win
+          key: local-freerdp-${{ matrix.platform }}-${{ hashFiles('freerdp-helper/build-freerdp.sh', 'freerdp-helper/scripts/build-windows.ps1') }}
+      - name: Install app dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Install MCP dependencies
+        run: npm --prefix mcp ci --no-audit --no-fund
+      - name: Build TypeScript and renderer
+        run: npm run build
+      - name: Rebuild SQLite for Node test runner
+        run: npm rebuild better-sqlite3
+      - name: Test sync, SSH config, session gates, VNC and RDP clipboard
+        run: >-
+          npx vitest run
+          electron/services/ssh/__tests__
+          electron/services/terminal/__tests__/ssh-startup.test.ts
+          electron/ipc-server/__tests__/server-agent-sessions.test.ts
+          electron/ipc-server/__tests__/ssh-startup-open.test.ts
+          src/stores/__tests__/entry-ssh-startup.test.ts
+          src/components/entries/__tests__/SshStartupTab.test.tsx
+          src/components/entries/__tests__/EntryDialog.test.tsx
+          src/components/connections/__tests__/QuickConnect.test.tsx
+          src/stores/__tests__/entry-rdp-proxy.test.ts
+          src/components/entries/__tests__/ProxyTab.test.tsx
+          src/lib/__tests__/resolveConfig.test.ts
+          electron/services/rdp/__tests__/helper-protocol.test.ts
+          electron/services/rdp/__tests__/helper-process.test.ts
+          electron/services/rdp/__tests__/proxy-config.test.ts
+          electron/services/rdp/__tests__/proxy-connect.test.ts
+          electron/ipc-server/__tests__/rdp-entry-config.test.ts
+          mcp/src/tools/__tests__/connection.test.ts
+          electron/services/sync/__tests__/local-file-sync.test.ts
+          electron/services/sync/__tests__/sync-engine-e2e.test.ts
+          electron/services/sync/__tests__/copy-scanner-integration.test.ts
+          electron/services/vault-session/__tests__/open-personal-vault-real.test.ts
+          electron/services/vault-session/__tests__/open-personal-vault-runtime.test.ts
+          electron/services/rdp/__tests__/session-clipboard.test.ts
+          electron/services/rdp/__tests__/clipboard-files.test.ts
+          src/components/settings/__tests__/SyncTab.test.tsx
+          src/hooks/__tests__/useRemoteClipboard.test.tsx
+          src/components/sessions/__tests__/VncView.test.tsx
+      - name: Test FreeRDP helper protocol parser
+        if: runner.os != 'Windows'
+        working-directory: freerdp-helper
+        run: bash tests/run-tests.sh
+      - name: Build FreeRDP helper (macOS)
+        if: runner.os == 'macOS'
+        working-directory: freerdp-helper
+        run: |
+          bash build-freerdp.sh
+          bash scripts/build-macos.sh
+          bash scripts/bundle-macos.sh
+          test -x bundle/darwin/conduit-freerdp
+      - name: Build FreeRDP helper (Windows)
+        if: runner.os == 'Windows'
+        working-directory: freerdp-helper
+        shell: cmd
+        run: powershell -ExecutionPolicy Bypass -File scripts\build-windows.ps1
+      - name: Set up .NET (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build WebView2 helper (Windows)
+        if: runner.os == 'Windows'
+        run: dotnet publish webview2-helper/ConduitWebView2/ConduitWebView2.csproj -c Release -r win-x64 --self-contained true -o webview2-helper/bundle/win-x64/
+      - name: Verify native helper startup
+        run: node scripts/verify/pr-installer-helpers.mjs
+      - name: SOCKS5 native smoke
+        env:
+          CONDUIT_FREERDP_REQUIRED: '1'
+        run: node freerdp-helper/tests/socks5-smoke.mjs
+      - name: Package installer
+        env:
+          # No signing credentials: identity "-" in the local config is ad-hoc.
+          # PR default skip would leave the patched Mach-O signature invalid.
+          CSC_FOR_PULL_REQUEST: 'true'
+        run: npx electron-builder --config electron-builder.local.yml ${{ matrix.flags }} --publish never
+      - name: Verify macOS signature and disk image
+        if: runner.os == 'macOS'
+        run: |
+          codesign --verify --deep --strict release/mac-arm64/Conduit.app
+          hdiutil verify release/*.dmg
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: conduit-local-${{ matrix.platform }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            release/*.dmg
+            release/*.exe
+          if-no-files-found: error
+          retention-days: 14

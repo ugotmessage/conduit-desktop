@@ -12,6 +12,7 @@ declare module '@novnc/novnc/lib/rfb.js' {
     );
 
     // Properties
+    showDotCursor: boolean;
     scaleViewport: boolean;
     resizeSession: boolean;
     viewOnly: boolean;

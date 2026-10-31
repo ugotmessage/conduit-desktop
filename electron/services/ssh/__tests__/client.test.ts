@@ -43,9 +43,14 @@ vi.mock('ssh2', () => ({ Client: FakeClient }));
 vi.mock('../../dns-resolver.js', () => ({
   resolveHostname: vi.fn(async (host: string) => host),
 }));
+vi.mock('../socks5.js', () => ({
+  connectSocks5: vi.fn(),
+}));
 
 // Imported after the mocks are registered.
 const { SshSession } = await import('../client.js');
+const { resolveHostname } = await import('../../dns-resolver.js');
+const { connectSocks5 } = await import('../socks5.js');
 
 /** Let connect()'s `await resolveHostname()` settle so client.connect() runs. */
 async function flush() {
@@ -151,5 +156,65 @@ describe('SshSession public-key auth', () => {
 
     const client = instances[0];
     expect(client.connectOpts?.privateKey).toBe('line1\nline2\n');
+  });
+});
+
+describe('SshSession OpenSSH config wiring', () => {
+  beforeEach(() => {
+    instances.length = 0;
+    vi.mocked(connectSocks5).mockReset();
+    vi.mocked(resolveHostname).mockClear();
+  });
+
+  it('passes a SOCKS5 socket to ssh2 and skips local DNS', async () => {
+    const fakeSock = { destroy: vi.fn() };
+    vi.mocked(connectSocks5).mockResolvedValue(fakeSock as never);
+    const session = new SshSession({
+      host: 'db.lab.test',
+      port: 2222,
+      auth: { type: 'password', username: 'labuser', password: 'pw' },
+      proxy: { type: 'socks5', proxyHost: '127.0.0.1', proxyPort: 1086 },
+    });
+    session.connect().catch(() => {});
+    await flush();
+
+    expect(connectSocks5).toHaveBeenCalledWith({
+      proxyHost: '127.0.0.1',
+      proxyPort: 1086,
+      destinationHost: 'db.lab.test',
+      destinationPort: 2222,
+      timeoutMs: 30_000,
+    });
+    expect(resolveHostname).not.toHaveBeenCalled();
+    expect(instances[0].connectOpts?.sock).toBe(fakeSock);
+    expect(instances[0].connectOpts?.host).toBe('db.lab.test');
+  });
+
+  it('does not fall back to a direct connect when SOCKS5 fails', async () => {
+    vi.mocked(connectSocks5).mockRejectedValue(new Error('proxy down'));
+    const session = new SshSession({
+      host: 'db.lab.test',
+      auth: { type: 'password', username: 'labuser', password: 'pw' },
+      proxy: { type: 'socks5', proxyHost: '127.0.0.1', proxyPort: 1086 },
+    });
+    await expect(session.connect()).rejects.toThrow('proxy down');
+    expect(instances[0].connectOpts).toBeNull();
+    expect(resolveHostname).not.toHaveBeenCalled();
+  });
+
+  it('forwards the agent and ServerAliveInterval keepalive', async () => {
+    const session = new SshSession({
+      host: 'lab-bastion',
+      auth: { type: 'password', username: 'labuser', password: 'pw' },
+      agent: '/tmp/ssh-agent.sock',
+      agentForward: true,
+      keepaliveMs: 30_000,
+    });
+    session.connect().catch(() => {});
+    await flush();
+
+    expect(instances[0].connectOpts?.agent).toBe('/tmp/ssh-agent.sock');
+    expect(instances[0].connectOpts?.agentForward).toBe(true);
+    expect(instances[0].connectOpts?.keepaliveInterval).toBe(30_000);
   });
 });

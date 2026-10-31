@@ -5,7 +5,22 @@ vi.mock('electron', () => ({ app: { getPath: () => '/tmp' } }));
 vi.mock('../../services/state.js', () => ({ AppState: { getInstance: () => ({ getMainWindow: () => null }) } }));
 vi.mock('../../services/env-config.js', () => ({ getSocketPath: () => '/tmp/x.sock', isNamedPipe: () => false }));
 vi.mock('../../ipc/settings.js', () => ({ readSettings: () => ({}) }));
-vi.mock('../../services/ssh/resolve-auth.js', () => ({ resolveSshAuth: vi.fn(() => ({})), resolveSshAuthSystem: vi.fn(() => ({})) }));
+vi.mock('../../services/ssh/resolve-connection.js', () => ({
+  resolveSshConnection: vi.fn((input: { host: string; port?: number | null }) => ({
+    config: {
+      host: input.host,
+      port: input.port ?? 22,
+      auth: { type: 'password', username: 'u', password: '' },
+    },
+    alias: input.host,
+  })),
+  sshInputFromSessionArgs: vi.fn((args: { host: string; port?: number | null; credential?: unknown; sshAuthMethod?: string | null }) => ({
+    host: args.host,
+    port: args.port,
+    credential: args.credential ?? null,
+    sshAuthMethod: args.sshAuthMethod,
+  })),
+}));
 vi.mock('../open-session.js', () => ({
   openSshSession: vi.fn(async () => ({ session_id: 'ssh-new', connection_type: 'ssh', host: '10.0.0.5', port: 22, status: 'connected' })),
   openRdpSession: vi.fn(async () => ({ session_id: 'rdp-new', connection_type: 'rdp', host: 'win', port: 3389, status: 'connected', width: 1, height: 1 })),

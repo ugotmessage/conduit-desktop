@@ -6,7 +6,7 @@
  * while allowing full CSS styling to match the app theme.
  */
 
-import { ipcMain, BrowserWindow, screen } from 'electron';
+import { ipcMain, BrowserWindow, Menu, screen } from 'electron';
 import { AppState } from '../services/state.js';
 import { sanitizeSvg } from './menu-svg.js';
 
@@ -554,4 +554,22 @@ async function showPopupMenu(args: unknown): Promise<string | null> {
 
 export function registerMenuHandlers(): void {
   ipcMain.handle('show_context_menu_popup', (_e, args: unknown) => showPopupMenu(args));
+  ipcMain.handle('show_terminal_native_menu', (event, args: { sessionId?: string; hasSelection?: boolean }) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win || typeof args?.sessionId !== 'string' || args.sessionId.length > 128) return false;
+    const sessionId = args.sessionId;
+    const menu = Menu.buildFromTemplate([
+      { label: 'Copy', enabled: args.hasSelection === true,
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'copy' }) },
+      { label: 'Paste',
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'paste' }) },
+      { type: 'separator' },
+      { label: 'Select All',
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'select_all' }) },
+    ]);
+    // Return immediately. Execute the selected command from the click handler
+    // rather than relying on Menu.popup's dismiss callback ordering.
+    menu.popup({ window: win });
+    return true;
+  });
 }

@@ -11,7 +11,8 @@
 
 import { randomUUID } from 'node:crypto';
 import { AppState } from '../services/state.js';
-import type { SshAuth } from '../services/ssh/client.js';
+import type { SshConfig } from '../services/ssh/client.js';
+import type { PreparedSshStartup } from '../services/ssh/startup-script.js';
 import type { RdpEngineConfig } from '../services/rdp/engine.js';
 import { ensureFreeRdpReady } from '../services/rdp/engines/factory.js';
 
@@ -68,23 +69,21 @@ function registerMcpConnection(
 /** Open an SSH terminal session and wire it into the MCP registry + UI. */
 export async function openSshSession(
   state: AppState,
-  opts: { host: string; port: number; auth: SshAuth; name: string },
+  opts: { config: SshConfig; name: string; alias?: string; startup?: PreparedSshStartup },
 ): Promise<OpenedSession> {
-  const sessionId = await state.terminalManager.createSshSession({
-    host: opts.host,
-    port: opts.port,
-    auth: opts.auth,
-  });
+  const sessionId = await state.terminalManager.createSshSession(opts.config, { startup: opts.startup });
   state.terminalManager.startReading(sessionId);
 
-  registerMcpConnection(state, sessionId, 'ssh', opts.name, opts.host, opts.port);
-  notifyRendererTab(sessionId, 'ssh', opts.name, opts.host, opts.port);
+  const host = opts.alias ?? opts.config.host;
+  const port = opts.config.port ?? 22;
+  registerMcpConnection(state, sessionId, 'ssh', opts.name, host, port);
+  notifyRendererTab(sessionId, 'ssh', opts.name, host, port);
 
   return {
     session_id: sessionId,
     connection_type: 'ssh',
-    host: opts.host,
-    port: opts.port,
+    host,
+    port,
     status: 'connected',
   };
 }

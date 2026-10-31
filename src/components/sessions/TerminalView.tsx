@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebglAddon } from "@xterm/addon-webgl";
+import { TERMINAL_RENDERER_EVENT, getTerminalRendererMode, clearTerminalRendererMode, type TerminalRendererMode } from "../../lib/terminalRenderer";
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
 import { getTerminalTheme } from "../../lib/terminalTheme";
 import { AGENT_NEWLINE_SEQUENCE, isAgentNewlineKey, type AgentZoom } from "../../lib/agentTerminalKeys";
@@ -20,6 +21,8 @@ interface TerminalEntry {
   terminal: Terminal;
   fitAddon: FitAddon;
   element: HTMLDivElement;  // the div that xterm.js rendered into
+  webgl: WebglAddon | null;
+  webglFailed: boolean;
   started: boolean;         // whether terminal_start was already called
 }
 const terminalRegistry = new Map<string, TerminalEntry>();
@@ -28,7 +31,9 @@ const terminalRegistry = new Map<string, TerminalEntry>();
 export function disposeTerminalEntry(sessionId: string): void {
   const entry = terminalRegistry.get(sessionId);
   if (entry) {
+    entry.webgl?.dispose();
     entry.terminal.dispose();
+    clearTerminalRendererMode(sessionId);
     terminalRegistry.delete(sessionId);
   }
 }
@@ -58,6 +63,7 @@ export default function TerminalView({
   const [terminal, setTerminal] = useState<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const resizeTimeoutRef = useRef<number | null>(null);
+  const contextMenuSelectionRef = useRef("");
   const onTitleChangeRef = useRef(onTitleChange);
   const startedRef = useRef(false);
   useEffect(() => { onTitleChangeRef.current = onTitleChange; }, [onTitleChange]);
@@ -112,27 +118,7 @@ export default function TerminalView({
 
     term.open(termElement);
 
-    try {
-      const loadWebgl = () => {
-        try {
-          const addon = new WebglAddon();
-          addon.onContextLoss(() => {
-            addon.dispose();
-            // Re-render with canvas fallback, then try reloading WebGL
-            requestAnimationFrame(() => {
-              term.refresh(0, term.rows - 1);
-              setTimeout(loadWebgl, 200);
-            });
-          });
-          term.loadAddon(addon);
-        } catch {
-          // Canvas fallback is fine
-        }
-      };
-      loadWebgl();
-    } catch (e) {
-      console.warn("WebGL addon not available:", e);
-    }
+    // Default DOM is stable. A per-session choice can enable WebGL live.
 
     fitAddon.fit();
 
@@ -141,6 +127,8 @@ export default function TerminalView({
       terminal: term,
       fitAddon,
       element: termElement,
+      webgl: null,
+      webglFailed: false,
       started: false,
     });
     startedRef.current = false;
@@ -154,6 +142,53 @@ export default function TerminalView({
       }
     };
   }, [sessionId]);
+
+  // Switch the renderer addon only; SSH connection and xterm buffer stay intact.
+  useEffect(() => {
+    if (!terminal) return;
+    const applyRenderer = (mode: TerminalRendererMode, explicit: boolean) => {
+      const entry = terminalRegistry.get(sessionId);
+      if (!entry || entry.terminal !== terminal) return;
+      if (explicit) entry.webglFailed = false;
+      if (mode === "dom" || (mode === "auto" && entry.webglFailed)) {
+        if (entry.webgl) {
+          const previous = entry.webgl;
+          entry.webgl = null;
+          previous.dispose();
+        }
+        terminal.refresh(0, terminal.rows - 1);
+        return;
+      }
+      if (entry.webgl) return;
+      try {
+        const addon = new WebglAddon();
+        addon.onContextLoss(() => {
+          const current = terminalRegistry.get(sessionId);
+          if (!current || current.terminal !== terminal || current.webgl !== addon) return;
+          current.webgl = null;
+          current.webglFailed = true;
+          addon.dispose();
+          terminal.refresh(0, terminal.rows - 1);
+        });
+        terminal.loadAddon(addon);
+        entry.webgl = addon;
+        terminal.refresh(0, terminal.rows - 1);
+      } catch (error) {
+        entry.webglFailed = true;
+        entry.webgl?.dispose();
+        entry.webgl = null;
+        console.warn("[terminal] WebGL unavailable; staying on DOM", error);
+        terminal.refresh(0, terminal.rows - 1);
+      }
+    };
+    const onChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ sessionId: string; mode: TerminalRendererMode }>).detail;
+      if (detail?.sessionId === sessionId) applyRenderer(detail.mode, true);
+    };
+    document.addEventListener(TERMINAL_RENDERER_EVENT, onChange);
+    applyRenderer(getTerminalRendererMode(sessionId), false);
+    return () => document.removeEventListener(TERMINAL_RENDERER_EVENT, onChange);
+  }, [sessionId, terminal]);
 
   const refit = useCallback(() => fitAddonRef.current?.fit(), []);
   useTerminalFontFamily(terminal, refit);
@@ -216,20 +251,21 @@ export default function TerminalView({
         return false;
       }
 
-      if (IS_MAC || ev.type !== "keydown") return true;
+      if (ev.type !== "keydown") return true;
 
       const isCtrl = ev.ctrlKey && !ev.altKey && !ev.metaKey;
+      const isMacCopy = IS_MAC && ev.metaKey && !ev.ctrlKey && !ev.altKey && !ev.shiftKey;
 
       // Ctrl+Shift+C  OR  Ctrl+C with active selection → Copy
-      if (isCtrl && ev.key === "c" && (ev.shiftKey || terminal.hasSelection())) {
+      if ((isMacCopy || isCtrl) && ev.key.toLowerCase() === "c" && (isMacCopy || ev.shiftKey || terminal.hasSelection())) {
         const selection = terminal.getSelection();
         if (selection) {
+          ev.preventDefault();
           navigator.clipboard.writeText(selection).catch((err) => {
             console.error("Failed to copy terminal selection:", err);
           });
-          terminal.clearSelection();
         }
-        return false;
+        return selection ? false : true;
       }
 
       // Ctrl+V or Ctrl+Shift+V → Paste
@@ -248,6 +284,44 @@ export default function TerminalView({
       return true;
     });
   }, [terminal, isAgentTerminal]);
+
+  // Native menu item clicks arrive as IPC events, not Menu.popup dismiss results.
+  useEffect(() => {
+    if (!terminal) return;
+    let disposed = false;
+    let unlisten: UnlistenFn | undefined;
+    void listen<{ sessionId: string; action: string }>("terminal:native-menu-action", async (event) => {
+      if (disposed || event.payload.sessionId !== sessionId) return;
+      try {
+        if (event.payload.action === "copy") {
+          const value = contextMenuSelectionRef.current || terminal.getSelection();
+          if (value) await navigator.clipboard.writeText(value);
+        } else if (event.payload.action === "paste") {
+          const value = await navigator.clipboard.readText();
+          if (value) terminal.paste(value);
+        } else if (event.payload.action === "select_all") {
+          terminal.selectAll();
+        }
+      } catch (error) {
+        console.error("[terminal] Native clipboard action failed:", error);
+      }
+    }).then((stop) => {
+      if (disposed) stop();
+      else unlisten = stop;
+    });
+    return () => { disposed = true; unlisten?.(); };
+  }, [terminal, sessionId]);
+
+  const handleTerminalContextMenu = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (!terminal) return;
+    event.preventDefault();
+    event.stopPropagation();
+    contextMenuSelectionRef.current = terminal.getSelection();
+    void invoke("show_terminal_native_menu", {
+      sessionId,
+      hasSelection: !!contextMenuSelectionRef.current,
+    }).catch((error) => console.error("[terminal] Failed to open native context menu:", error));
+  }, [terminal, sessionId]);
 
   // Re-fit and focus when tab becomes active
   useEffect(() => {
@@ -379,7 +453,7 @@ export default function TerminalView({
   }, [terminal, sessionId]);
 
   return (
-    <div data-session-keyboard className="h-full w-full bg-editor overflow-hidden">
+    <div data-session-keyboard className="h-full w-full bg-editor overflow-hidden" onContextMenu={handleTerminalContextMenu}>
       <div
         ref={terminalRef}
         {...(isAgentTerminal && onFontZoom ? { [AGENT_TERMINAL_ATTR]: "" } : {})}

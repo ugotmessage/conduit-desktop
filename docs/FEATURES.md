@@ -1,7 +1,7 @@
 # Conduit Features
 
 > **Auto-maintained**: This document is updated whenever a new feature is implemented.
-> Last updated: 2026-09-29
+> Last updated: 2026-10-27
 
 ---
 
@@ -14,6 +14,9 @@
 - **Global SSH auth default**: Configurable in Settings → Sessions → SSH — sets the default auth method when both key and password are present
 - **Terminal font family**: Settings → Sessions → Terminal takes any installed font (type a name or browse the installed fonts), with a live preview including Nerd Font icons. The built-in fonts (Menlo, Monaco, Consolas, Courier New) stay as the fallback. Applies to SSH, local, agent and command terminals, and open terminals switch as soon as the setting is saved. Nerd Font icons are scaled to fit their cell
 - Auto-detection of local SSH keys (~/.ssh/id_rsa, id_ed25519)
+- **OpenSSH user config** (`~/.ssh/config`): UI and MCP SSH sessions apply matching `Host` / `HostName` / `User` / `Port` / `IdentityFile` / `ServerAliveInterval` / `ForwardAgent` (only when `SSH_AUTH_SOCK` exists). SOCKS5 `ProxyCommand nc -X 5 -x host:port %h %p` is implemented without a shell; unsupported `ProxyCommand` / `ProxyJump` fail instead of connecting directly. Explicit entry/MCP user, port and credentials win over config. See `docs/SSH_CONFIG.md`
+- **SSH login startup steps**: Each SSH entry can run an optional ordered list of keystrokes after login. Every step waits a fixed number of seconds (relative to the previous step), then types text or the connection password and Enter. There is no prompt / expect matching. Off by default. Opening the entry in the UI and MCP `connection_open_entry` use the same saved settings; Quick Connect and MCP `connection_open` do not. See `docs/SSH_STARTUP.md`
+- Terminal text uses xterm.js DOM rendering for SSH, local, agent and command sessions, avoiding stale WebGL glyph atlases after tab reuse or GPU context loss
 - Real-time terminal via xterm.js + node-pty
 - Terminal buffer reading with configurable history
 - Dynamic terminal resize (cols/rows)
@@ -56,6 +59,12 @@
   - Gateways show in the sidebar with their own icon and are left out of every login picker
   - The connecting screen names the gateway, and gateway failures (login, unreachable, refused by policy, certificate) get their own error messages
   - iOS shows a gateway as a regular credential and connects RDP entries straight to the computer
+- **SOCKS5 proxy** (see `docs/RDP_SOCKS.md`): per-RDP-entry TCP hop through a SOCKS5 proxy (default off)
+  - Proxy tab: enable, host, port (1080), optional saved vault login for proxy authentication
+  - FreeRDP 3.15 native client proxy (`PROXY_TYPE_SOCKS`); destination DNS is done by the proxy
+  - SOCKS5 and RD Gateway cannot be on at the same time (editor and connect both refuse)
+  - Saved entries (UI and `connection_open_entry`) use the entry's proxy; Quick Connect and manual `connection_open` stay direct
+  - An explicit SOCKS hop does not fall back to a direct connect, and ambient `no_proxy`/`NO_PROXY` is cleared for the helper so it cannot cancel the hop
 
 ### VNC (Virtual Network Computing)
 - Password authentication via rfb2 client
@@ -527,7 +536,7 @@ Standalone MCP server process exposes Conduit tools to AI agents (Claude Code, e
 - **Web**: screenshot (returns viewport + image dims atomically), read content, navigate (with `wait_until` = `load`/`domcontentloaded`/`networkidle`), click, type, send key (press/down/up), mouse move, drag, scroll, get dimensions, click element (CSS selector), fill input (CSS selector), get interactive elements, execute JavaScript
 - **Web Tab Management**: list tabs, create tab, close tab, switch tab, go back, go forward, reload — enables AI agents to manage multiple browser tabs per web session
 - **Credentials**: list, create, read (returns refs, not values; `reveal: true` asks the user first), delete, generate SSH key pair (`ssh_key_generate` — generates ed25519/RSA/ECDSA, stores encrypted in vault, returns only the public key + fingerprint)
-- **Connections**: list (active and saved), open (SSH/RDP/VNC by manual host/port/credential params), open from vault entry (`connection_open_entry` — opens a saved ssh/rdp/vnc entry by its `entry_id`; resolves host, port, and credentials server-side from the entry, honoring stored RDP settings and SSH auth-method preference, so the agent never handles secrets), close (also drops cached coordinate scale factors so a reopen under the same id can't reuse stale scale)
+- **Connections**: list (active and saved), open (SSH/RDP/VNC by manual host/port/credential params; RDP stays a direct connect unless a saved entry has SOCKS5), open from vault entry (`connection_open_entry` — opens a saved ssh/rdp/vnc entry by its `entry_id`; resolves host, port, and credentials server-side from the entry, honoring stored RDP settings including SOCKS5 and SSH auth-method preference, so the agent never handles secrets), close (also drops cached coordinate scale factors so a reopen under the same id can't reuse stale scale)
 - **Entry**: get metadata for any vault entry with optional notes, update entry notes, edit part of the notes (`entry_edit_notes`: exact find-and-replace edits, applied in order, all or nothing), list entries (filter by `entry_type` / `folder_id` / `tags`), search entries (case-insensitive substring on name and host)
 - **Document**: read, create, and update markdown document entries
 - **Knowledge base**: `kb_context` (what applies to an asset or folder), `kb_search`, `kb_read`, `kb_write` (create, rewrite or exact edits; saves at once for later review), `kb_log` (change log line), `kb_verify`, `kb_archive`, `kb_import_notes`, `kb_dismiss_migration`. `entry_info` adds a `knowledge` block with the articles that apply, a stale count and the notes-migration suggestion. The MCP server's instructions tell every agent to read knowledge first and write what it learns

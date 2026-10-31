@@ -11,9 +11,11 @@
 import type { RdpEngineConfig } from '../services/rdp/engine.js';
 import { gatewayIdOf, type RdpEntryGatewayFields } from '../services/rdp/gateway-config.js';
 import { connectGateway, type GatewayVault } from '../services/rdp/gateway-connect.js';
+import type { RdpEntryProxyFields } from '../services/rdp/proxy-config.js';
+import { connectProxy } from '../services/rdp/proxy-connect.js';
 
 /** Minimal view of the RDP fields stored on an entry's `config` JSON blob. */
-export interface RdpEntryConfigFields extends RdpEntryGatewayFields {
+export interface RdpEntryConfigFields extends RdpEntryGatewayFields, RdpEntryProxyFields {
   resolution?: string;
   customWidth?: number;
   customHeight?: number;
@@ -85,11 +87,13 @@ export function buildRdpEngineConfigFromEntry(opts: {
 }): RdpEngineConfig {
   const cfg = (opts.entryConfig ?? {}) as RdpEntryConfigFields;
   const { width, height } = resolutionToDimensions(cfg);
+  const gatewayVault = opts.gatewayVault ?? NO_GATEWAYS;
   const gateway = connectGateway(
     gatewayIdOf(cfg),
     { username: opts.username, password: opts.password, domain: opts.domain },
-    opts.gatewayVault ?? NO_GATEWAYS,
+    gatewayVault,
   );
+  const proxy = connectProxy(cfg, opts.gatewayVault, { gatewayEnabled: Boolean(gateway) });
 
   return {
     host: opts.host,
@@ -110,5 +114,6 @@ export function buildRdpEngineConfigFromEntry(opts: {
     frameRate: 30,
     enableClipboard: cfg.clipboard ?? true,
     gateway,
+    proxy,
   };
 }

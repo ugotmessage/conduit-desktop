@@ -33,6 +33,7 @@
 #include <winpr/synch.h>
 #include <winpr/thread.h>
 #include <winpr/wlog.h>
+#include <winpr/environment.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -319,6 +320,42 @@ static BOOL apply_gateway_settings(rdpSettings *settings, const GatewayConfig *g
     return TRUE;
 }
 
+static BOOL apply_proxy_settings(rdpSettings *settings, const ProxyConfig *px) {
+    /* Also protect direct helper callers from environment-driven proxy bypass. */
+    /* Windows names are case-insensitive, and deleting an absent variable may fail.
+     * Check the resulting values instead of treating an already-absent name as an error. */
+    SetEnvironmentVariableA("no_proxy", NULL);
+    SetEnvironmentVariableA("NO_PROXY", NULL);
+    if (GetEnvironmentVariableA("no_proxy", NULL, 0) > 0 ||
+        GetEnvironmentVariableA("NO_PROXY", NULL, 0) > 0) return FALSE;
+    /* FreeRDP ProxyPort is UINT16 (the UINT32 setter rejects this setting). */
+    if (!freerdp_settings_set_uint32(settings, FreeRDP_ProxyType, PROXY_TYPE_SOCKS) ||
+        !freerdp_settings_set_string(settings, FreeRDP_ProxyHostname, px->host) ||
+        !freerdp_settings_set_uint16(settings, FreeRDP_ProxyPort, (UINT16)px->port)) {
+        return FALSE;
+    }
+    if (px->username && px->username[0] &&
+        !freerdp_settings_set_string(settings, FreeRDP_ProxyUsername, px->username)) {
+        return FALSE;
+    }
+    if (px->password &&
+        !freerdp_settings_set_string(settings, FreeRDP_ProxyPassword, px->password)) {
+        return FALSE;
+    }
+    /* Disable UDP transports, but keep network autodetection on the RDP TCP stream.
+     * Servers may send continuous RTT requests after login; FreeRDP disconnects
+     * on those requests if NetworkAutoDetect is disabled. */
+    if (!freerdp_settings_set_bool(settings, FreeRDP_NetworkAutoDetect, TRUE) ||
+        !freerdp_settings_set_bool(settings, FreeRDP_SupportMultitransport, FALSE) ||
+        !freerdp_settings_set_uint32(settings, FreeRDP_MultitransportFlags, 0)) {
+        return FALSE;
+    }
+    fprintf(stderr, "[conduit-freerdp] SOCKS5 proxy: %s:%d auth=%s\n",
+            px->host ? px->host : "?", px->port,
+            (px->username && px->username[0]) ? "set" : "none");
+    return TRUE;
+}
+
 /* Gateway code writes to its own TLS sockets, so the first transport write is RDP data to the target. */
 static pTransportRWFkt s_default_write_pdu = NULL;
 static volatile BOOL s_target_reached = FALSE;
@@ -417,15 +454,29 @@ freerdp *connection_init(const ConnectConfig *config) {
     }
 
     /* ── RD Gateway ── */
+    if (config->has_gateway && config->has_proxy) {
+        fprintf(stderr, "[conduit-freerdp] SOCKS5 proxy and RD Gateway cannot be used together\n");
+        freerdp_context_free(instance);
+        freerdp_free(instance);
+        return NULL;
+    }
     if (config->has_gateway && !apply_gateway_settings(settings, &config->gateway)) {
         fprintf(stderr, "[conduit-freerdp] Failed to apply RD Gateway settings\n");
         freerdp_context_free(instance);
         freerdp_free(instance);
         return NULL;
     }
+    if (config->has_proxy && !apply_proxy_settings(settings, &config->proxy)) {
+        fprintf(stderr, "[conduit-freerdp] Failed to apply SOCKS5 proxy settings\n");
+        freerdp_context_free(instance);
+        freerdp_free(instance);
+        return NULL;
+    }
 
     /* ── Network ── */
-    freerdp_settings_set_bool(settings, FreeRDP_NetworkAutoDetect, TRUE);
+    if (!config->has_proxy) {
+        freerdp_settings_set_bool(settings, FreeRDP_NetworkAutoDetect, TRUE);
+    }
 
     /* ── GFX pipeline (H.264/AVC + progressive codec) ── */
     if (config->enable_gfx) {
@@ -479,6 +530,9 @@ bool connection_connect(freerdp *instance) {
 
     const BOOL gateway_enabled =
         freerdp_settings_get_bool(instance->context->settings, FreeRDP_GatewayEnabled);
+    const UINT32 proxy_type =
+        freerdp_settings_get_uint32(instance->context->settings, FreeRDP_ProxyType);
+    const BOOL proxy_enabled = proxy_type == PROXY_TYPE_SOCKS;
     if (gateway_enabled) track_target_reached(instance->context);
 
     if (!freerdp_connect(instance)) {
@@ -489,7 +543,9 @@ bool connection_connect(freerdp *instance) {
             /* Some gateway failure paths reset the last error to SUCCESS. */
             error_str = gateway_enabled
                 ? "Could not connect through the RD Gateway."
-                : "Connection failed";
+                : proxy_enabled
+                    ? "Could not connect through the SOCKS5 proxy."
+                    : "Connection failed";
         }
         const char *error_name = freerdp_get_last_error_name(error);
         const char *phase = s_default_write_pdu

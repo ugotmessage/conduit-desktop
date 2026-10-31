@@ -55,6 +55,33 @@ GatewayTransport gateway_transport_from_string(const char *s) {
 }
 
 const char *connect_config_validate(const ConnectConfig *config) {
+    if (config->has_proxy && config->has_gateway) {
+        return "SOCKS5 proxy and RD Gateway cannot be used together.";
+    }
+    if (config->proxy_malformed) {
+        return "The RDP proxy settings are invalid.";
+    }
+    if (config->has_proxy) {
+        if (!config->proxy.host || !config->proxy.host[0]) {
+            return "The SOCKS5 proxy address is missing.";
+        }
+        if (config->proxy.port < 1 || config->proxy.port > 65535) {
+            return "The SOCKS5 proxy port must be between 1 and 65535.";
+        }
+        if (!config->proxy.type || strcmp(config->proxy.type, "socks5") != 0) {
+            return "Only SOCKS5 proxies are supported.";
+        }
+        if (strpbrk(config->proxy.host, " \t\r\n") != NULL) {
+            return "The SOCKS5 proxy address is invalid.";
+        }
+        if (config->proxy.username || config->proxy.password) {
+            if (!config->proxy.username || !config->proxy.password ||
+                strlen(config->proxy.username) < 1 || strlen(config->proxy.username) > 255 ||
+                strlen(config->proxy.password) < 1 || strlen(config->proxy.password) > 255) {
+                return "SOCKS5 authentication requires a username and password of 1-255 bytes.";
+            }
+        }
+    }
     if (!config->has_gateway) return NULL;
     if (!config->gateway.host || !config->gateway.host[0]) {
         return "The RD Gateway address is missing.";
@@ -77,6 +104,49 @@ static void parse_gateway(cJSON *config, GatewayConfig *gw, bool *has_gateway) {
     gw->domain = safe_strdup(cjson_get_string(obj, "domain"));
     gw->transport = gateway_transport_from_string(cjson_get_string(obj, "transport"));
     gw->bypass_local = cjson_get_bool(obj, "bypassLocal", false);
+    scrub_json_string(obj, "password");
+}
+
+static bool json_is_int_port(cJSON *item) {
+    return cJSON_IsNumber(item) && item->valueint >= 1 && item->valueint <= 65535
+        && item->valuedouble == (double)item->valueint;
+}
+
+static void parse_proxy(cJSON *config, ConnectConfig *out) {
+    cJSON *obj = cJSON_GetObjectItemCaseSensitive(config, "proxy");
+    if (!obj || cJSON_IsNull(obj)) return;
+
+    /* Present but not an object: reject. Dropping it would silently connect direct. */
+    out->has_proxy = true;
+    if (!cJSON_IsObject(obj)) {
+        out->proxy_malformed = true;
+        return;
+    }
+
+    const char *type = cjson_get_string(obj, "type");
+    out->proxy.type = safe_strdup(type);
+    if (!type || strcmp(type, "socks5") != 0) {
+        out->proxy_malformed = true;
+    }
+
+    out->proxy.host = safe_strdup(cjson_get_string(obj, "host"));
+
+    cJSON *port = cJSON_GetObjectItemCaseSensitive(obj, "port");
+    if (!port) {
+        out->proxy.port = 1080;
+    } else if (!json_is_int_port(port)) {
+        out->proxy_malformed = true;
+        out->proxy.port = cJSON_IsNumber(port) ? port->valueint : 0;
+    } else {
+        out->proxy.port = port->valueint;
+    }
+
+    cJSON *user = cJSON_GetObjectItemCaseSensitive(obj, "username");
+    cJSON *pass = cJSON_GetObjectItemCaseSensitive(obj, "password");
+    if (user && !cJSON_IsString(user) && !cJSON_IsNull(user)) out->proxy_malformed = true;
+    if (pass && !cJSON_IsString(pass) && !cJSON_IsNull(pass)) out->proxy_malformed = true;
+    out->proxy.username = safe_strdup(cjson_get_string(obj, "username"));
+    out->proxy.password = safe_strdup(cjson_get_string(obj, "password"));
     scrub_json_string(obj, "password");
 }
 
@@ -133,6 +203,7 @@ bool protocol_read_command(Command *cmd) {
             cmd->data.connect.enable_clipboard = cjson_get_bool(config, "enableClipboard", true);
             scrub_json_string(config, "password");
             parse_gateway(config, &cmd->data.connect.gateway, &cmd->data.connect.has_gateway);
+            parse_proxy(config, &cmd->data.connect);
 
             /* Parse drives array for RDPDR */
             cJSON *drives = cJSON_GetObjectItemCaseSensitive(config, "drives");
@@ -235,6 +306,10 @@ void protocol_free_command(Command *cmd) {
         free(cmd->data.connect.gateway.username);
         secure_free_string(cmd->data.connect.gateway.password);
         free(cmd->data.connect.gateway.domain);
+        free(cmd->data.connect.proxy.type);
+        free(cmd->data.connect.proxy.host);
+        free(cmd->data.connect.proxy.username);
+        secure_free_string(cmd->data.connect.proxy.password);
         if (cmd->data.connect.drives) {
             for (int i = 0; i < cmd->data.connect.drive_count; i++) {
                 free(cmd->data.connect.drives[i].name);
