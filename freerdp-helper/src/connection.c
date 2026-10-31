@@ -342,8 +342,10 @@ static BOOL apply_proxy_settings(rdpSettings *settings, const ProxyConfig *px) {
         !freerdp_settings_set_string(settings, FreeRDP_ProxyPassword, px->password)) {
         return FALSE;
     }
-    /* SOCKS5 is TCP CONNECT. Do not send UDP probes around the proxy. */
-    if (!freerdp_settings_set_bool(settings, FreeRDP_NetworkAutoDetect, FALSE) ||
+    /* Disable UDP transports, but keep network autodetection on the RDP TCP stream.
+     * Servers may send continuous RTT requests after login; FreeRDP disconnects
+     * on those requests if NetworkAutoDetect is disabled. */
+    if (!freerdp_settings_set_bool(settings, FreeRDP_NetworkAutoDetect, TRUE) ||
         !freerdp_settings_set_bool(settings, FreeRDP_SupportMultitransport, FALSE) ||
         !freerdp_settings_set_uint32(settings, FreeRDP_MultitransportFlags, 0)) {
         return FALSE;

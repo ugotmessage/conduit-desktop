@@ -50,9 +50,20 @@ Malformed or unknown helper `proxy` objects are rejected. The helper does not dr
 - A live login through a real RDP server, NLA, or TLS certificate after the SOCKS `CONNECT` (native smoke stops at the SOCKS handshake).
 - SOCKS5 and RD Gateway chained together (explicitly refused).
 - HTTP, SOCKS4, or other proxy types.
-- UDP / RDP multitransport around the proxy (Network Auto-Detect is turned off for a SOCKS hop).
+- UDP / RDP multitransport around the proxy (disabled; network autodetection stays enabled on the proxied RDP TCP stream).
 - Reading `~/.ssh/config` for RDP.
 - iOS.
 - Authenticated SOCKS against a proxy that is not a vault login credential.
 
 Native validation also disables SupportMultitransport and MultitransportFlags (UDP), uses the UINT16 ProxyPort API, and clears proxy bypass variables inside the helper. CI tests both no-auth and username/password SOCKS5 with loopback fixtures and does not log into an RDP server.
+
+### Post-login RTT disconnect regression
+
+The first SOCKS5 build disabled `NetworkAutoDetect` as well as UDP multitransport.
+Device logs showed a successful SOCKS5 connection and an active RDP session, followed
+by a continuous RTT request and `STATE_RUN_FAILED`. FreeRDP 3.15.0 rejects that
+request when network autodetection is disabled (`libfreerdp/core/autodetect.c`).
+Keep `NetworkAutoDetect=TRUE` while retaining `SupportMultitransport=FALSE` and
+`MultitransportFlags=0`. RTT responses use the existing RDP TCP connection.
+The loopback smoke only covers SOCKS5 CONNECT; it does not verify post-login RTT
+handling. Sustained real-server use after this correction still needs device validation.
