@@ -50,6 +50,15 @@ typedef struct {
     bool bypass_local;
 } GatewayConfig;
 
+/* SOCKS5 client proxy (config.proxy). Password is memory-only. */
+typedef struct {
+    char *type;
+    char *host;
+    int port;
+    char *username;
+    char *password;
+} ProxyConfig;
+
 /* Parsed connect configuration */
 typedef struct {
     char *host;
@@ -70,6 +79,9 @@ typedef struct {
     bool enable_clipboard;
     bool has_gateway;
     GatewayConfig gateway;
+    bool has_proxy;
+    bool proxy_malformed;
+    ProxyConfig proxy;
 } ConnectConfig;
 
 /* Parsed command */

@@ -24,6 +24,7 @@ import {
 import type { RdpEngineConfig } from '../services/rdp/engine.js';
 import { GatewayConfigError, gatewayIdOf } from '../services/rdp/gateway-config.js';
 import { describeGateway } from '../services/rdp/gateway-connect.js';
+import { ProxyConfigError, describeProxy } from '../services/rdp/proxy-config.js';
 import { rdpLog } from '../services/rdp/rdp-log.js';
 import { gatewayInfo } from './gateway-info.js';
 import type { ImageFormat } from '../services/rdp/framebuffer.js';
@@ -688,13 +689,13 @@ async function dispatchRequest(
               entryConfig,
               gatewayVault: vault,
             });
-            rdpLog(`[RDP] connection_open_entry ${config.gateway ? describeGateway(config.gateway) : 'gateway=none'}`);
+            rdpLog(`[RDP] connection_open_entry ${config.gateway ? describeGateway(config.gateway) : 'gateway=none'} ${config.proxy ? describeProxy(config.proxy) : 'proxy=none'}`);
 
             const result = await openRdpSession(state, { config, name: entry.name, gatewayId: gatewayIdOf(entryConfig) });
             return successResponse({ ...result, entry_id, name: entry.name });
           } catch (e) {
-            if (e instanceof GatewayConfigError) {
-              rdpLog(`[RDP] Gateway setup failed: ${e.message}`);
+            if (e instanceof GatewayConfigError || e instanceof ProxyConfigError) {
+              rdpLog(`[RDP] Hop setup failed: ${e.message}`);
               return errorResponse('RDP_ERROR', e.message);
             }
             return errorResponse('RDP_ERROR', String(e));

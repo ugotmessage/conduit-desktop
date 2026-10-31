@@ -265,6 +265,11 @@ async function connectEntry(
       deviceScaleFactor,
       enableClipboard: rdpCfg.clipboard,
       gatewayId,
+      proxyEnabled: rdpCfg.proxyEnabled,
+      proxyType: rdpCfg.proxyType,
+      proxyHost: rdpCfg.proxyHost,
+      proxyPort: rdpCfg.proxyPort,
+      proxyCredentialId: rdpCfg.proxyCredentialId,
     }).then((result) => {
       useSessionStore.getState().addSession({
         id: entry.id, type: "rdp", title: entry.name,

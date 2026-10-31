@@ -9,6 +9,7 @@ import { DEFAULT_COMMAND_CONFIG, DEFAULT_SSH_STARTUP } from "../../types/entry";
 import { loadSshStartupConfig, serializeSshStartupConfig, sshStartupSaveError } from "../../lib/sshStartup";
 import type { CredentialType } from "../../types/credential";
 import { RD_GATEWAY_CREDENTIAL_TYPE, type RdGatewayConfig } from "../../lib/rdpGateway";
+import { rdpProxyConfigForSave, rdpProxyValidationError } from "../../lib/rdpProxy";
 import { Button, Dialog, DialogFooter, DialogHeader, type DialogLayer } from "../ui";
 import CredentialPicker from "../vault/CredentialPicker";
 import EntryDialogSidebar from "./EntryDialogSidebar";
@@ -26,6 +27,7 @@ import InformationTab from "./tabs/InformationTab";
 import CommandTab from "./tabs/CommandTab";
 import SshStartupTab from "./tabs/SshStartupTab";
 import GatewayTab from "./tabs/GatewayTab";
+import ProxyTab from "./tabs/ProxyTab";
 import GatewayServerTab from "./tabs/GatewayServerTab";
 import GatewayLoginTab from "./tabs/GatewayLoginTab";
 import {
@@ -264,7 +266,10 @@ export default function EntryDialog({
       return { ...commandConfig as unknown as Record<string, unknown>, ...totpMeta };
     }
     if (entryType === "rdp") {
-      return { ...stripUndefined(rdpGatewayConfigForSave(rdpConfig) as unknown as Record<string, unknown>), ...totpMeta };
+      return {
+        ...stripUndefined(rdpProxyConfigForSave(rdpGatewayConfigForSave(rdpConfig)) as unknown as Record<string, unknown>),
+        ...totpMeta,
+      };
     }
     if (isGateway) {
       return { ...gatewayEntryConfigForSave(gatewayConfig, gatewayLogin, credentialId) };
@@ -366,6 +371,14 @@ export default function EntryDialog({
       const serverError = gatewayEntryValidationError(gatewayConfig, 'typed', null);
       setActiveTab(serverError ? 'gateway_server' : 'gateway_login');
       return;
+    }
+    if (entryType === 'rdp') {
+      const proxyError = rdpProxyValidationError(rdpConfig);
+      if (proxyError) {
+        setValidationError(proxyError);
+        setActiveTab('proxy');
+        return;
+      }
     }
     setValidationError(null);
 
@@ -521,6 +534,14 @@ export default function EntryDialog({
             config={rdpConfig}
             onChange={setRdpConfig}
             onNewGateway={() => setShowNewGateway(true)}
+          />
+        );
+      case "proxy":
+        return (
+          <ProxyTab
+            config={rdpConfig}
+            onChange={(next) => { setRdpConfig(next); setValidationError(null); }}
+            showErrors={validationError !== null}
           />
         );
       case "gateway_server":

@@ -69,4 +69,9 @@ describe("GatewayTab", () => {
     render(<Harness />);
     expect(screen.getByText(/No gateways in this vault yet/)).toBeTruthy();
   });
+
+  it("warns when SOCKS5 is also enabled", () => {
+    render(<Harness initial={{ gatewayId: "g1", proxyEnabled: true }} />);
+    expect(screen.getByText(/cannot be used together/)).toBeTruthy();
+  });
 });

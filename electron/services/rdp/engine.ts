@@ -3,6 +3,7 @@
  */
 
 import type { RdpGatewayEngineConfig } from './gateway-config.js';
+import type { RdpProxyEngineConfig } from './proxy-config.js';
 
 export interface SharedFolder {
   name: string;
@@ -32,6 +33,8 @@ export interface RdpEngineConfig {
   enableClipboard?: boolean;
   /** Set only when the connection goes through an RD Gateway. */
   gateway?: RdpGatewayEngineConfig;
+  /** Set only when the connection goes through an explicit SOCKS5 hop. */
+  proxy?: RdpProxyEngineConfig;
 }
 
 export interface RdpBitmapUpdate {

@@ -1,6 +1,7 @@
 import { useId, useMemo } from "react";
 import type { RdpEntryConfig } from "../../../types/entry";
 import { gatewayIdOf } from "../../../lib/rdpGateway";
+import { PROXY_GATEWAY_MESSAGE, proxyEnabledOf } from "../../../lib/rdpProxy";
 import { useEntryStore } from "../../../stores/entryStore";
 import Field from "../Field";
 import { gatewayOptions } from "../gatewayForm";
@@ -24,14 +25,22 @@ export default function GatewayTab({ config, onChange, onNewGateway }: GatewayTa
 
   const gatewayId = gatewayIdOf(config);
   const missing = gatewayId !== undefined && !options.some((o) => o.id === gatewayId);
+  const proxyOn = proxyEnabledOf(config);
 
   const select = (value: string) => onChange({ ...config, gatewayId: value === NONE ? undefined : value });
 
   return (
     <div className="space-y-4">
       <p className={HINT}>
-        A Remote Desktop Gateway lets you reach computers on a private network over HTTPS.
+        A Remote Desktop Gateway lets you reach computers on a private network over HTTPS. This is not a
+        SOCKS5 proxy.
       </p>
+
+      {proxyOn && gatewayId && (
+        <Callout tone="warning" size="sm">
+          {PROXY_GATEWAY_MESSAGE}
+        </Callout>
+      )}
 
       <Field label="Gateway" group htmlFor={selectId}>
         <div className="flex items-center gap-2">

@@ -74,6 +74,14 @@ jobs:
           src/components/entries/__tests__/SshStartupTab.test.tsx
           src/components/entries/__tests__/EntryDialog.test.tsx
           src/components/connections/__tests__/QuickConnect.test.tsx
+          src/stores/__tests__/entry-rdp-proxy.test.ts
+          src/components/entries/__tests__/ProxyTab.test.tsx
+          src/lib/__tests__/resolveConfig.test.ts
+          electron/services/rdp/__tests__/helper-protocol.test.ts
+          electron/services/rdp/__tests__/helper-process.test.ts
+          electron/services/rdp/__tests__/proxy-config.test.ts
+          electron/services/rdp/__tests__/proxy-connect.test.ts
+          electron/ipc-server/__tests__/rdp-entry-config.test.ts
           mcp/src/tools/__tests__/connection.test.ts
           electron/services/sync/__tests__/local-file-sync.test.ts
           electron/services/sync/__tests__/sync-engine-e2e.test.ts
@@ -85,6 +93,10 @@ jobs:
           src/components/settings/__tests__/SyncTab.test.tsx
           src/hooks/__tests__/useRemoteClipboard.test.tsx
           src/components/sessions/__tests__/VncView.test.tsx
+      - name: Test FreeRDP helper protocol parser
+        if: runner.os != 'Windows'
+        working-directory: freerdp-helper
+        run: bash tests/run-tests.sh
       - name: Build FreeRDP helper (macOS)
         if: runner.os == 'macOS'
         working-directory: freerdp-helper
@@ -108,6 +120,10 @@ jobs:
         run: dotnet publish webview2-helper/ConduitWebView2/ConduitWebView2.csproj -c Release -r win-x64 --self-contained true -o webview2-helper/bundle/win-x64/
       - name: Verify native helper startup
         run: node scripts/verify/pr-installer-helpers.mjs
+      - name: SOCKS5 native smoke
+        env:
+          CONDUIT_FREERDP_REQUIRED: '1'
+        run: node freerdp-helper/tests/socks5-smoke.mjs
       - name: Package installer
         env:
           # No signing credentials: identity "-" in the local config is ad-hoc.

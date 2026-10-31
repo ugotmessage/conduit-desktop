@@ -1,4 +1,5 @@
 import type { RdpEntryGatewayFields } from "../lib/rdpGateway";
+import type { RdpEntryProxyFields } from "../lib/rdpProxy";
 import type { SshStartupScript } from "../lib/sshStartup";
 
 export type { SshStartupInputMode, SshStartupScript, SshStartupStep } from "../lib/sshStartup";
@@ -14,7 +15,7 @@ export interface SharedFolder {
   readOnly?: boolean;
 }
 
-export interface RdpEntryConfig extends RdpEntryGatewayFields {
+export interface RdpEntryConfig extends RdpEntryGatewayFields, RdpEntryProxyFields {
   resolution: RdpResolution;
   customWidth?: number;
   customHeight?: number;

@@ -1,7 +1,7 @@
 import type { EntryType } from "../../types/entry";
 import { RD_GATEWAY_CREDENTIAL_TYPE } from "../../lib/rdpGateway";
 import {
-  ClockIcon, DesktopIcon, DevicesIcon, InfoCircleIcon, KeyIcon, NetworkIcon, PlayerPlayIcon, RobotIcon, SettingsIcon, ShieldLockIcon, UserIcon
+  ClockIcon, DesktopIcon, DevicesIcon, InfoCircleIcon, KeyIcon, NetworkIcon, PlayerPlayIcon, PlugIcon, RobotIcon, SettingsIcon, ShieldLockIcon, UserIcon
 } from "../../lib/icons";
 import type { IconComponent } from "../../lib/icons";
 
@@ -12,6 +12,7 @@ export type EntryTabId =
   | "resources"
   | "security"
   | "gateway"
+  | "proxy"
   | "gateway_server"
   | "gateway_login"
   | "autofill"
@@ -73,6 +74,7 @@ export function getTabCategories(entryType: EntryType, credentialType?: string |
         { id: "resources", label: "Resources", icon: DevicesIcon },
         { id: "security", label: "Security", icon: ShieldLockIcon },
         { id: "gateway", label: "Gateway", icon: NetworkIcon },
+        { id: "proxy", label: "Proxy", icon: PlugIcon },
       ],
     });
   } else if (entryType === "web") {

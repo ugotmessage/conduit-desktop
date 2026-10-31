@@ -24,6 +24,37 @@ describe('buildHelperConnectConfig', () => {
     expect(buildHelperConnectConfig({ ...base, hostname: 'pc01.corp.local' }).host).toBe('pc01.corp.local');
   });
 
+  it('omits proxy when there is none', () => {
+    expect('proxy' in buildHelperConnectConfig(base)).toBe(false);
+  });
+
+  it('sends an unauthenticated SOCKS5 hop and keeps the target hostname', () => {
+    const cfg = buildHelperConnectConfig({
+      ...base,
+      hostname: 'pc01.corp.local',
+      port: 3390,
+      proxy: { type: 'socks5', host: '127.0.0.1', port: 1080 },
+    });
+    expect(cfg.host).toBe('pc01.corp.local');
+    expect(cfg.port).toBe(3390);
+    expect(cfg.proxy).toEqual({ type: 'socks5', host: '127.0.0.1', port: 1080 });
+    expect(cfg.proxy).not.toHaveProperty('password');
+  });
+
+  it('sends resolved proxy auth only in the helper payload', () => {
+    const cfg = buildHelperConnectConfig({
+      ...base,
+      proxy: { type: 'socks5', host: 'proxy.example', port: 1080, username: 'alice', password: 'proxy-pw' },
+    });
+    expect(cfg.proxy).toEqual({
+      type: 'socks5',
+      host: 'proxy.example',
+      port: 1080,
+      username: 'alice',
+      password: 'proxy-pw',
+    });
+  });
+
   it('sends the gateway with host = gateway hostname', () => {
     const cfg = buildHelperConnectConfig({
       ...base,

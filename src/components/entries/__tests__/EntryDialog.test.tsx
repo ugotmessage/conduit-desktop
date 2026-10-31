@@ -98,7 +98,7 @@ describe("EntryDialog form step", () => {
   it("uses NavList for the tabs, with group labels in title case and the selected tab marked", () => {
     render(<EntryDialog onClose={vi.fn()} presetType="rdp" />);
     const nav = panel().querySelector("nav") as HTMLElement;
-    expect(buttonTexts(nav)).toEqual(["General", "Credentials", "Information", "Display", "Resources", "Security", "Gateway"]);
+    expect(buttonTexts(nav)).toEqual(["General", "Credentials", "Information", "Display", "Resources", "Security", "Gateway", "Proxy"]);
     expect(within(nav).getByText("Common").className).not.toMatch(/uppercase/);
     expect(within(nav).getByText("Connection")).toBeTruthy();
     const general = within(nav).getByRole("button", { name: "General" });
@@ -504,5 +504,49 @@ describe("EntryDialog while loading an entry", () => {
     expect(within(panel()).queryByRole("button")).toBeNull();
     fireEvent.keyDown(document.body, { key: "Escape" });
     expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe("EntryDialog RDP SOCKS5", () => {
+  const nameField = () => labelWithText("Name*").querySelector("input")!;
+  const nav = () => panel().querySelector("nav")!;
+  const openProxy = () => fireEvent.click(within(nav()).getByRole("button", { name: "Proxy" }));
+  const created = () => (createEntry.mock.calls as unknown as [Record<string, unknown>][]).map((c) => c[0]);
+
+  it("saves an enabled hop without a password", async () => {
+    render(<EntryDialog onClose={vi.fn()} presetType="rdp" />);
+    fireEvent.change(nameField(), { target: { value: "app-01" } });
+    openProxy();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Use a SOCKS5 proxy" }));
+    fireEvent.change(screen.getByLabelText("Proxy host"), { target: { value: "127.0.0.1" } });
+    fireEvent.submit(panel().querySelector("form")!);
+    await vi.waitFor(() => expect(createEntry).toHaveBeenCalledTimes(1));
+    expect(created()[0].config).toMatchObject({
+      proxyEnabled: true,
+      proxyType: "socks5",
+      proxyHost: "127.0.0.1",
+      proxyPort: 1080,
+    });
+    expect(created()[0].config).not.toHaveProperty("password");
+    expect(JSON.stringify(created()[0].config)).not.toMatch(/secret|proxy-pw/);
+  });
+
+  it("refuses SOCKS5 together with a gateway", async () => {
+    useEntryStore.setState({
+      entries: [{ id: "g1", name: "East", entry_type: "credential", credential_type: "rd_gateway", config: { gatewayHostname: "east" } }],
+      createEntry,
+      getEntry,
+      updateEntry,
+    } as never);
+    render(<EntryDialog onClose={vi.fn()} presetType="rdp" />);
+    fireEvent.change(nameField(), { target: { value: "app-01" } });
+    fireEvent.click(within(nav()).getByRole("button", { name: "Gateway" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Gateway" }), { target: { value: "g1" } });
+    openProxy();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Use a SOCKS5 proxy" }));
+    fireEvent.change(screen.getByLabelText("Proxy host"), { target: { value: "127.0.0.1" } });
+    fireEvent.submit(panel().querySelector("form")!);
+    expect(createEntry).not.toHaveBeenCalled();
+    expect(panel().querySelector("[data-cv-dialog-footer] [data-cv-error]")?.textContent).toMatch(/cannot be used together/);
   });
 });
