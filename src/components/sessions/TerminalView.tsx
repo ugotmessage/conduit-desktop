@@ -6,6 +6,7 @@ import { TERMINAL_RENDERER_EVENT, getTerminalRendererMode, clearTerminalRenderer
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
 import { getTerminalTheme } from "../../lib/terminalTheme";
 import { AGENT_NEWLINE_SEQUENCE, isAgentNewlineKey, type AgentZoom } from "../../lib/agentTerminalKeys";
+import { isTerminalPasteShortcut } from "../../lib/terminalClipboardKeys";
 import { AGENT_TERMINAL_ATTR, AGENT_ZOOM_EVENT } from "../../lib/zoomKeys";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { buildTerminalFontStack } from "../../lib/terminalFont";
@@ -236,7 +237,8 @@ export default function TerminalView({
   }, [terminal, isAgentTerminal, fontSize, settingFontSize]);
 
   // Agent terminals: Shift+Enter inserts a new line instead of submitting.
-  // Windows/Linux: clipboard shortcuts (Ctrl+C/V, Ctrl+Shift+C/V).
+  // Clipboard shortcuts: Ctrl+Shift+C/V (and Ctrl+C with selection).
+  // Plain Ctrl+V belongs to terminal applications, including nano Page Down.
   // On macOS, Cmd+C/V work natively through Electron — no interception needed.
   useEffect(() => {
     if (!terminal) return;
@@ -268,8 +270,8 @@ export default function TerminalView({
         return selection ? false : true;
       }
 
-      // Ctrl+V or Ctrl+Shift+V → Paste
-      if (isCtrl && ev.key === "v") {
+      // Ctrl+Shift+V → Paste. Match uppercase V too, as browsers report Shift.
+      if (isTerminalPasteShortcut(ev)) {
         ev.preventDefault(); // prevent browser native paste (would double-paste)
         navigator.clipboard.readText().then((text) => {
           if (text) {
