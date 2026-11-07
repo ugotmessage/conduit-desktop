@@ -303,9 +303,19 @@ export default function TerminalView({
           if (value) terminal.paste(value);
         } else if (event.payload.action === "select_all") {
           terminal.selectAll();
+        } else if (event.payload.action === "look_up" && IS_MAC) {
+          const value = contextMenuSelectionRef.current.trim();
+          const textarea = terminal.textarea;
+          if (!value || !textarea?.isConnected) return;
+          // The xterm selection is drawn separately from the browser selection.
+          // Restore its right-click textarea selection in case the menu took focus.
+          terminal.focus();
+          textarea.value = value;
+          textarea.select();
+          await invoke("show_terminal_definition");
         }
       } catch (error) {
-        console.error("[terminal] Native clipboard action failed:", error);
+        console.error("[terminal] Native menu action failed:", error);
       }
     }).then((stop) => {
       if (disposed) stop();

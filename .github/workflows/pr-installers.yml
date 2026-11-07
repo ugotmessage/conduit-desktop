@@ -75,6 +75,7 @@ jobs:
           src/components/entries/__tests__/EntryDialog.test.tsx
           src/components/connections/__tests__/QuickConnect.test.tsx
           src/lib/__tests__/terminalClipboardKeys.test.ts
+          electron/ipc/__tests__/menu.test.ts
           src/stores/__tests__/entry-rdp-proxy.test.ts
           src/components/entries/__tests__/ProxyTab.test.tsx
           src/lib/__tests__/resolveConfig.test.ts
