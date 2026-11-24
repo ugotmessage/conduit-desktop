@@ -38,7 +38,9 @@ describe("Settings > Sessions > Terminal font", () => {
     expect(fontInput().placeholder).toBe(TERMINAL_FONT_FALLBACK);
 
     fireEvent.change(fontInput(), { target: { value: "Maple Mono NF" } });
-    expect(latest!.session_defaults_terminal).toEqual({ fontSize: 16, scrollback: 500, cursorBlink: false, fontFamily: "Maple Mono NF" });
+    expect(latest!.session_defaults_terminal.fontFamily).toBe("Maple Mono NF");
+    expect(latest!.session_defaults_terminal).toMatchObject({ fontSize: 16, scrollback: 500, cursorBlink: false });
+    expect(typeof latest!.session_defaults_terminal.ctrlCCopiesSelection).toBe("boolean");
   });
 
   it("previews the chosen font with the built-in fonts after it", () => {

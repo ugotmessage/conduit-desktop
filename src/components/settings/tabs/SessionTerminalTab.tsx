@@ -5,9 +5,12 @@ import { useSessionStore } from "../../../stores/sessionStore";
 import { getTerminalRendererMode, setTerminalRendererMode, TERMINAL_RENDERER_EVENT, type TerminalRendererMode } from "../../../lib/terminalRenderer";
 import type { TerminalGlobalDefaults } from "../../../types/entry";
 import { HARDCODED_TERMINAL_DEFAULTS } from "../../../types/entry";
+import { resolveCtrlCCopiesSelection } from "../../../lib/terminalClipboardKeys";
 import { Checkbox, FormField, Select, Slider, TextInput } from "../../ui";
 import { HINT, SECTION_LABEL } from "../settings-styles";
 import TerminalFontField from "./TerminalFontField";
+
+const IS_MAC = typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
 
 export default function SessionTerminalTab({ settings, setSettings }: TabProps) {
   const focusedPaneId = useLayoutStore((state) => state.focusedPaneId);
@@ -27,7 +30,11 @@ export default function SessionTerminalTab({ settings, setSettings }: TabProps) 
     document.addEventListener(TERMINAL_RENDERER_EVENT, update);
     return () => document.removeEventListener(TERMINAL_RENDERER_EVENT, update);
   }, [activeSessionId]);
-  const defaults: TerminalGlobalDefaults = { ...HARDCODED_TERMINAL_DEFAULTS, ...settings.session_defaults_terminal };
+  const defaults: TerminalGlobalDefaults = {
+    ...HARDCODED_TERMINAL_DEFAULTS,
+    ...settings.session_defaults_terminal,
+    ctrlCCopiesSelection: resolveCtrlCCopiesSelection(settings.session_defaults_terminal, IS_MAC),
+  };
 
   const updateTerminal = (partial: Partial<TerminalGlobalDefaults>) => {
     setSettings({
@@ -106,6 +113,18 @@ export default function SessionTerminalTab({ settings, setSettings }: TabProps) 
         <Checkbox checked={defaults.cursorBlink} onChange={(cursorBlink) => updateTerminal({ cursorBlink })}>
           Cursor Blink
         </Checkbox>
+
+        <Checkbox
+          checked={defaults.ctrlCCopiesSelection}
+          onChange={(ctrlCCopiesSelection) => updateTerminal({ ctrlCCopiesSelection })}
+        >
+          Ctrl+C copies when text is selected
+        </Checkbox>
+        <p className={HINT}>
+          {IS_MAC
+            ? "Off by default on macOS so Ctrl+C always interrupts. Use ⌘C or Ctrl+Shift+C to copy. Turn on to match Windows/Linux terminal emulators."
+            : "On by default: Ctrl+C copies when there is a selection; with no selection it still interrupts. Turn off to always send interrupt."}
+        </p>
       </div>
     </div>
   );

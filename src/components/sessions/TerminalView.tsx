@@ -6,7 +6,7 @@ import { TERMINAL_RENDERER_EVENT, getTerminalRendererMode, clearTerminalRenderer
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
 import { getTerminalTheme } from "../../lib/terminalTheme";
 import { AGENT_NEWLINE_SEQUENCE, isAgentNewlineKey, type AgentZoom } from "../../lib/agentTerminalKeys";
-import { isTerminalPasteShortcut } from "../../lib/terminalClipboardKeys";
+import { isTerminalCopyShortcut, isTerminalPasteShortcut, resolveCtrlCCopiesSelection } from "../../lib/terminalClipboardKeys";
 import { AGENT_TERMINAL_ATTR, AGENT_ZOOM_EVENT } from "../../lib/zoomKeys";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { buildTerminalFontStack } from "../../lib/terminalFont";
@@ -37,6 +37,38 @@ export function disposeTerminalEntry(sessionId: string): void {
     clearTerminalRendererMode(sessionId);
     terminalRegistry.delete(sessionId);
   }
+}
+
+/** The xterm instance that currently owns keyboard focus, if any. */
+export function getFocusedTerminal(): Terminal | null {
+  const active = document.activeElement;
+  if (!(active instanceof Node)) return null;
+  for (const entry of terminalRegistry.values()) {
+    if (entry.element.contains(active) || entry.terminal.textarea === active) {
+      return entry.terminal;
+    }
+  }
+  return null;
+}
+
+/**
+ * Terminal to use for Edit → Copy / Cmd+C. Prefers the focused xterm; if the
+ * menu bar stole focus, falls back to a terminal that still has a selection
+ * (unless a normal text field owns focus).
+ */
+export function getTerminalForEditCopy(): Terminal | null {
+  const focused = getFocusedTerminal();
+  if (focused) return focused;
+  const active = document.activeElement;
+  const inEditable =
+    active instanceof HTMLInputElement ||
+    active instanceof HTMLTextAreaElement ||
+    (active instanceof HTMLElement && active.isContentEditable);
+  if (inEditable) return null;
+  for (const entry of terminalRegistry.values()) {
+    if (entry.terminal.hasSelection()) return entry.terminal;
+  }
+  return null;
 }
 
 interface TerminalViewProps {
@@ -237,9 +269,9 @@ export default function TerminalView({
   }, [terminal, isAgentTerminal, fontSize, settingFontSize]);
 
   // Agent terminals: Shift+Enter inserts a new line instead of submitting.
-  // Clipboard shortcuts: Ctrl+Shift+C/V (and Ctrl+C with selection).
+  // Clipboard: Cmd+C (macOS, via edit-copy-key + fallback here), Ctrl+Shift+C/V.
+  // Ctrl+C interrupts by default on macOS; optional setting copies when selected.
   // Plain Ctrl+V belongs to terminal applications, including nano Page Down.
-  // On macOS, Cmd+C/V work natively through Electron — no interception needed.
   useEffect(() => {
     if (!terminal) return;
 
@@ -255,11 +287,15 @@ export default function TerminalView({
 
       if (ev.type !== "keydown") return true;
 
-      const isCtrl = ev.ctrlKey && !ev.altKey && !ev.metaKey;
-      const isMacCopy = IS_MAC && ev.metaKey && !ev.ctrlKey && !ev.altKey && !ev.shiftKey;
-
-      // Ctrl+Shift+C  OR  Ctrl+C with active selection → Copy
-      if ((isMacCopy || isCtrl) && ev.key.toLowerCase() === "c" && (isMacCopy || ev.shiftKey || terminal.hasSelection())) {
+      const ctrlCCopiesSelection = resolveCtrlCCopiesSelection(
+        useSettingsStore.getState().sessionDefaultsTerminal,
+        IS_MAC,
+      );
+      if (isTerminalCopyShortcut(ev, {
+        isMac: IS_MAC,
+        hasSelection: terminal.hasSelection(),
+        ctrlCCopiesSelection,
+      })) {
         const selection = terminal.getSelection();
         if (selection) {
           ev.preventDefault();

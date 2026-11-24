@@ -6,10 +6,12 @@ export interface TerminalGlobalDefaults {
   scrollback: number;
   cursorBlink: boolean;
   fontFamily: string;
+  /** Placeholder; readSettings applies the platform default when the key was never saved. */
+  ctrlCCopiesSelection: boolean;
 }
 
 export const HARDCODED_TERMINAL_DEFAULTS: TerminalGlobalDefaults = {
-  fontSize: 14, scrollback: 10000, cursorBlink: true, fontFamily: '',
+  fontSize: 14, scrollback: 10000, cursorBlink: true, fontFamily: '', ctrlCCopiesSelection: false,
 };
 
 const MAX_FONT_FAMILY_LENGTH = 100;

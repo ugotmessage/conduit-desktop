@@ -223,6 +223,20 @@ export function readSettings(): AppSettings {
     if (raw.session_defaults_rdp && typeof raw.session_defaults_rdp === 'object' && !Array.isArray(raw.session_defaults_rdp)) {
       parsed.session_defaults_rdp = { ...HARDCODED_RDP_DEFAULTS, ...withoutStaleGatewayKeys(raw.session_defaults_rdp) };
     }
+    {
+      const rawTerm = raw.session_defaults_terminal;
+      const partial = rawTerm && typeof rawTerm === 'object' && !Array.isArray(rawTerm)
+        ? rawTerm as Partial<TerminalGlobalDefaults>
+        : {};
+      parsed.session_defaults_terminal = {
+        ...HARDCODED_TERMINAL_DEFAULTS,
+        ...partial,
+        // macOS: Ctrl+C interrupts; elsewhere copy-on-selection matches common emulators.
+        ctrlCCopiesSelection: typeof partial.ctrlCCopiesSelection === 'boolean'
+          ? partial.ctrlCCopiesSelection
+          : process.platform !== 'darwin',
+      };
+    }
     // Migrate: populate session_defaults_web.engine from legacy default_web_engine
     if (!raw.session_defaults_web && raw.default_web_engine) {
       parsed.session_defaults_web = {
