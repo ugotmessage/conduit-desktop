@@ -18,10 +18,18 @@ import {
   HARDCODED_SSH_DEFAULTS,
 } from "../types/entry";
 import { sanitizeFontFamily } from "../lib/terminalFont";
+import { resolveCtrlCCopiesSelection } from "../lib/terminalClipboardKeys";
+
+const IS_MAC = typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
 
 function loadTerminalDefaults(saved: unknown): TerminalGlobalDefaults {
-  const merged = { ...HARDCODED_TERMINAL_DEFAULTS, ...(saved as Partial<TerminalGlobalDefaults> | undefined) };
-  return { ...merged, fontFamily: sanitizeFontFamily(merged.fontFamily) };
+  const partial = (saved as Partial<TerminalGlobalDefaults> | undefined) ?? {};
+  const merged = { ...HARDCODED_TERMINAL_DEFAULTS, ...partial };
+  return {
+    ...merged,
+    fontFamily: sanitizeFontFamily(merged.fontFamily),
+    ctrlCCopiesSelection: resolveCtrlCCopiesSelection(partial, IS_MAC),
+  };
 }
 
 interface SettingsState {

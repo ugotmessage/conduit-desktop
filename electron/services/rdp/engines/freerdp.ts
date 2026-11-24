@@ -39,6 +39,7 @@ import type {
 } from '../engine.js';
 import { getFreeRdpBinaryPath } from './factory.js';
 import { buildHelperConnectConfig, parseHelperError, parseHelperJson } from './helper-protocol.js';
+import { helperChildEnv, shouldPreResolveRdpTarget } from './helper-process.js';
 import { formatRdpConnectError } from '../connect-error.js';
 
 /* Binary protocol message types */
@@ -138,10 +139,10 @@ export class FreeRdpEngine implements RdpEngine {
 
     this.process = spawn(binaryPath, [], {
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: {
-        ...process.env,
-        OPENSSL_MODULES: join(binaryDir, 'ossl-modules'),
-      },
+      env: helperChildEnv(process.env, {
+        osslModulesDir: join(binaryDir, 'ossl-modules'),
+        clearProxyBypass: Boolean(config.proxy),
+      }),
     });
 
     /* Forward stderr to console (FreeRDP errors only — WLog set to ERROR level) */
@@ -193,9 +194,10 @@ export class FreeRdpEngine implements RdpEngine {
     /* Pre-resolve hostname for diagnostics. We pass the original hostname
      * to FreeRDP (not the resolved IP) so TLS certificate CN matching works.
      * FreeRDP's own getaddrinfo() works now that we call WSAStartup() early.
-     * Behind a gateway the target is often an internal name only the gateway resolves. */
+     * Behind a gateway or SOCKS5 hop the target is often an internal name only
+     * that hop resolves — never pre-resolve the target in those cases. */
     const helperConfig = buildHelperConnectConfig(config);
-    if (!config.gateway) {
+    if (shouldPreResolveRdpTarget(config)) {
       await resolveHostname(helperConfig.host); // diagnostic logging only
     }
 

@@ -71,6 +71,7 @@ export function connectionOpenDefinition() {
     name: 'connection_open',
     description:
       'Open a new connection (SSH, RDP, or VNC) by specifying host/port/credentials manually. ' +
+      'SSH also applies the user ~/.ssh/config for the Host alias when user, port or keys are omitted. ' +
       'To open a connection already saved in the vault, prefer connection_open_entry, which resolves ' +
       'host, port, and credentials from the saved entry by its entry_id.',
     inputSchema: {
@@ -83,7 +84,8 @@ export function connectionOpenDefinition() {
         host: { type: 'string', description: 'Host to connect to' },
         port: {
           type: 'number',
-          description: 'Port (default depends on type: SSH=22, RDP=3389, VNC=5900)',
+          description:
+            'Port. SSH: omit to use ~/.ssh/config Port, then 22. RDP defaults to 3389, VNC to 5900.',
         },
         credential_id: {
           type: 'string',
@@ -124,21 +126,16 @@ export async function connectionOpen(
     ssh_auth_method?: string;
   },
 ): Promise<unknown> {
-  // Determine default port based on connection type
+  // SSH leaves port unset so the app can apply ~/.ssh/config before defaulting to 22.
   const port =
     args.port ??
-    (() => {
-      switch (args.connection_type) {
-        case 'ssh':
-          return 22;
-        case 'rdp':
-          return 3389;
-        case 'vnc':
-          return 5900;
-        default:
-          return 22;
-      }
-    })();
+    (args.connection_type === 'ssh'
+      ? null
+      : args.connection_type === 'rdp'
+        ? 3389
+        : args.connection_type === 'vnc'
+          ? 5900
+          : 22);
 
   const connection = await client.connectionOpen(
     args.connection_type,
@@ -154,8 +151,8 @@ export async function connectionOpen(
     id: connection.session_id ?? connection.id,
     name: connection.name,
     connection_type: connection.connection_type,
-    host: args.host,
-    port,
+    host: connection.host ?? args.host,
+    port: connection.port ?? port,
     status: connection.status,
   };
 }

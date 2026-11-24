@@ -26,6 +26,11 @@ import { devServerUrl } from './services/env-config.js';
 import { describeDeepLink } from './services/deep-link-log.js';
 import { attachStartupWindow, initStartupVault, noteLaunchUrl, noteSecondInstance } from './ipc/startup-vault.js';
 import { installZoomKeys, registerAppZoomKeyHandler, stepAppZoom } from './ipc/zoom-keys.js';
+import {
+  installEditCopyKey,
+  registerEditCopyHandlers,
+  sendEditCopyKey,
+} from './ipc/edit-copy-key.js';
 import { SKIP_SWITCH } from './services/vault/startup-modifiers.js';
 import { reportFullScreen, titleBarOptions } from './window-title-bar.js';
 
@@ -567,7 +572,9 @@ function buildAppMenu() {
         isMac ? { role: 'close' } : { role: 'quit' },
       ],
     },
-    // Edit menu — required on macOS for Cmd+C/V/X/A to reach the renderer
+    // Edit menu — required on macOS for Cmd+C/V/X/A to reach the renderer.
+    // Copy is custom on macOS: xterm selections are not DOM selections, and
+    // `{ role: 'copy' }` would clear the clipboard after our handler wrote it.
     {
       label: 'Edit',
       submenu: [
@@ -575,7 +582,15 @@ function buildAppMenu() {
         { role: 'redo' },
         { type: 'separator' },
         { role: 'cut' },
-        { role: 'copy' },
+        isMac
+          ? {
+              label: 'Copy',
+              accelerator: 'CmdOrCtrl+C',
+              // Keyboard Cmd+C is handled by before-input-event (installEditCopyKey).
+              registerAccelerator: false,
+              click: () => sendEditCopyKey(mainWindowRef),
+            }
+          : { role: 'copy' },
         { role: 'paste' },
         { role: 'selectAll' },
       ],
@@ -795,6 +810,7 @@ function createWindow(): BrowserWindow {
   attachStartupWindow(mainWindow);
   reportFullScreen(mainWindow);
   installZoomKeys(mainWindow);
+  installEditCopyKey(mainWindow);
 
   if (isDev) {
     mainWindow.loadURL(devServerUrl());
@@ -892,6 +908,7 @@ app.whenReady().then(async () => {
   });
 
   registerAppZoomKeyHandler(isDev);
+  registerEditCopyHandlers();
 
   ipcMain.handle('get-zoom-factor', () => {
     if (mainWindowRef && !mainWindowRef.isDestroyed()) {

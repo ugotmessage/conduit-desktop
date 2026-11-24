@@ -136,6 +136,26 @@ static void test_parse_connect_without_gateway(void) {
     CHECK_STR(cmd.data.connect.host, "pc1");
     CHECK(!cmd.data.connect.has_gateway);
     CHECK(cmd.data.connect.gateway.host == NULL);
+    CHECK(cmd.data.connect.performance_mode == PERF_BALANCED);
+    protocol_free_command(&cmd);
+}
+
+static void test_parse_performance_mode(void) {
+    CHECK(performance_mode_from_string("best") == PERF_BEST);
+    CHECK(performance_mode_from_string("fast") == PERF_FAST);
+    CHECK(performance_mode_from_string("balanced") == PERF_BALANCED);
+    CHECK(performance_mode_from_string("bogus") == PERF_BALANCED);
+    CHECK(performance_mode_from_string(NULL) == PERF_BALANCED);
+
+    Command cmd;
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\","
+                     "\"performanceMode\":\"best\"}}", &cmd));
+    CHECK(cmd.data.connect.performance_mode == PERF_BEST);
+    protocol_free_command(&cmd);
+
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\","
+                     "\"performanceMode\":\"fast\"}}", &cmd));
+    CHECK(cmd.data.connect.performance_mode == PERF_FAST);
     protocol_free_command(&cmd);
 }
 
@@ -204,6 +224,118 @@ static void test_validate_gateway(void) {
     CHECK(connect_config_validate(&cfg) != NULL);
 }
 
+static void test_parse_connect_without_proxy(void) {
+    Command cmd;
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\",\"port\":3389,"
+                     "\"username\":\"u\",\"password\":\"p\"}}", &cmd));
+    CHECK(!cmd.data.connect.has_proxy);
+    CHECK(!cmd.data.connect.proxy_malformed);
+    CHECK(cmd.data.connect.proxy.host == NULL);
+    protocol_free_command(&cmd);
+}
+
+static void test_parse_connect_with_socks5(void) {
+    Command cmd;
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"rdp.fixture.test\",\"port\":3390,"
+                     "\"proxy\":{\"type\":\"socks5\",\"host\":\"127.0.0.1\",\"port\":1080}}}", &cmd));
+    CHECK(cmd.type == CMD_CONNECT);
+    CHECK(cmd.data.connect.has_proxy);
+    CHECK(!cmd.data.connect.proxy_malformed);
+    CHECK_STR(cmd.data.connect.proxy.type, "socks5");
+    CHECK_STR(cmd.data.connect.proxy.host, "127.0.0.1");
+    CHECK(cmd.data.connect.proxy.port == 1080);
+    CHECK(cmd.data.connect.proxy.username == NULL);
+    CHECK(cmd.data.connect.proxy.password == NULL);
+    CHECK_STR(cmd.data.connect.host, "rdp.fixture.test");
+    CHECK(cmd.data.connect.port == 3390);
+    CHECK(connect_config_validate(&cmd.data.connect) == NULL);
+    protocol_free_command(&cmd);
+}
+
+static void test_parse_proxy_auth_and_default_port(void) {
+    Command cmd;
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\","
+                     "\"proxy\":{\"type\":\"socks5\",\"host\":\"proxy.example\","
+                     "\"username\":\"alice\",\"password\":\"proxy\\\"pw\"}}}", &cmd));
+    CHECK(cmd.data.connect.proxy.port == 1080);
+    CHECK_STR(cmd.data.connect.proxy.username, "alice");
+    CHECK_STR(cmd.data.connect.proxy.password, "proxy\"pw");
+    protocol_free_command(&cmd);
+}
+
+static void test_parse_proxy_null_is_no_proxy(void) {
+    Command cmd;
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\",\"proxy\":null}}", &cmd));
+    CHECK(!cmd.data.connect.has_proxy);
+    protocol_free_command(&cmd);
+}
+
+static void test_parse_malformed_proxy_is_rejected(void) {
+    Command cmd;
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\",\"proxy\":true}}", &cmd));
+    CHECK(cmd.data.connect.has_proxy);
+    CHECK(cmd.data.connect.proxy_malformed);
+    CHECK(connect_config_validate(&cmd.data.connect) != NULL);
+    protocol_free_command(&cmd);
+
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\","
+                     "\"proxy\":{\"type\":\"http\",\"host\":\"127.0.0.1\",\"port\":1080}}}", &cmd));
+    CHECK(cmd.data.connect.proxy_malformed);
+    CHECK(connect_config_validate(&cmd.data.connect) != NULL);
+    protocol_free_command(&cmd);
+
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\","
+                     "\"proxy\":{\"type\":\"socks5\",\"host\":\"127.0.0.1\",\"port\":\"1080\"}}}", &cmd));
+    CHECK(cmd.data.connect.proxy_malformed);
+    protocol_free_command(&cmd);
+}
+
+static void test_validate_proxy(void) {
+    ConnectConfig cfg;
+    memset(&cfg, 0, sizeof(cfg));
+    CHECK(connect_config_validate(&cfg) == NULL);
+
+    cfg.has_proxy = true;
+    cfg.proxy.port = 1080;
+    char type[] = "socks5";
+    cfg.proxy.type = type;
+    CHECK(connect_config_validate(&cfg) != NULL);
+
+    char host[] = "127.0.0.1";
+    cfg.proxy.host = host;
+    CHECK(connect_config_validate(&cfg) == NULL);
+
+    cfg.proxy.port = 70000;
+    CHECK(connect_config_validate(&cfg) != NULL);
+    cfg.proxy.port = 0;
+    CHECK(connect_config_validate(&cfg) != NULL);
+    cfg.proxy.port = 1080;
+
+    char http[] = "http";
+    cfg.proxy.type = http;
+    CHECK(connect_config_validate(&cfg) != NULL);
+    cfg.proxy.type = type;
+
+    cfg.has_gateway = true;
+    char gw[] = "rdg";
+    cfg.gateway.host = gw;
+    cfg.gateway.port = 443;
+    CHECK(connect_config_validate(&cfg) != NULL);
+}
+
+static void test_proxy_password_cleared_on_free(void) {
+    Command cmd;
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\","
+                     "\"proxy\":{\"type\":\"socks5\",\"host\":\"127.0.0.1\",\"port\":1080,"
+                     "\"username\":\"u\",\"password\":\"secret\"}}}", &cmd));
+    char *pw = cmd.data.connect.proxy.password;
+    CHECK(pw != NULL);
+    CHECK_STR(pw, "secret");
+    protocol_free_command(&cmd);
+    /* After free the pointer is dangling; we only assert the helper did not crash. */
+    (void)pw;
+}
+
 int main(void) {
     test_error_json_plain();
     test_error_json_with_code();
@@ -215,11 +347,19 @@ int main(void) {
     test_error_json_long_message_not_truncated_into_bad_json();
     test_disconnected_json();
     test_parse_connect_without_gateway();
+    test_parse_performance_mode();
     test_parse_connect_with_gateway();
     test_parse_gateway_defaults();
     test_parse_gateway_transport_values();
     test_parse_gateway_null_is_no_gateway();
     test_validate_gateway();
+    test_parse_connect_without_proxy();
+    test_parse_connect_with_socks5();
+    test_parse_proxy_auth_and_default_port();
+    test_parse_proxy_null_is_no_proxy();
+    test_parse_malformed_proxy_is_rejected();
+    test_validate_proxy();
+    test_proxy_password_cleared_on_free();
 
     if (g_failures) {
         fprintf(stderr, "%d of %d checks failed\n", g_failures, g_checks);

@@ -132,6 +132,6 @@ protocols:
       - conduit
 publish:
   provider: github
-  owner: advenimus
+  owner: ugotmessage
   repo: conduit-desktop
 npmRebuild: true

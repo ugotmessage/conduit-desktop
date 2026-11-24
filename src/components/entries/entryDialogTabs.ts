@@ -1,7 +1,7 @@
 import type { EntryType } from "../../types/entry";
 import { RD_GATEWAY_CREDENTIAL_TYPE } from "../../lib/rdpGateway";
 import {
-  DesktopIcon, DevicesIcon, InfoCircleIcon, KeyIcon, NetworkIcon, PlayerPlayIcon, RobotIcon, SettingsIcon, ShieldLockIcon, UserIcon
+  ClockIcon, DesktopIcon, DevicesIcon, InfoCircleIcon, KeyIcon, NetworkIcon, PlayerPlayIcon, PlugIcon, RobotIcon, SettingsIcon, ShieldLockIcon, UserIcon
 } from "../../lib/icons";
 import type { IconComponent } from "../../lib/icons";
 
@@ -12,10 +12,12 @@ export type EntryTabId =
   | "resources"
   | "security"
   | "gateway"
+  | "proxy"
   | "gateway_server"
   | "gateway_login"
   | "autofill"
   | "command"
+  | "startup"
   | "information";
 
 export interface EntryTab {
@@ -72,6 +74,7 @@ export function getTabCategories(entryType: EntryType, credentialType?: string |
         { id: "resources", label: "Resources", icon: DevicesIcon },
         { id: "security", label: "Security", icon: ShieldLockIcon },
         { id: "gateway", label: "Gateway", icon: NetworkIcon },
+        { id: "proxy", label: "Proxy", icon: PlugIcon },
       ],
     });
   } else if (entryType === "web") {
@@ -87,6 +90,13 @@ export function getTabCategories(entryType: EntryType, credentialType?: string |
       label: "Execution",
       tabs: [
         { id: "command", label: "Command", icon: PlayerPlayIcon },
+      ],
+    });
+  } else if (entryType === "ssh") {
+    categories.push({
+      label: "Connection",
+      tabs: [
+        { id: "startup", label: "Startup", icon: ClockIcon },
       ],
     });
   }

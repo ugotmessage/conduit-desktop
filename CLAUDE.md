@@ -145,6 +145,7 @@ Desktop side: `electron/services/auth/auth-service.ts` adopts the session the we
 - `docs/APPWRITE.md`: Appwrite backend architecture, tables, deploy and secrets
 - `docs/LOCAL_APPWRITE.md`: local Appwrite stack for development
 - `docs/appwrite-migration/API_CONTRACT.md`: request and response format of the `api` function
+- `docs/SSH_CONFIG.md` — OpenSSH user config support and limits for SSH sessions
 - `docs/ADDING_ENTRY_TYPES.md` — How to add new entry / credential types
 - `docs/BUILD_FREERDP.md` — FreeRDP helper build instructions
 - `docs/DEPENDENCY_UPGRADES.md` — Upgrade notes for major dependencies

@@ -5,6 +5,7 @@ import {
   mapQualityToPerformanceMode,
 } from '../rdp-entry-config.js';
 import { GatewayConfigError } from '../../services/rdp/gateway-config.js';
+import { PROXY_CREDENTIAL_MESSAGE, PROXY_GATEWAY_MESSAGE } from '../../services/rdp/proxy-config.js';
 import type { GatewayVault, GatewayVaultEntry } from '../../services/rdp/gateway-connect.js';
 
 describe('mapQualityToPerformanceMode', () => {
@@ -107,6 +108,91 @@ describe('buildRdpEngineConfigFromEntry', () => {
   it('omits sharedFolders when the stored list is empty', () => {
     const cfg = buildRdpEngineConfigFromEntry({ ...base, entryConfig: { sharedFolders: [] } });
     expect(cfg.sharedFolders).toBeUndefined();
+    expect(cfg.proxy).toBeUndefined();
+  });
+});
+
+describe('buildRdpEngineConfigFromEntry SOCKS5', () => {
+  const base = {
+    host: 'pc01.corp.local',
+    port: 3390,
+    username: 'alice',
+    password: 'host-pw',
+  };
+  const login = (over: Partial<GatewayVaultEntry> = {}): GatewayVaultEntry => ({
+    id: 'c1',
+    name: 'Proxy login',
+    entry_type: 'credential',
+    credential_type: 'generic',
+    config: {},
+    credential_id: null,
+    username: 'proxy-user',
+    password: 'proxy-pw',
+    domain: null,
+    ...over,
+  });
+  const vaultWith = (...entries: GatewayVaultEntry[]): GatewayVault => ({
+    getEntry: vi.fn((id: string) => {
+      const e = entries.find((x) => x.id === id);
+      if (!e) throw new Error(`Entry not found: ${id}`);
+      return e;
+    }),
+  });
+
+  it('omits proxy when the entry hop is off', () => {
+    expect(buildRdpEngineConfigFromEntry({ ...base, entryConfig: {} }).proxy).toBeUndefined();
+  });
+
+  it('builds an unauthenticated hop and keeps the target host and port', () => {
+    const cfg = buildRdpEngineConfigFromEntry({
+      ...base,
+      entryConfig: { proxyEnabled: true, proxyHost: '127.0.0.1', proxyPort: 1080, hostname: 'alias.internal' },
+    });
+    expect(cfg.host).toBe('pc01.corp.local');
+    expect(cfg.hostname).toBe('alias.internal');
+    expect(cfg.port).toBe(3390);
+    expect(cfg.proxy).toEqual({ type: 'socks5', host: '127.0.0.1', port: 1080 });
+  });
+
+  it('resolves a vault login for proxy auth', () => {
+    const cfg = buildRdpEngineConfigFromEntry({
+      ...base,
+      entryConfig: { proxyEnabled: true, proxyHost: 'proxy.example', proxyCredentialId: 'c1' },
+      gatewayVault: vaultWith(login()),
+    });
+    expect(cfg.proxy).toEqual({
+      type: 'socks5',
+      host: 'proxy.example',
+      port: 1080,
+      username: 'proxy-user',
+      password: 'proxy-pw',
+    });
+  });
+
+  it('fails when the proxy credential is gone', () => {
+    expect(() => buildRdpEngineConfigFromEntry({
+      ...base,
+      entryConfig: { proxyEnabled: true, proxyHost: '127.0.0.1', proxyCredentialId: 'gone' },
+      gatewayVault: vaultWith(),
+    })).toThrow(PROXY_CREDENTIAL_MESSAGE);
+  });
+
+  it('refuses SOCKS5 together with an RD Gateway', () => {
+    expect(() => buildRdpEngineConfigFromEntry({
+      ...base,
+      entryConfig: { proxyEnabled: true, proxyHost: '127.0.0.1', gatewayId: 'gw-1' },
+      gatewayVault: vaultWith({
+        id: 'gw-1',
+        name: 'Corp GW',
+        entry_type: 'credential',
+        credential_type: 'rd_gateway',
+        config: { gatewayHostname: 'gw.corp.example' },
+        credential_id: null,
+        username: 'gwuser',
+        password: 'gw-pw',
+        domain: 'GW',
+      }),
+    })).toThrow(PROXY_GATEWAY_MESSAGE);
   });
 });
 

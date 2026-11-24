@@ -23,6 +23,9 @@ const electron = vi.hoisted(() => {
     contentEvents: Map<string, (...args: unknown[]) => void>;
   }
   class BrowserWindow {
+    static fromWebContents(sender: { hasWindow?: boolean }) {
+      return sender.hasWindow ? {} : null;
+    }
     private readonly state: FakeWindow;
     readonly webContents: { on: (event: string, cb: (...args: unknown[]) => void) => void };
     constructor(options: Record<string, unknown>) {
@@ -52,6 +55,8 @@ const electron = vi.hoisted(() => {
     handlers,
     windows,
     BrowserWindow,
+    popup: vi.fn(),
+    buildFromTemplate: vi.fn(),
     ipcMain: { handle: (channel: string, fn: (...args: unknown[]) => unknown) => void handlers.set(channel, fn) },
     screen: { getDisplayNearestPoint: vi.fn(() => ({ workArea: { x: 0, y: 0, width: 1920, height: 1080 } })) },
     parent: {
@@ -61,7 +66,13 @@ const electron = vi.hoisted(() => {
   };
 });
 
-vi.mock('electron', () => ({ ipcMain: electron.ipcMain, BrowserWindow: electron.BrowserWindow, screen: electron.screen }));
+vi.mock('electron', () => ({
+  app: { getLocale: () => 'zh-TW' },
+  ipcMain: electron.ipcMain,
+  BrowserWindow: electron.BrowserWindow,
+  screen: electron.screen,
+  Menu: { buildFromTemplate: electron.buildFromTemplate },
+}));
 vi.mock('../../services/state.js', () => ({
   AppState: { getInstance: () => ({ getMainWindow: () => electron.parent }) },
 }));
@@ -592,6 +603,44 @@ describe('the menu page', () => {
     page.key('Escape');
     expect(page.results()).toEqual([null]);
     page.close();
+  });
+});
+
+describe('terminal dictionary menu', () => {
+  registerMenuHandlers();
+  const show = electron.handlers.get('show_terminal_native_menu')!;
+  const lookUp = electron.handlers.get('show_terminal_definition')!;
+  const setPlatform = (platform: string) => vi.stubGlobal('process', Object.create(process, { platform: { value: platform } }));
+
+  beforeEach(() => {
+    electron.buildFromTemplate.mockReset().mockReturnValue({ popup: electron.popup });
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('routes Look Up back to the terminal owning the macOS selection', () => {
+    setPlatform('darwin');
+    const send = vi.fn();
+    show({ sender: { hasWindow: true, send } }, { sessionId: 'ssh-1', hasSelection: true });
+    const items = electron.buildFromTemplate.mock.calls[0][0];
+    const action = items.find((item: { label?: string }) => item.label === '查詢定義');
+    action.click();
+    expect(send).toHaveBeenCalledWith('terminal:native-menu-action', { sessionId: 'ssh-1', action: 'look_up' });
+  });
+
+  it.each([['darwin', false], ['win32', true]])('omits Look Up on %s with selection=%s', (platform, hasSelection) => {
+    setPlatform(platform);
+    show({ sender: { hasWindow: true } }, { sessionId: 'ssh-1', hasSelection });
+    expect(electron.buildFromTemplate.mock.calls[0][0].map((item: { label?: string }) => item.label).filter(Boolean))
+      .toEqual(['Copy', 'Paste', 'Select All']);
+  });
+
+  it('uses the macOS dictionary API only for a window-owned sender', () => {
+    setPlatform('darwin');
+    const showDefinitionForSelection = vi.fn();
+    lookUp({ sender: { hasWindow: false, showDefinitionForSelection } });
+    expect(showDefinitionForSelection).not.toHaveBeenCalled();
+    lookUp({ sender: { hasWindow: true, showDefinitionForSelection } });
+    expect(showDefinitionForSelection).toHaveBeenCalledOnce();
   });
 });
 

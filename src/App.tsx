@@ -65,6 +65,8 @@ import { installHomeTabGuard, openHome } from "./lib/openHome";
 import { preloadHomeSettings } from "./components/dashboard/home/useHomeSettings";
 import { isHomeSession } from "./lib/dashboardSessions";
 import { routeZoomKey } from "./lib/zoomKeys";
+import { resolveEditCopy } from "./lib/terminalClipboardKeys";
+import { getTerminalForEditCopy } from "./components/sessions/TerminalView";
 
 /**
  * Notification controllers — manage toast + update state and push to overlay window.
@@ -853,6 +855,13 @@ function App() {
       routeZoomKey(zoom, (channel, z) => window.electron.send(channel, z)),
     );
 
+    // macOS Cmd+C is taken in main before Edit → Copy; copy xterm selection or fall back.
+    const unlistenEditCopyKey = window.electron.on("edit-copy-key", () => {
+      const decision = resolveEditCopy(getTerminalForEditCopy());
+      if (decision.action === "write") window.electron.send("edit-copy-text", decision.text);
+      else if (decision.action === "fallback") window.electron.send("edit-copy-fallback");
+    });
+
     // Listen for native menu actions from Electron main process
     const unlistenMenu = window.electron.on("menu-action", (action: unknown) => {
       const a = action as string;
@@ -964,6 +973,7 @@ function App() {
       unlistenOpenVaultFile();
       unlistenMenu();
       unlistenZoomKey();
+      unlistenEditCopyKey();
       unlistenLocalNetwork();
     };
   }, []);

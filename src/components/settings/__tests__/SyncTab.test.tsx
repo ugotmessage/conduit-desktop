@@ -31,6 +31,18 @@ vi.mock("../../sync/SyncDevicesList", () => ({ default: () => <div>devices</div>
 vi.mock("../../sync/SyncNoticeList", () => ({ default: () => null }));
 
 import SyncTab from "../tabs/SyncTab";
+import type { Settings } from "../SettingsHelpers";
+import { HARDCODED_RDP_DEFAULTS, HARDCODED_WEB_DEFAULTS, HARDCODED_TERMINAL_DEFAULTS, HARDCODED_SSH_DEFAULTS } from "../../../types/entry";
+
+const settings: Settings = {
+  theme: "dark", color_scheme: "default", icon_pack: "default", default_shell: "",
+  ai_mode: "api", cli_agent: "claude", cli_font_size: 13, default_engine: "claude-code",
+  default_working_directory: null, ui_scale: 1, default_web_engine: "auto",
+  session_defaults_rdp: HARDCODED_RDP_DEFAULTS, session_defaults_web: HARDCODED_WEB_DEFAULTS,
+  session_defaults_terminal: HARDCODED_TERMINAL_DEFAULTS, session_defaults_ssh: HARDCODED_SSH_DEFAULTS,
+  personal_sync_enabled: true, local_file_sync_unlimited: false, vault_idle_lock_minutes: 0,
+};
+const props = { settings, setSettings: vi.fn(), onClose: vi.fn() };
 
 function syncState(killSwitch: boolean) {
   return {
@@ -52,8 +64,8 @@ beforeEach(() => {
 
 describe("Settings > Sync hooks (B4, B7, B36, B37)", () => {
   it("names its sections with h3 and exposes status, detail and plan through their hooks", () => {
-    render(<div data-cv-settings=""><SyncTab /></div>);
-    expect([...root().querySelectorAll("h3")].map((h) => h.textContent)).toEqual(["Multi-device sync", "This vault", "Devices"]);
+    render(<div data-cv-settings=""><SyncTab {...props} /></div>);
+    expect([...root().querySelectorAll("h3")].map((h) => h.textContent)).toEqual(["Multi-device sync", "Local file sync (no server required)", "This vault", "Devices"]);
 
     const status = cv.pickOne(root(), S.syncStatus);
     expect(status).toHaveAttribute("data-cv-sync-status");
@@ -65,7 +77,7 @@ describe("Settings > Sync hooks (B4, B7, B36, B37)", () => {
   });
 
   it("keeps the button texts the flows click", () => {
-    render(<div data-cv-settings=""><SyncTab /></div>);
+    render(<div data-cv-settings=""><SyncTab {...props} /></div>);
     expect(screen.getByRole("button", { name: "Sync now" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Review changes (2)" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Recently deleted" })).toBeInTheDocument();
@@ -74,7 +86,7 @@ describe("Settings > Sync hooks (B4, B7, B36, B37)", () => {
 
   it("marks the paused note while the kill switch is on", () => {
     sync.state = syncState(true);
-    render(<div data-cv-settings=""><SyncTab /></div>);
+    render(<div data-cv-settings=""><SyncTab {...props} /></div>);
     const paused = cv.pickAll(root(), S.syncPaused);
     expect(paused.map((p) => p.textContent)).toEqual(["Conduit paused syncing for now. Your changes are saved on this device."]);
     expect(paused[0].className).toContain("text-warning");

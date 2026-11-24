@@ -98,7 +98,7 @@ describe("EntryDialog form step", () => {
   it("uses NavList for the tabs, with group labels in title case and the selected tab marked", () => {
     render(<EntryDialog onClose={vi.fn()} presetType="rdp" />);
     const nav = panel().querySelector("nav") as HTMLElement;
-    expect(buttonTexts(nav)).toEqual(["General", "Credentials", "Information", "Display", "Resources", "Security", "Gateway"]);
+    expect(buttonTexts(nav)).toEqual(["General", "Credentials", "Information", "Display", "Resources", "Security", "Gateway", "Proxy"]);
     expect(within(nav).getByText("Common").className).not.toMatch(/uppercase/);
     expect(within(nav).getByText("Connection")).toBeTruthy();
     const general = within(nav).getByRole("button", { name: "General" });
@@ -368,6 +368,81 @@ describe("EntryDialog RD Gateway object", () => {
   });
 });
 
+describe("EntryDialog SSH startup steps", () => {
+  const tab = (name: string) => fireEvent.click(within(panel()).getByRole("button", { name }));
+
+  it("shows a Startup tab for SSH and omits startup from a default save", async () => {
+    render(<EntryDialog onClose={vi.fn()} presetType="ssh" />);
+    expect(buttonTexts(panel().querySelector("nav")!)).toEqual(["General", "Credentials", "Information", "Startup"]);
+    fireEvent.change(labelWithText("Name*").querySelector("input")!, { target: { value: "lab" } });
+    tab("Credentials");
+    fireEvent.change(labelWithText("Username *").querySelector("input")!, { target: { value: "alice" } });
+    fireEvent.submit(panel().querySelector("form")!);
+    await waitFor(() => expect(createEntry).toHaveBeenCalledTimes(1));
+    const created = (createEntry.mock.calls as unknown as [Record<string, unknown>][])[0][0];
+    expect(created.config).toBeUndefined();
+  });
+
+  it("loads, edits, and saves ordered steps without storing a password", async () => {
+    getEntry.mockResolvedValue({
+      id: "e1",
+      name: "lab",
+      entry_type: "ssh",
+      credential_type: null,
+      credential_id: null,
+      username: "alice",
+      password: "kept-in-vault",
+      domain: null,
+      private_key: null,
+      totp_secret: null,
+      icon: null,
+      color: null,
+      tags: [],
+      notes: null,
+      host: "lab.example",
+      port: 22,
+      folder_id: null,
+      config: {
+        startup: {
+          enabled: true,
+          steps: [{ delaySeconds: 1, inputMode: "text", text: "sudo -i" }],
+        },
+      },
+    });
+    render(<EntryDialog onClose={vi.fn()} editingEntryId="e1" />);
+    await waitFor(() => expect(heading().textContent).toBe("Edit SSH Entry"));
+    tab("Startup");
+    expect((screen.getByRole("checkbox", { name: /Run steps after login/ }) as HTMLInputElement).checked).toBe(true);
+    expect((screen.getByPlaceholderText("sudo -i") as HTMLInputElement).value).toBe("sudo -i");
+    fireEvent.click(screen.getByRole("button", { name: "Add step" }));
+    fireEvent.change(screen.getAllByRole("combobox", { name: /input/ })[1], { target: { value: "credential_password" } });
+    fireEvent.submit(panel().querySelector("form")!);
+    await waitFor(() => expect(updateEntry).toHaveBeenCalledTimes(1));
+    const saved = (updateEntry.mock.calls as unknown as [string, { config?: Record<string, unknown> }][])[0][1];
+    expect(saved.config?.startup).toEqual({
+      enabled: true,
+      steps: [
+        { delaySeconds: 1, inputMode: "text", text: "sudo -i" },
+        { delaySeconds: 2, inputMode: "credential_password" },
+      ],
+    });
+    expect(JSON.stringify(saved.config)).not.toContain("kept-in-vault");
+  });
+
+  it("refuses to enable a password-mode script without a password source", async () => {
+    render(<EntryDialog onClose={vi.fn()} presetType="ssh" />);
+    fireEvent.change(labelWithText("Name*").querySelector("input")!, { target: { value: "lab" } });
+    tab("Credentials");
+    fireEvent.change(labelWithText("Username *").querySelector("input")!, { target: { value: "alice" } });
+    tab("Startup");
+    fireEvent.click(screen.getByRole("checkbox", { name: /Run steps after login/ }));
+    fireEvent.change(screen.getByRole("combobox", { name: /input/ }), { target: { value: "credential_password" } });
+    fireEvent.submit(panel().querySelector("form")!);
+    expect(panel().querySelector("[data-cv-error]")?.textContent).toMatch(/no password or linked credential/);
+    expect(createEntry).not.toHaveBeenCalled();
+  });
+});
+
 describe("EntryDialog opened on a type from a menu", () => {
   it.each([["ssh", "22", "New SSH Entry"], ["rdp", "3389", "New RDP Entry"], ["vnc", "5900", "New VNC Entry"]] as const)(
     "starts a %s entry on its default port",
@@ -429,5 +504,49 @@ describe("EntryDialog while loading an entry", () => {
     expect(within(panel()).queryByRole("button")).toBeNull();
     fireEvent.keyDown(document.body, { key: "Escape" });
     expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe("EntryDialog RDP SOCKS5", () => {
+  const nameField = () => labelWithText("Name*").querySelector("input")!;
+  const nav = () => panel().querySelector("nav")!;
+  const openProxy = () => fireEvent.click(within(nav()).getByRole("button", { name: "Proxy" }));
+  const created = () => (createEntry.mock.calls as unknown as [Record<string, unknown>][]).map((c) => c[0]);
+
+  it("saves an enabled hop without a password", async () => {
+    render(<EntryDialog onClose={vi.fn()} presetType="rdp" />);
+    fireEvent.change(nameField(), { target: { value: "app-01" } });
+    openProxy();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Use a SOCKS5 proxy" }));
+    fireEvent.change(screen.getByLabelText("Proxy host"), { target: { value: "127.0.0.1" } });
+    fireEvent.submit(panel().querySelector("form")!);
+    await vi.waitFor(() => expect(createEntry).toHaveBeenCalledTimes(1));
+    expect(created()[0].config).toMatchObject({
+      proxyEnabled: true,
+      proxyType: "socks5",
+      proxyHost: "127.0.0.1",
+      proxyPort: 1080,
+    });
+    expect(created()[0].config).not.toHaveProperty("password");
+    expect(JSON.stringify(created()[0].config)).not.toMatch(/secret|proxy-pw/);
+  });
+
+  it("refuses SOCKS5 together with a gateway", async () => {
+    useEntryStore.setState({
+      entries: [{ id: "g1", name: "East", entry_type: "credential", credential_type: "rd_gateway", config: { gatewayHostname: "east" } }],
+      createEntry,
+      getEntry,
+      updateEntry,
+    } as never);
+    render(<EntryDialog onClose={vi.fn()} presetType="rdp" />);
+    fireEvent.change(nameField(), { target: { value: "app-01" } });
+    fireEvent.click(within(nav()).getByRole("button", { name: "Gateway" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Gateway" }), { target: { value: "g1" } });
+    openProxy();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Use a SOCKS5 proxy" }));
+    fireEvent.change(screen.getByLabelText("Proxy host"), { target: { value: "127.0.0.1" } });
+    fireEvent.submit(panel().querySelector("form")!);
+    expect(createEntry).not.toHaveBeenCalled();
+    expect(panel().querySelector("[data-cv-dialog-footer] [data-cv-error]")?.textContent).toMatch(/cannot be used together/);
   });
 });

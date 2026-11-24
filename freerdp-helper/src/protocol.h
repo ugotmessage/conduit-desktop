@@ -50,6 +50,22 @@ typedef struct {
     bool bypass_local;
 } GatewayConfig;
 
+/* SOCKS5 client proxy (config.proxy). Password is memory-only. */
+typedef struct {
+    char *type;
+    char *host;
+    int port;
+    char *username;
+    char *password;
+} ProxyConfig;
+
+/* Maps the UI quality preset → FreeRDP connection-type / cache behaviour. */
+typedef enum {
+    PERF_BEST,      /* LAN-class visuals; still keeps NetworkAutoDetect for RTT */
+    PERF_BALANCED,  /* /network:auto — probe bandwidth, then raise quality on LAN */
+    PERF_FAST       /* Prefer responsiveness over clarity */
+} PerformanceMode;
+
 /* Parsed connect configuration */
 typedef struct {
     char *host;
@@ -63,6 +79,7 @@ typedef struct {
     bool skip_cert_verification;
     bool enable_gfx;
     bool enable_h264;
+    PerformanceMode performance_mode;
     DriveConfig *drives;
     int drive_count;
     int desktop_scale_factor;
@@ -70,6 +87,9 @@ typedef struct {
     bool enable_clipboard;
     bool has_gateway;
     GatewayConfig gateway;
+    bool has_proxy;
+    bool proxy_malformed;
+    ProxyConfig proxy;
 } ConnectConfig;
 
 /* Parsed command */
@@ -101,6 +121,9 @@ void protocol_free_command(Command *cmd);
 
 /* Map "auto" | "http" | "rpc" to a transport. Anything else is AUTO. */
 GatewayTransport gateway_transport_from_string(const char *s);
+
+/* Map "best" | "balanced" | "fast" (default balanced). */
+PerformanceMode performance_mode_from_string(const char *s);
 
 /* NULL when a parsed connect config is valid, else a short user-facing message (static string). */
 const char *connect_config_validate(const ConnectConfig *config);

@@ -13,8 +13,21 @@ export interface HelperGatewayConfig {
   bypassLocal: boolean;
 }
 
-export function buildHelperConnectConfig(config: RdpEngineConfig): Record<string, unknown> & { host: string; gateway?: HelperGatewayConfig } {
+export interface HelperProxyConfig {
+  type: 'socks5';
+  host: string;
+  port: number;
+  username?: string;
+  password?: string;
+}
+
+export function buildHelperConnectConfig(config: RdpEngineConfig): Record<string, unknown> & {
+  host: string;
+  gateway?: HelperGatewayConfig;
+  proxy?: HelperProxyConfig;
+} {
   const gw = config.gateway;
+  const px = config.proxy;
   return {
     host: config.hostname || config.host,
     port: config.port,
@@ -27,6 +40,8 @@ export function buildHelperConnectConfig(config: RdpEngineConfig): Record<string
     skipCertVerification: config.skipCertVerification,
     enableGfx: true,
     enableH264: true,
+    /** Drives FreeRDP ConnectionType + GFX cache; balanced enables bandwidth autodetection. */
+    performanceMode: config.performanceMode ?? 'balanced',
     drives: (config.sharedFolders || []).map(f => ({
       name: f.name,
       path: f.path,
@@ -44,6 +59,17 @@ export function buildHelperConnectConfig(config: RdpEngineConfig): Record<string
             domain: gw.domain,
             transport: gw.transport,
             bypassLocal: gw.bypassLocal,
+          },
+        }
+      : {}),
+    ...(px
+      ? {
+          proxy: {
+            type: px.type,
+            host: px.host,
+            port: px.port,
+            ...(px.username !== undefined ? { username: px.username } : {}),
+            ...(px.password !== undefined ? { password: px.password } : {}),
           },
         }
       : {}),

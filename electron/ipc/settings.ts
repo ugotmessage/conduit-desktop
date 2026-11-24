@@ -113,6 +113,8 @@ export interface AppSettings {
   engine_picker_completed: boolean;
   // Personal-vault multi-device sync; no UI, kept for support (docs/MULTI_DEVICE_SYNC.md 5.11)
   personal_sync_enabled: boolean;
+  // Fork opt-in: permit concurrent local-mode vault access via synced file (no service).
+  local_file_sync_unlimited: boolean;
   // Idle auto-lock of the personal vault in minutes; 0 = off
   vault_idle_lock_minutes: number;
   // What opens at startup (docs/AUTO_UNLOCK.md 3.5); null = the last team vault used, else the Vault Hub
@@ -152,6 +154,7 @@ const defaultSettings: AppSettings = {
   analytics_opt_out: false,
   engine_picker_completed: false,
   personal_sync_enabled: true,
+  local_file_sync_unlimited: false,
   vault_idle_lock_minutes: 0,
   startup_vault: null,
 };
@@ -219,6 +222,20 @@ export function readSettings(): AppSettings {
     // Nested merge so files saved before a default existed still get it.
     if (raw.session_defaults_rdp && typeof raw.session_defaults_rdp === 'object' && !Array.isArray(raw.session_defaults_rdp)) {
       parsed.session_defaults_rdp = { ...HARDCODED_RDP_DEFAULTS, ...withoutStaleGatewayKeys(raw.session_defaults_rdp) };
+    }
+    {
+      const rawTerm = raw.session_defaults_terminal;
+      const partial = rawTerm && typeof rawTerm === 'object' && !Array.isArray(rawTerm)
+        ? rawTerm as Partial<TerminalGlobalDefaults>
+        : {};
+      parsed.session_defaults_terminal = {
+        ...HARDCODED_TERMINAL_DEFAULTS,
+        ...partial,
+        // macOS: Ctrl+C interrupts; elsewhere copy-on-selection matches common emulators.
+        ctrlCCopiesSelection: typeof partial.ctrlCCopiesSelection === 'boolean'
+          ? partial.ctrlCCopiesSelection
+          : process.platform !== 'darwin',
+      };
     }
     // Migrate: populate session_defaults_web.engine from legacy default_web_engine
     if (!raw.session_defaults_web && raw.default_web_engine) {

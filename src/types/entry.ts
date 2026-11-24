@@ -1,4 +1,9 @@
 import type { RdpEntryGatewayFields } from "../lib/rdpGateway";
+import type { RdpEntryProxyFields } from "../lib/rdpProxy";
+import type { SshStartupScript } from "../lib/sshStartup";
+
+export type { SshStartupInputMode, SshStartupScript, SshStartupStep } from "../lib/sshStartup";
+export { DEFAULT_SSH_STARTUP } from "../lib/sshStartup";
 
 export type EntryType = 'ssh' | 'rdp' | 'vnc' | 'web' | 'credential' | 'document' | 'command';
 
@@ -10,7 +15,7 @@ export interface SharedFolder {
   readOnly?: boolean;
 }
 
-export interface RdpEntryConfig extends RdpEntryGatewayFields {
+export interface RdpEntryConfig extends RdpEntryGatewayFields, RdpEntryProxyFields {
   resolution: RdpResolution;
   customWidth?: number;
   customHeight?: number;
@@ -108,6 +113,12 @@ export interface TerminalGlobalDefaults {
   cursorBlink: boolean;
   /** An installed font name tried before the built-in fonts; "" uses only the built-in fonts. */
   fontFamily: string;
+  /**
+   * When true, Ctrl+C with a selection copies instead of interrupting.
+   * Platform default when unset: false on macOS (use ⌘C), true elsewhere.
+   * The hardcoded value is only a placeholder; resolveCtrlCCopiesSelection applies the real default.
+   */
+  ctrlCCopiesSelection: boolean;
 }
 
 export const HARDCODED_RDP_DEFAULTS: RdpGlobalDefaults = {
@@ -132,9 +143,15 @@ export const HARDCODED_TERMINAL_DEFAULTS: TerminalGlobalDefaults = {
   scrollback: 10000,
   cursorBlink: true,
   fontFamily: "",
+  ctrlCCopiesSelection: false,
 };
 
 export type SshAuthMethod = 'key' | 'password';
+
+export interface SshEntryConfig {
+  ssh_auth_method?: SshAuthMethod;
+  startup?: SshStartupScript;
+}
 
 export interface SshGlobalDefaults {
   authMethodWhenKeyPresent: SshAuthMethod;

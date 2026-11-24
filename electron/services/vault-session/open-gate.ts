@@ -55,6 +55,9 @@ function logUnconfirmed(ctx: OpenContext, call: string, res: Unconfirmed): void 
 
 /** Step 3: refuses before the password prompt when another device holds the vault (not on take-over). */
 export async function earlyInUseCheck(ctx: OpenContext, loc: VaultLocation, g: GateInput): Promise<void> {
+  // Standalone local-file mode has no account/lease backend. The merge engine still
+  // handles multi-device writes, but the server and in-file single-device gate do not apply.
+  if (ctx.deps.localFileSync === true && !ctx.signedIn) return;
   if (ctx.input.takeover) return;
   const ids = { vaultKey: g.lineageId, deviceId: ctx.config.deviceUuid };
   const bounded = await raceTimeout(ctx.client.peek(ids, EARLY_CHECK_TIMEOUT_MS), EARLY_CHECK_TIMEOUT_MS, ctx.host.timers);

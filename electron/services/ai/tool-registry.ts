@@ -139,7 +139,7 @@ export const TOOL_REGISTRY: ToolRegistryEntry[] = [
       properties: {
         connection_type: { type: 'string', description: 'Connection type: ssh, rdp, vnc' },
         host: { type: 'string', description: 'Host to connect to' },
-        port: { type: 'number', description: 'Port (default depends on type: SSH=22, RDP=3389, VNC=5900)' },
+        port: { type: 'number', description: 'Port. SSH: omit to use ~/.ssh/config Port, then 22. RDP defaults to 3389, VNC to 5900.' },
         credential_id: { type: 'string', description: 'Credential ID from the vault to use for authentication' },
         username: { type: 'string', description: 'Username for authentication (used if credential_id is not provided)' },
         password: { type: 'string', description: 'Password for authentication (used with username if credential_id is not provided)' },

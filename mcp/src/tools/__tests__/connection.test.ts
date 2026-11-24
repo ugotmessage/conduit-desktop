@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
 import type { ConduitClient } from '../../ipc-client.js';
-import { connectionList, connectionOpenEntry } from '../connection.js';
+import { connectionList, connectionOpen, connectionOpenEntry } from '../connection.js';
 
 function makeClient(overrides: Partial<Record<keyof ConduitClient, unknown>>): ConduitClient {
   return overrides as unknown as ConduitClient;
@@ -31,6 +31,35 @@ describe('connection_list owner', () => {
     const { connections } = (await connectionList(client)) as { connections: Array<Record<string, unknown>> };
     expect(connections[0]).not.toHaveProperty('owner');
     expect(connections[0]).not.toHaveProperty('note');
+  });
+});
+
+describe('connection_open SSH port', () => {
+  it('does not default SSH port to 22 before the app reads ssh config', async () => {
+    const connectionOpenFn = vi.fn(async () => ({
+      session_id: 's1',
+      connection_type: 'ssh',
+      host: 'lab-bastion',
+      port: 2222,
+      status: 'connected',
+    }));
+    const client = makeClient({ connectionOpen: connectionOpenFn });
+    const out = await connectionOpen(client, { connection_type: 'ssh', host: 'lab-bastion' });
+    expect(connectionOpenFn).toHaveBeenCalledWith('ssh', 'lab-bastion', null, null, null, null, null);
+    expect(out).toMatchObject({ host: 'lab-bastion', port: 2222 });
+  });
+
+  it('still defaults RDP port to 3389', async () => {
+    const connectionOpenFn = vi.fn(async () => ({
+      session_id: 'r1',
+      connection_type: 'rdp',
+      host: 'win.test',
+      port: 3389,
+      status: 'connected',
+    }));
+    const client = makeClient({ connectionOpen: connectionOpenFn });
+    await connectionOpen(client, { connection_type: 'rdp', host: 'win.test' });
+    expect(connectionOpenFn.mock.calls[0][2]).toBe(3389);
   });
 });
 

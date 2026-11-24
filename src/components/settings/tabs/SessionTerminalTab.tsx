@@ -1,12 +1,40 @@
+import { useState, useEffect } from "react";
 import type { TabProps } from "../SettingsHelpers";
+import { useLayoutStore, findLeaf } from "../../../stores/layoutStore";
+import { useSessionStore } from "../../../stores/sessionStore";
+import { getTerminalRendererMode, setTerminalRendererMode, TERMINAL_RENDERER_EVENT, type TerminalRendererMode } from "../../../lib/terminalRenderer";
 import type { TerminalGlobalDefaults } from "../../../types/entry";
 import { HARDCODED_TERMINAL_DEFAULTS } from "../../../types/entry";
+import { resolveCtrlCCopiesSelection } from "../../../lib/terminalClipboardKeys";
 import { Checkbox, FormField, Select, Slider, TextInput } from "../../ui";
 import { HINT, SECTION_LABEL } from "../settings-styles";
 import TerminalFontField from "./TerminalFontField";
 
+const IS_MAC = typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
+
 export default function SessionTerminalTab({ settings, setSettings }: TabProps) {
-  const defaults: TerminalGlobalDefaults = { ...HARDCODED_TERMINAL_DEFAULTS, ...settings.session_defaults_terminal };
+  const focusedPaneId = useLayoutStore((state) => state.focusedPaneId);
+  const activeSessionId = useLayoutStore((state) => {
+    const pane = state.focusedPaneId ? findLeaf(state.root, state.focusedPaneId) : null;
+    return pane?.activeSessionId ?? null;
+  });
+  const activeType = useSessionStore((state) => state.sessions.find((session) => session.id === activeSessionId)?.type);
+  const isTerminal = activeType === "ssh" || activeType === "local_shell";
+  const [mode, setMode] = useState<TerminalRendererMode>("dom");
+  useEffect(() => {
+    setMode(activeSessionId ? getTerminalRendererMode(activeSessionId) : "dom");
+    const update = (event: Event) => {
+      const detail = (event as CustomEvent<{ sessionId: string; mode: TerminalRendererMode }>).detail;
+      if (detail?.sessionId === activeSessionId) setMode(detail.mode);
+    };
+    document.addEventListener(TERMINAL_RENDERER_EVENT, update);
+    return () => document.removeEventListener(TERMINAL_RENDERER_EVENT, update);
+  }, [activeSessionId]);
+  const defaults: TerminalGlobalDefaults = {
+    ...HARDCODED_TERMINAL_DEFAULTS,
+    ...settings.session_defaults_terminal,
+    ctrlCCopiesSelection: resolveCtrlCCopiesSelection(settings.session_defaults_terminal, IS_MAC),
+  };
 
   const updateTerminal = (partial: Partial<TerminalGlobalDefaults>) => {
     setSettings({
@@ -26,6 +54,24 @@ export default function SessionTerminalTab({ settings, setSettings }: TabProps) 
         </Select>
       </FormField>
 
+      <div className="space-y-3 border-t border-divider pt-4">
+        <FormField label="Current SSH tab renderer" description="Apply immediately to the selected SSH or local terminal in the focused pane. This does not restart the session or erase scrollback.">
+          <Select
+            value={mode}
+            disabled={!isTerminal || !focusedPaneId}
+            onChange={(event) => {
+              if (!activeSessionId || !isTerminal) return;
+              setTerminalRendererMode(activeSessionId, event.target.value as TerminalRendererMode);
+            }}
+          >
+            <option value="auto">Auto — WebGL with DOM fallback</option>
+            <option value="dom">DOM — compatibility (default)</option>
+            <option value="webgl">WebGL — accelerated</option>
+          </Select>
+        </FormField>
+        {!isTerminal && <p className={HINT}>Select an SSH or local terminal tab to enable this control.</p>}
+        <p className={HINT}>Auto falls back to DOM on detected WebGL context loss. If text is black but no context-loss event occurs, manually switch to DOM. The choice lasts for the life of this tab.</p>
+      </div>
       <div className="space-y-4 border-t border-divider pt-4">
         <p className={HINT}>
           Default settings for all terminal sessions. SSH sessions inherit these values.
@@ -67,6 +113,18 @@ export default function SessionTerminalTab({ settings, setSettings }: TabProps) 
         <Checkbox checked={defaults.cursorBlink} onChange={(cursorBlink) => updateTerminal({ cursorBlink })}>
           Cursor Blink
         </Checkbox>
+
+        <Checkbox
+          checked={defaults.ctrlCCopiesSelection}
+          onChange={(ctrlCCopiesSelection) => updateTerminal({ ctrlCCopiesSelection })}
+        >
+          Ctrl+C copies when text is selected
+        </Checkbox>
+        <p className={HINT}>
+          {IS_MAC
+            ? "Off by default on macOS so Ctrl+C always interrupts. Use ⌘C or Ctrl+Shift+C to copy. Turn on to match Windows/Linux terminal emulators."
+            : "On by default: Ctrl+C copies when there is a selection; with no selection it still interrupts. Turn off to always send interrupt."}
+        </p>
       </div>
     </div>
   );

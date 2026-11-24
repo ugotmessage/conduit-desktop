@@ -15,6 +15,7 @@ import type {
   SshAuthMethod,
 } from "../types/entry";
 import { gatewayIdOf } from "./rdpGateway";
+import { proxyCredentialIdOf, readProxyFields } from "./rdpProxy";
 import {
   HARDCODED_RDP_DEFAULTS,
   HARDCODED_WEB_DEFAULTS,
@@ -39,6 +40,18 @@ export function resolveRdpConfig(
     sharedFolders: entryConfig.sharedFolders ?? [],
     enableHighDpi: entryConfig.enableHighDpi ?? globalDefaults.enableHighDpi,
     gatewayId: gatewayIdOf(entryConfig),
+    ...rdpProxyOverrides(entryConfig),
+  };
+}
+
+function rdpProxyOverrides(entryConfig: Partial<RdpEntryConfig>): Partial<RdpEntryConfig> {
+  const proxy = readProxyFields(entryConfig);
+  return {
+    ...(entryConfig.proxyEnabled !== undefined ? { proxyEnabled: entryConfig.proxyEnabled } : {}),
+    ...(entryConfig.proxyType !== undefined ? { proxyType: entryConfig.proxyType } : entryConfig.proxyEnabled === true ? { proxyType: "socks5" as const } : {}),
+    ...(proxy.host ? { proxyHost: proxy.host } : {}),
+    ...(entryConfig.proxyPort !== undefined ? { proxyPort: proxy.portInvalid ? entryConfig.proxyPort : proxy.port } : {}),
+    ...(proxyCredentialIdOf(entryConfig) ? { proxyCredentialId: proxy.credentialId } : {}),
   };
 }
 

@@ -31,7 +31,7 @@ import {
 import type { SessionHost, VaultAccessHost } from '../vault-session/host.js';
 import { createConsoleLogger, nodeRandom } from './host-node.js';
 import { createElectronSyncHost, sendToAll, allWindows, type AuthSource, type SyncableVault, type WindowList } from './host-electron.js';
-import { PERSONAL_SYNC_SETTING, personalSyncEnabled, type SettingsSource } from './host-electron-settings.js';
+import { PERSONAL_SYNC_SETTING, localFileSyncEnabled, personalSyncEnabled, type SettingsSource } from './host-electron-settings.js';
 import { SYNC_LOG_PREFIX, type SyncHost, type SyncLogger, type WaitingState } from './host.js';
 import { FINAL_CYCLE_CAP_MS } from './sync-engine.js';
 import { hasConflict } from './conflicts.js';
@@ -39,6 +39,7 @@ import { TBL } from './types.js';
 import { loadLaunchIdentity, type LaunchIdentity } from './app-sync-identity.js';
 import { openInPlace } from './app-sync-open.js';
 import { devDeviceLimitOverride, devLimitCollaborators } from './app-sync-dev.js';
+import { localFileSyncCollaborators } from './app-sync-local.js';
 import { devIgnoreOwnerTag } from './app-sync-dev-owner.js';
 import { exportClosedLineage, lineageForPath, pendingVaults, type LineageLookupDeps } from './app-sync-lineage.js';
 import { exportUnsynced as exportOpen, sideFileTuples } from './app-sync-actions.js';
@@ -118,6 +119,7 @@ export class AppSyncManager {
   private started: Started | null = null;
   private readonly slot: VaultSlot<OpenedPersonalVault>;
   private openedPath: string | null = null;
+  private localFileSyncSession = false;
   private continueWaiters: (() => void)[] = [];
   /** Lineages whose unsynced changes were exported this launch (5.11 turn-off rule). */
   private readonly exported = new Set<string>();
@@ -170,7 +172,10 @@ export class AppSyncManager {
   /** settings personal_sync_enabled (on by default; no UI, support can turn it off). */
   isEnabled(): boolean {
     try {
-      return personalSyncEnabled(this.deps.settings.read());
+      const settings = this.deps.settings.read();
+      // Concurrent local-file access must always use independent working copies.
+      // Never fall through to openInPlace even if an old support setting disabled sync.
+      return personalSyncEnabled(settings) || localFileSyncEnabled(settings, this.started?.syncHost.account.userId() ?? null);
     } catch (err) {
       this.logger.warn(`${SYNC_LOG_PREFIX} settings unreadable; sync stays on`, { name: (err as Error)?.name ?? 'Error' });
       return true;
@@ -207,15 +212,21 @@ export class AppSyncManager {
       create: req.create === true,
       recoverWorkingCopy: req.recoverWorkingCopy === true,
     };
+    // This opt-in affects only signed-out Local Mode, never an authenticated account
+    // or its server-authoritative plan limit. Read at unlock: changing settings
+    // requires closing and reopening the vault.
+    const localFileSync = localFileSyncEnabled(this.deps.settings.read(), s.syncHost.account.userId());
     const openDeps: OpenDeps = {
       host: s.sessionHost,
       config: s.identity.config,
       progress: this.progress(),
       incarnations: s.identity.incarnations,
       tickets: this.tickets,
-      collaborators: devLimitCollaborators(s.devLimit),
-      ignoreOwnerTag: s.ignoreOwnerTag,
+      collaborators: localFileSync ? localFileSyncCollaborators() : devLimitCollaborators(s.devLimit),
+      ignoreOwnerTag: localFileSync || s.ignoreOwnerTag,
+      localFileSync,
     };
+    this.localFileSyncSession = localFileSync;
     try {
       const opened = await this.slot.open(() => (this.isEnabled() ? openPersonalVault(input, openDeps) : openInPlace(input, openDeps)));
       this.openedPath = path.resolve(input.path);
@@ -258,6 +269,11 @@ export class AppSyncManager {
   /** Opening, closing, open or soft-locked: a lock must run and before-quit must flush. */
   hasSession(): boolean {
     return this.slot.isBusy();
+  }
+
+  /** Includes an unlock in progress, so signing in cannot retain a local-only runtime. */
+  hasLocalFileSyncSession(): boolean {
+    return this.localFileSyncSession && this.hasSession();
   }
 
   isOpening(): boolean {

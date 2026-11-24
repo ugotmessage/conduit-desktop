@@ -6,9 +6,13 @@
 
 import { Client, ClientChannel } from 'ssh2';
 import fs from 'node:fs';
+import type { Socket } from 'node:net';
 import { EventEmitter } from 'node:events';
 import { resolveHostname } from '../dns-resolver.js';
 import { withLocalNetworkHint } from '../local-network.js';
+import type { Socks5ProxyTarget } from './proxy-command.js';
+import { connectSocks5 } from './socks5.js';
+import { SshConfigError } from './ssh-config-error.js';
 
 // ── Config & Auth types ──────────────────────────────────────────────
 
@@ -36,6 +40,11 @@ export interface SshConfig {
   auth: SshAuth;
   timeoutMs?: number;   // default 30 000
   keepaliveMs?: number; // default 60 000
+  /** Local ssh-agent socket (`SSH_AUTH_SOCK`). Set only when ForwardAgent can actually run. */
+  agent?: string;
+  agentForward?: boolean;
+  /** SOCKS5 hop from a supported ProxyCommand. Destination DNS is done by the proxy. */
+  proxy?: Socks5ProxyTarget;
 }
 
 // ── SshSession ───────────────────────────────────────────────────────
@@ -69,7 +78,21 @@ export class SshSession extends EventEmitter {
     const timeoutMs = cfg.timeoutMs ?? 30_000;
     const keepaliveMs = cfg.keepaliveMs ?? 60_000;
 
-    const resolvedHost = await resolveHostname(cfg.host);
+    let sock: Socket | undefined;
+    let connectHost = cfg.host;
+
+    if (cfg.proxy) {
+      // Destination DNS must be done by SOCKS. Never fall back to a direct TCP connect.
+      sock = await connectSocks5({
+        proxyHost: cfg.proxy.proxyHost,
+        proxyPort: cfg.proxy.proxyPort,
+        destinationHost: cfg.host,
+        destinationPort: port,
+        timeoutMs,
+      });
+    } else {
+      connectHost = await resolveHostname(cfg.host);
+    }
 
     return new Promise<void>((resolve, reject) => {
       const onReady = () => {
@@ -79,7 +102,8 @@ export class SshSession extends EventEmitter {
 
       const onError = (err: Error) => {
         cleanup();
-        withLocalNetworkHint(err, resolvedHost)
+        sock?.destroy();
+        withLocalNetworkHint(err, connectHost)
           .then(reject)
           .catch(() => reject(err));
       };
@@ -104,11 +128,21 @@ export class SshSession extends EventEmitter {
       });
 
       const connectOpts: Record<string, unknown> = {
-        host: resolvedHost,
+        host: connectHost,
         port,
         readyTimeout: timeoutMs,
         keepaliveInterval: keepaliveMs,
       };
+
+      if (sock) {
+        connectOpts.sock = sock;
+      }
+      if (cfg.agent) {
+        connectOpts.agent = cfg.agent;
+      }
+      if (cfg.agentForward) {
+        connectOpts.agentForward = true;
+      }
 
       if (cfg.auth.type === 'password') {
         connectOpts.username = cfg.auth.username;
@@ -139,7 +173,18 @@ export class SshSession extends EventEmitter {
           // Normalize CRLF→LF — Windows clipboard may inject \r\n
           connectOpts.privateKey = cfg.auth.keyContent.replace(/\r\n/g, '\n');
         } else if (cfg.auth.keyPath) {
-          connectOpts.privateKey = fs.readFileSync(cfg.auth.keyPath);
+          try {
+            connectOpts.privateKey = fs.readFileSync(cfg.auth.keyPath);
+          } catch (err) {
+            sock?.destroy();
+            reject(
+              new SshConfigError(
+                'IDENTITY_FILE',
+                `Unable to read SSH identity file ${cfg.auth.keyPath}: ${err instanceof Error ? err.message : String(err)}`,
+              ),
+            );
+            return;
+          }
         }
         if (cfg.auth.passphrase) {
           connectOpts.passphrase = cfg.auth.passphrase;
@@ -149,7 +194,15 @@ export class SshSession extends EventEmitter {
       // Accept all host keys (mirrors Rust impl TODO for host key verification)
       connectOpts.hostVerifier = () => true;
 
-      this.client.connect(connectOpts as Parameters<Client['connect']>[0]);
+      try {
+        this.client.connect(connectOpts as Parameters<Client['connect']>[0]);
+        sock?.resume();
+      } catch (err) {
+        cleanup();
+        sock?.destroy();
+        this.client.end();
+        reject(err);
+      }
     });
   }
 

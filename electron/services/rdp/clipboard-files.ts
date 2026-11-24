@@ -206,7 +206,7 @@ async function writeClipboardFilesMacOS(filePaths: string[]): Promise<boolean> {
   // Electron writes one file-URL pasteboard item per path. The old osascript
   // writeObjects approach intermittently dropped items (seen on macOS 27).
   console.log('[clipboard-files] macOS write: using Electron clipboard for', filePaths);
-  const uriList = filePaths.map(p => pathToFileURL(p).href).join('\r\n');
+  const uriList = filePaths.map(p => pathToFileURL(p, { windows: false }).href).join('\r\n');
   await clipboardCall(() => clipboard.write([new ClipboardItem({ [URI_LIST]: uriList })]));
   return true;
 }

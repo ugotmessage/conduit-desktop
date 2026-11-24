@@ -1,0 +1,6 @@
+# Test installers from the PR; never publish vendor update manifests.
+extends: electron-builder.yml
+artifactName: "Conduit-Local-${version}-${os}-${arch}.${ext}"
+mac:
+  identity: "-"
+  notarize: false

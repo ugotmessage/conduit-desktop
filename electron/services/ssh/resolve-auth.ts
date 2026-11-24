@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
 
-interface CredentialData {
+export interface CredentialData {
   username: string | null;
   password: string | null;
   private_key: string | null;
@@ -55,10 +55,11 @@ export function resolveSshAuth(cred: CredentialData, overrideMethod?: string | n
 /**
  * Resolve SSH auth from system defaults (current user + default SSH key).
  */
-export function resolveSshAuthSystem(): SshAuth {
-  const currentUser = os.userInfo().username;
-  const ed25519KeyPath = path.join(os.homedir(), '.ssh', 'id_ed25519');
-  const rsaKeyPath = path.join(os.homedir(), '.ssh', 'id_rsa');
+export function resolveSshAuthSystem(opts?: { username?: string; homedir?: string }): SshAuth {
+  const currentUser = opts?.username || os.userInfo().username;
+  const home = opts?.homedir ?? os.homedir();
+  const ed25519KeyPath = path.join(home, '.ssh', 'id_ed25519');
+  const rsaKeyPath = path.join(home, '.ssh', 'id_rsa');
 
   const keyPath = fs.existsSync(ed25519KeyPath) ? ed25519KeyPath
     : fs.existsSync(rsaKeyPath) ? rsaKeyPath

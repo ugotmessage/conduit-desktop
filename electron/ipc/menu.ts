@@ -6,7 +6,7 @@
  * while allowing full CSS styling to match the app theme.
  */
 
-import { ipcMain, BrowserWindow, screen } from 'electron';
+import { app, ipcMain, BrowserWindow, Menu, screen, type MenuItemConstructorOptions } from 'electron';
 import { AppState } from '../services/state.js';
 import { sanitizeSvg } from './menu-svg.js';
 
@@ -554,4 +554,34 @@ async function showPopupMenu(args: unknown): Promise<string | null> {
 
 export function registerMenuHandlers(): void {
   ipcMain.handle('show_context_menu_popup', (_e, args: unknown) => showPopupMenu(args));
+  ipcMain.handle('show_terminal_definition', (event) => {
+    if (process.platform !== 'darwin' || !BrowserWindow.fromWebContents(event.sender)) return;
+    event.sender.showDefinitionForSelection();
+  });
+  ipcMain.handle('show_terminal_native_menu', (event, args: { sessionId?: string; hasSelection?: boolean }) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win || typeof args?.sessionId !== 'string' || args.sessionId.length > 128) return false;
+    const sessionId = args.sessionId;
+    const items: MenuItemConstructorOptions[] = [
+      { label: 'Copy', enabled: args.hasSelection === true,
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'copy' }) },
+      { label: 'Paste',
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'paste' }) },
+      { type: 'separator' },
+      { label: 'Select All',
+        click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'select_all' }) },
+    ];
+    if (process.platform === 'darwin' && args.hasSelection === true) {
+      items.unshift(
+        { label: app.getLocale().startsWith('zh') ? '查詢定義' : 'Look Up',
+          click: () => event.sender.send('terminal:native-menu-action', { sessionId, action: 'look_up' }) },
+        { type: 'separator' },
+      );
+    }
+    const menu = Menu.buildFromTemplate(items);
+    // Return immediately. Execute the selected command from the click handler
+    // rather than relying on Menu.popup's dismiss callback ordering.
+    menu.popup({ window: win });
+    return true;
+  });
 }

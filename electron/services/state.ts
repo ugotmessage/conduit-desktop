@@ -36,6 +36,7 @@ import { McpGatekeeper } from './mcp-gatekeeper.js';
 import { CommandExecutor } from './command/executor.js';
 import { NetworkVaultWatcher } from './vault/network-watcher.js';
 import { ApprovalManager } from './reveal-approvals.js';
+import { lockPersonalVault } from '../ipc/vault-lock-flow.js';
 
 // ---------- types ----------
 
@@ -232,6 +233,12 @@ export class AppState {
       if (previousUserId !== null && userId === null) {
         this.appSync.signedOut().catch((err: unknown) => {
           console.error('[vault-session] sign-out release failed', { name: err instanceof Error ? err.name : 'Error' });
+        });
+      }
+      if (previousUserId === null && userId !== null && this.appSync.hasLocalFileSyncSession()) {
+        // A fresh unlock must acquire the authenticated lease and enforce ownership/plan limits.
+        void lockPersonalVault(this).catch((err: unknown) => {
+          console.error('[vault-session] locking Local Mode vault after sign-in failed', { name: err instanceof Error ? err.name : 'Error' });
         });
       }
       previousUserId = userId;

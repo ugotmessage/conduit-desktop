@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
-import { WebglAddon } from "@xterm/addon-webgl";
 import { invoke, listen, type UnlistenFn } from "../../lib/electron";
 import { getTerminalTheme } from "../../lib/terminalTheme";
 import { useSessionStore } from "../../stores/sessionStore";
@@ -99,26 +98,9 @@ export default function CommandView({
 
     term.open(termElement);
 
-    try {
-      const loadWebgl = () => {
-        try {
-          const addon = new WebglAddon();
-          addon.onContextLoss(() => {
-            addon.dispose();
-            requestAnimationFrame(() => {
-              term.refresh(0, term.rows - 1);
-              setTimeout(loadWebgl, 200);
-            });
-          });
-          term.loadAddon(addon);
-        } catch {
-          // Canvas fallback
-        }
-      };
-      loadWebgl();
-    } catch {
-      // WebGL not available
-    }
+    // Keep xterm's DOM renderer. Preserved terminals can outlive GPU contexts;
+    // stale WebGL glyph atlases may hide output even while selection still paints.
+    // Do not recreate GPU contexts on timers after a context loss.
 
     fitAddon.fit();
     termRef.current = term;

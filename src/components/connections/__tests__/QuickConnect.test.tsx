@@ -75,6 +75,19 @@ describe("QuickConnect", () => {
     expect(screen.getByPlaceholderText("3389")).toBeInTheDocument();
   });
 
+  it("does not send another entry's startup steps with SSH Quick Connect", async () => {
+    invoke.mockResolvedValueOnce("sess-1");
+    render(<QuickConnect onClose={() => {}} />);
+    fireEvent.change(screen.getByLabelText("Host"), { target: { value: "10.0.0.1" } });
+    fireEvent.change(screen.getByLabelText("Username"), { target: { value: "alice" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Connect" }));
+    });
+    expect(invoke).toHaveBeenCalledWith("ssh_session_create", expect.objectContaining({ host: "10.0.0.1" }));
+    const args = invoke.mock.calls.find((c) => c[0] === "ssh_session_create")?.[1] as Record<string, unknown>;
+    expect(args).not.toHaveProperty("entryConfig");
+  });
+
   it("shows a connection error as a danger callout", async () => {
     invoke.mockRejectedValueOnce(new Error("Host unreachable"));
     render(<QuickConnect onClose={() => {}} />);

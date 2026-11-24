@@ -17,11 +17,50 @@ describe('buildHelperConnectConfig', () => {
   it('omits gateway when there is none', () => {
     const cfg = buildHelperConnectConfig(base);
     expect('gateway' in cfg).toBe(false);
-    expect(cfg).toMatchObject({ host: '10.0.0.5', port: 3389, domain: '', enableGfx: true, drives: [] });
+    expect(cfg).toMatchObject({
+      host: '10.0.0.5', port: 3389, domain: '', enableGfx: true, drives: [],
+      performanceMode: 'balanced',
+    });
+  });
+
+  it('forwards the UI quality preset as performanceMode for bandwidth probing', () => {
+    expect(buildHelperConnectConfig({ ...base, performanceMode: 'best' }).performanceMode).toBe('best');
+    expect(buildHelperConnectConfig({ ...base, performanceMode: 'fast' }).performanceMode).toBe('fast');
   });
 
   it('prefers the hostname alias over the host', () => {
     expect(buildHelperConnectConfig({ ...base, hostname: 'pc01.corp.local' }).host).toBe('pc01.corp.local');
+  });
+
+  it('omits proxy when there is none', () => {
+    expect('proxy' in buildHelperConnectConfig(base)).toBe(false);
+  });
+
+  it('sends an unauthenticated SOCKS5 hop and keeps the target hostname', () => {
+    const cfg = buildHelperConnectConfig({
+      ...base,
+      hostname: 'pc01.corp.local',
+      port: 3390,
+      proxy: { type: 'socks5', host: '127.0.0.1', port: 1080 },
+    });
+    expect(cfg.host).toBe('pc01.corp.local');
+    expect(cfg.port).toBe(3390);
+    expect(cfg.proxy).toEqual({ type: 'socks5', host: '127.0.0.1', port: 1080 });
+    expect(cfg.proxy).not.toHaveProperty('password');
+  });
+
+  it('sends resolved proxy auth only in the helper payload', () => {
+    const cfg = buildHelperConnectConfig({
+      ...base,
+      proxy: { type: 'socks5', host: 'proxy.example', port: 1080, username: 'alice', password: 'proxy-pw' },
+    });
+    expect(cfg.proxy).toEqual({
+      type: 'socks5',
+      host: 'proxy.example',
+      port: 1080,
+      username: 'alice',
+      password: 'proxy-pw',
+    });
   });
 
   it('sends the gateway with host = gateway hostname', () => {

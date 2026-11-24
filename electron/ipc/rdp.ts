@@ -14,6 +14,8 @@ import type { ImageFormat } from '../services/rdp/framebuffer.js';
 import { isFreeRdpAvailable, ensureFreeRdpReady } from '../services/rdp/engines/factory.js';
 import { GatewayConfigError } from '../services/rdp/gateway-config.js';
 import { connectGateway, describeGateway, parseGatewayIdArg } from '../services/rdp/gateway-connect.js';
+import { ProxyConfigError, describeProxy } from '../services/rdp/proxy-config.js';
+import { connectProxy } from '../services/rdp/proxy-connect.js';
 import { rdpLog } from '../services/rdp/rdp-log.js';
 
 export function registerRdpHandlers(): void {
@@ -47,21 +49,40 @@ export function registerRdpHandlers(): void {
     deviceScaleFactor?: number;
     enableClipboard?: boolean;
     gatewayId?: string | null;
+    proxyEnabled?: boolean;
+    proxyType?: string;
+    proxyHost?: string;
+    proxyPort?: number;
+    proxyCredentialId?: string | null;
   }) => {
     // Only the gateway's id crosses IPC; its address and login are read from the vault here.
+    // SOCKS5 host/port ride on the RDP entry; an optional credential id is resolved here.
     let gatewayId: string | undefined;
     let gateway: RdpEngineConfig['gateway'];
+    let proxy: RdpEngineConfig['proxy'];
+    const vault = AppState.getInstance().getActiveVault();
     try {
       gatewayId = parseGatewayIdArg(args.gatewayId);
       gateway = connectGateway(
         gatewayId,
         { username: args.username, password: args.password, domain: args.domain },
-        AppState.getInstance().getActiveVault(),
+        vault,
+      );
+      proxy = connectProxy(
+        {
+          proxyEnabled: args.proxyEnabled,
+          proxyType: args.proxyType,
+          proxyHost: args.proxyHost,
+          proxyPort: args.proxyPort,
+          proxyCredentialId: args.proxyCredentialId ?? undefined,
+        },
+        vault,
+        { gatewayEnabled: Boolean(gateway) },
       );
     } catch (e) {
-      rdpLog(`[RDP] Gateway setup failed: ${e instanceof Error ? e.message : String(e)}`);
+      rdpLog(`[RDP] Hop setup failed: ${e instanceof Error ? e.message : String(e)}`);
       // A plain Error so the renderer shows the message without the class-name prefix.
-      if (e instanceof GatewayConfigError) throw new Error(e.message);
+      if (e instanceof GatewayConfigError || e instanceof ProxyConfigError) throw new Error(e.message);
       throw e;
     }
 
@@ -86,11 +107,12 @@ export function registerRdpHandlers(): void {
       deviceScaleFactor: args.deviceScaleFactor,
       enableClipboard: args.enableClipboard,
       gateway,
+      proxy,
     };
 
     rdpLog(`[RDP] rdp_connect called. sharedFolders=${JSON.stringify(config.sharedFolders)}`);
     rdpLog(`[RDP] Full config: host=${config.host}, port=${config.port}, width=${config.width}, height=${config.height}, enableNla=${config.enableNla}, desktopSF=${config.desktopScaleFactor ?? 100}, deviceSF=${config.deviceScaleFactor ?? 100}`);
-    rdpLog(`[RDP] ${gateway ? describeGateway(gateway) : 'gateway=none'}`);
+    rdpLog(`[RDP] ${gateway ? describeGateway(gateway) : 'gateway=none'} ${proxy ? describeProxy(proxy) : 'proxy=none'}`);
 
     // Ensure FreeRDP helper binary is available (auto-builds if missing)
     await ensureFreeRdpReady();

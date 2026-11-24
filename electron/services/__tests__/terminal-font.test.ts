@@ -4,7 +4,9 @@ import { HARDCODED_TERMINAL_DEFAULTS, withSafeTerminalFont } from '../terminal-f
 
 describe('withSafeTerminalFont', () => {
   it('defaults the terminal font to the built-in fonts', () => {
-    expect(HARDCODED_TERMINAL_DEFAULTS).toEqual({ fontSize: 14, scrollback: 10000, cursorBlink: true, fontFamily: '' });
+    expect(HARDCODED_TERMINAL_DEFAULTS).toEqual({
+      fontSize: 14, scrollback: 10000, cursorBlink: true, fontFamily: '', ctrlCCopiesSelection: false,
+    });
   });
 
   it('keeps a safe font name, trimmed, without changing the input', () => {
