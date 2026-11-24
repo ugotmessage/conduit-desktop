@@ -345,6 +345,7 @@ build_freerdp() {
         -DWITH_JPEG=OFF \
         -DWITH_GFX_H264=ON \
         -DWITH_FFMPEG=ON \
+        -DWITH_DSP_FFMPEG=OFF \
         -DWITH_JSON_DISABLED=ON \
         -DWITH_PCSC=OFF \
         -DWITH_CUPS=OFF \
