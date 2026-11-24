@@ -100,7 +100,10 @@ export default function SessionRdpTab({ settings, setSettings, onApplyDisplaySca
         </Select>
       </FormField>
 
-      <FormField label="Quality">
+      <FormField
+        label="Quality"
+        description="Good probes bandwidth after connect so a fast LAN can raise encode quality. Best forces LAN-class visuals; Low prefers speed on weak links. Proxied sessions keep UDP multitransport off."
+      >
         <Select value={defaults.quality} onChange={(e) => update({ quality: e.target.value as "best" | "good" | "low" })}>
           {QUALITY_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>

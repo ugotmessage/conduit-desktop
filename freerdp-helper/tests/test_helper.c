@@ -136,6 +136,26 @@ static void test_parse_connect_without_gateway(void) {
     CHECK_STR(cmd.data.connect.host, "pc1");
     CHECK(!cmd.data.connect.has_gateway);
     CHECK(cmd.data.connect.gateway.host == NULL);
+    CHECK(cmd.data.connect.performance_mode == PERF_BALANCED);
+    protocol_free_command(&cmd);
+}
+
+static void test_parse_performance_mode(void) {
+    CHECK(performance_mode_from_string("best") == PERF_BEST);
+    CHECK(performance_mode_from_string("fast") == PERF_FAST);
+    CHECK(performance_mode_from_string("balanced") == PERF_BALANCED);
+    CHECK(performance_mode_from_string("bogus") == PERF_BALANCED);
+    CHECK(performance_mode_from_string(NULL) == PERF_BALANCED);
+
+    Command cmd;
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\","
+                     "\"performanceMode\":\"best\"}}", &cmd));
+    CHECK(cmd.data.connect.performance_mode == PERF_BEST);
+    protocol_free_command(&cmd);
+
+    CHECK(parse_line("{\"type\":\"connect\",\"config\":{\"host\":\"pc1\","
+                     "\"performanceMode\":\"fast\"}}", &cmd));
+    CHECK(cmd.data.connect.performance_mode == PERF_FAST);
     protocol_free_command(&cmd);
 }
 
@@ -327,6 +347,7 @@ int main(void) {
     test_error_json_long_message_not_truncated_into_bad_json();
     test_disconnected_json();
     test_parse_connect_without_gateway();
+    test_parse_performance_mode();
     test_parse_connect_with_gateway();
     test_parse_gateway_defaults();
     test_parse_gateway_transport_values();

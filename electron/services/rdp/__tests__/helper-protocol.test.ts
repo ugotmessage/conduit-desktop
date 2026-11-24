@@ -17,7 +17,15 @@ describe('buildHelperConnectConfig', () => {
   it('omits gateway when there is none', () => {
     const cfg = buildHelperConnectConfig(base);
     expect('gateway' in cfg).toBe(false);
-    expect(cfg).toMatchObject({ host: '10.0.0.5', port: 3389, domain: '', enableGfx: true, drives: [] });
+    expect(cfg).toMatchObject({
+      host: '10.0.0.5', port: 3389, domain: '', enableGfx: true, drives: [],
+      performanceMode: 'balanced',
+    });
+  });
+
+  it('forwards the UI quality preset as performanceMode for bandwidth probing', () => {
+    expect(buildHelperConnectConfig({ ...base, performanceMode: 'best' }).performanceMode).toBe('best');
+    expect(buildHelperConnectConfig({ ...base, performanceMode: 'fast' }).performanceMode).toBe('fast');
   });
 
   it('prefers the hostname alias over the host', () => {

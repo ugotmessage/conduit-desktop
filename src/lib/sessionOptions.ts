@@ -29,9 +29,9 @@ export const COLOR_DEPTH_OPTIONS: { value: number; label: string }[] = [
 ];
 
 export const QUALITY_OPTIONS: { value: string; label: string }[] = [
-  { value: "best", label: "Best" },
-  { value: "good", label: "Good" },
-  { value: "low", label: "Low" },
+  { value: "best", label: "Best — LAN-class" },
+  { value: "good", label: "Good — auto-detect bandwidth" },
+  { value: "low", label: "Low — prefer speed" },
 ];
 
 export const SOUND_OPTIONS: { value: string; label: string }[] = [

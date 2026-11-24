@@ -40,6 +40,8 @@ export function buildHelperConnectConfig(config: RdpEngineConfig): Record<string
     skipCertVerification: config.skipCertVerification,
     enableGfx: true,
     enableH264: true,
+    /** Drives FreeRDP ConnectionType + GFX cache; balanced enables bandwidth autodetection. */
+    performanceMode: config.performanceMode ?? 'balanced',
     drives: (config.sharedFolders || []).map(f => ({
       name: f.name,
       path: f.path,

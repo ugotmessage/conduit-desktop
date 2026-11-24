@@ -54,6 +54,12 @@ GatewayTransport gateway_transport_from_string(const char *s) {
     return GATEWAY_TRANSPORT_AUTO;
 }
 
+PerformanceMode performance_mode_from_string(const char *s) {
+    if (s && strcmp(s, "best") == 0) return PERF_BEST;
+    if (s && strcmp(s, "fast") == 0) return PERF_FAST;
+    return PERF_BALANCED;
+}
+
 const char *connect_config_validate(const ConnectConfig *config) {
     if (config->has_proxy && config->has_gateway) {
         return "SOCKS5 proxy and RD Gateway cannot be used together.";
@@ -197,6 +203,8 @@ bool protocol_read_command(Command *cmd) {
             cmd->data.connect.skip_cert_verification = cjson_get_bool(config, "skipCertVerification", false);
             cmd->data.connect.enable_gfx = cjson_get_bool(config, "enableGfx", true);
             cmd->data.connect.enable_h264 = cjson_get_bool(config, "enableH264", true);
+            cmd->data.connect.performance_mode =
+                performance_mode_from_string(cjson_get_string(config, "performanceMode"));
 
             cmd->data.connect.desktop_scale_factor = cjson_get_int(config, "desktopScaleFactor", 100);
             cmd->data.connect.device_scale_factor = cjson_get_int(config, "deviceScaleFactor", 100);

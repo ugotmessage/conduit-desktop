@@ -342,9 +342,9 @@ static BOOL apply_proxy_settings(rdpSettings *settings, const ProxyConfig *px) {
         !freerdp_settings_set_string(settings, FreeRDP_ProxyPassword, px->password)) {
         return FALSE;
     }
-    /* Disable UDP transports, but keep network autodetection on the RDP TCP stream.
-     * Servers may send continuous RTT requests after login; FreeRDP disconnects
-     * on those requests if NetworkAutoDetect is disabled. */
+    /* Disable UDP transports through SOCKS, but keep network autodetection on the
+     * RDP TCP stream. Servers may send continuous RTT requests after login;
+     * FreeRDP disconnects on those requests if NetworkAutoDetect is disabled. */
     if (!freerdp_settings_set_bool(settings, FreeRDP_NetworkAutoDetect, TRUE) ||
         !freerdp_settings_set_bool(settings, FreeRDP_SupportMultitransport, FALSE) ||
         !freerdp_settings_set_uint32(settings, FreeRDP_MultitransportFlags, 0)) {
@@ -473,16 +473,52 @@ freerdp *connection_init(const ConnectConfig *config) {
         return NULL;
     }
 
-    /* ── Network ── */
-    if (!config->has_proxy) {
-        freerdp_settings_set_bool(settings, FreeRDP_NetworkAutoDetect, TRUE);
+    /* ── Network / quality (match xfreerdp /network:auto + optional /multitransport) ──
+     * Windows picks GFX encode quality from measured bandwidth. Without ConnectionType
+     * AUTODETECT/LAN performance flags and (on direct links) multitransport, the server
+     * often stays at a conservative encode — the "noisy" look on a fast LAN. */
+    {
+        UINT32 conn_type = CONNECTION_TYPE_AUTODETECT;
+        if (config->performance_mode == PERF_BEST) conn_type = CONNECTION_TYPE_LAN;
+        else if (config->performance_mode == PERF_FAST) conn_type = CONNECTION_TYPE_WAN;
+
+        /* Always keep NetworkAutoDetect (RTT); proxy path already set it above. */
+        if (!freerdp_settings_set_bool(settings, FreeRDP_NetworkAutoDetect, TRUE) ||
+            !freerdp_set_connection_type(settings, conn_type)) {
+            fprintf(stderr, "[conduit-freerdp] Failed to apply network autodetection settings\n");
+            freerdp_context_free(instance);
+            freerdp_free(instance);
+            return NULL;
+        }
+
+        /* Direct TCP only: advertise multitransport so bandwidth / QoE measure can use UDP.
+         * SOCKS/Gateway keep UDP off (apply_proxy_settings; gateway has no UDP path here). */
+        if (!config->has_proxy && !config->has_gateway) {
+            if (!freerdp_settings_set_bool(settings, FreeRDP_SupportMultitransport, TRUE) ||
+                !freerdp_settings_set_uint32(settings, FreeRDP_MultitransportFlags,
+                    TRANSPORT_TYPE_UDP_FECR | TRANSPORT_TYPE_UDP_FECL | TRANSPORT_TYPE_UDP_PREFERRED)) {
+                fprintf(stderr, "[conduit-freerdp] Failed to enable multitransport for bandwidth probing\n");
+                freerdp_context_free(instance);
+                freerdp_free(instance);
+                return NULL;
+            }
+        }
+
+        fprintf(stderr,
+            "[conduit-freerdp] Network: autoDetect=1 connectionType=%u multitransport=%s performance=%s\n",
+            (unsigned)conn_type,
+            (!config->has_proxy && !config->has_gateway) ? "on" : "off",
+            config->performance_mode == PERF_BEST ? "best" :
+            config->performance_mode == PERF_FAST ? "fast" : "balanced");
     }
 
     /* ── GFX pipeline (H.264/AVC + progressive codec) ── */
     if (config->enable_gfx) {
         freerdp_settings_set_bool(settings, FreeRDP_SupportGraphicsPipeline, TRUE);
         freerdp_settings_set_bool(settings, FreeRDP_GfxThinClient, FALSE);
-        freerdp_settings_set_bool(settings, FreeRDP_GfxSmallCache, TRUE);
+        /* Large cache on LAN / autodetect so high bandwidth can keep quality. */
+        freerdp_settings_set_bool(settings, FreeRDP_GfxSmallCache,
+            config->performance_mode == PERF_FAST ? TRUE : FALSE);
     }
     if (config->enable_h264) {
         freerdp_settings_set_bool(settings, FreeRDP_GfxH264, TRUE);

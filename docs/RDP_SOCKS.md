@@ -50,7 +50,7 @@ Malformed or unknown helper `proxy` objects are rejected. The helper does not dr
 - A live login through a real RDP server, NLA, or TLS certificate after the SOCKS `CONNECT` (native smoke stops at the SOCKS handshake).
 - SOCKS5 and RD Gateway chained together (explicitly refused).
 - HTTP, SOCKS4, or other proxy types.
-- UDP / RDP multitransport around the proxy (disabled; network autodetection stays enabled on the proxied RDP TCP stream).
+- UDP / RDP multitransport around the proxy (disabled; network autodetection stays enabled on the proxied RDP TCP stream). Direct (non-proxy) sessions advertise multitransport so Windows can probe bandwidth and raise GFX quality on a LAN.
 - Reading `~/.ssh/config` for RDP.
 - iOS.
 - Authenticated SOCKS against a proxy that is not a vault login credential.
